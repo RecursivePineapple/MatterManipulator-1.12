@@ -106,7 +106,10 @@ jobs:
 
       - name: Checkout Maven Repo
         working-directory: /home/runner/work/
-        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
+          git config user.name "Release Tags (${{ github.repository }})"
+          git config user.email "N/A"
 
       - name: Publish to Maven
         run: ./gradlew --build-cache --info --stacktrace -Dmaven.repo.local=/home/runner/work/mvn-repo assemble publishToMavenLocal -x test
@@ -115,7 +118,6 @@ jobs:
       - name: Update Maven Repo
         working-directory: /home/runner/work/mvn-repo
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
           git add -A
           git commit -m "Add ${{ github.ref_name }}"
           git push
