@@ -1357,11 +1357,6 @@ publishing {
     repositories {
         maven {
             url = customMavenPublishUrl
-            allowInsecureProtocol = !customMavenPublishUrl.startsWith('https')
-            credentials {
-                username = providers.environmentVariable('MAVEN_USER').getOrElse('NONE')
-                password = providers.environmentVariable('MAVEN_PASSWORD').getOrElse('NONE')
-            }
         }
     }
 }
