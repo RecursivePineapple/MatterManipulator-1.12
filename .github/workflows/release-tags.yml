@@ -105,12 +105,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Maven Repo
-        uses: actions/checkout@v5
-        with:
-          repository: RecursivePineapple/mvn-repo
-          path: /home/runner/work/mvn-repo
-
-      - name: Checkout Maven Repo
         working-directory: /home/runner/work/
         run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
 
