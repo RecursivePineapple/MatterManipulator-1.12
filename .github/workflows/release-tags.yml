@@ -108,6 +108,6 @@ jobs:
         run: ./gradlew --build-cache --info --stacktrace assemble publish -x test
         continue-on-error: true
         env:
-          GITHUB_PACKAGE_TARGET: ${{ github.GITHUB_REPOSITORY }}
+          GITHUB_PACKAGE_TARGET: ${{ github.repository }}
           MAVEN_USERNAME: ${{ github.actor }}
           MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
