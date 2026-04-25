@@ -114,8 +114,9 @@ jobs:
         continue-on-error: true
 
       - name: Update Maven Repo
-        uses: devops-infra/action-commit-push@v1.1.0
         working-directory: /home/runner/work/RecursivePineapple/mvn-repo
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit_message: "Push ${{ github.ref_name }}"
+        run: |
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
+          git add -A
+          git commit -m "Add ${{ github.ref_name }}"
+          git push
