@@ -110,7 +110,7 @@ jobs:
           git clone https://x-access-token:${{ secrets.MVN_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
 
       - name: Publish to Maven
-        run: ./gradlew --build-cache --info --stacktrace -Dmaven.repo.local=/home/runner/work/mvn-repo assemble publishToMavenLocal -x test
+        run: ./gradlew --build-cache --info --stacktrace -PcustomMavenPublishUrl=file:///home/runner/work/mvn-repo assemble publish -x test
         continue-on-error: true
 
       - name: Update Maven Repo
