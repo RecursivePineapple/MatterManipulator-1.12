@@ -110,6 +110,10 @@ jobs:
           repository: RecursivePineapple/mvn-repo
           path: /home/runner/work/mvn-repo
 
+      - name: Checkout Maven Repo
+        working-directory: /home/runner/work/
+        run: git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
+
       - name: Publish to Maven
         run: ./gradlew --build-cache --info --stacktrace -Dmaven.repo.local=/home/runner/work/mvn-repo assemble publishToMavenLocal -x test
         continue-on-error: true
