@@ -16,40 +16,15 @@ import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 import org.jetbrains.annotations.NotNull;
 
-import matter_manipulator.common.utils.enums.ExtendedFacing;
 import mcp.MethodsReturnNonnullByDefault;
 
 public class MachineModelRegistry {
 
     /// Known machine model paths. {path with $machine suffix -> base model}
     private static final Map<ResourceLocation, ResourceLocation> MODELS = new HashMap<>();
-
-    public static final IUnlistedProperty<ExtendedFacing> EXTENDED_FACING = new IUnlistedProperty<>() {
-
-        @Override
-        public String getName() {
-            return "extended-facing";
-        }
-
-        @Override
-        public boolean isValid(ExtendedFacing value) {
-            return true;
-        }
-
-        @Override
-        public Class<ExtendedFacing> getType() {
-            return ExtendedFacing.class;
-        }
-
-        @Override
-        public String valueToString(ExtendedFacing value) {
-            return value.name().toLowerCase();
-        }
-    };
 
     public static void init() {
         ModelLoaderRegistry.registerLoader(new MachineModelLoader());
@@ -103,7 +78,7 @@ public class MachineModelRegistry {
 
         @Override
         public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-            return new BakedMachineModel(base.bake(base.getDefaultState(), format, bakedTextureGetter), format, EXTENDED_FACING);
+            return new BakedMachineModel(base.bake(base.getDefaultState(), format, bakedTextureGetter), format, MachineModelProperty.EXTENDED_FACING);
         }
     }
 }

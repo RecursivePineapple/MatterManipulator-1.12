@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import matter_manipulator.CommonProxy;
 import matter_manipulator.Tags;
-import matter_manipulator.client.rendering.models.MachineModelRegistry;
+import matter_manipulator.client.rendering.models.MachineModelProperty;
 import matter_manipulator.common.uplink.TileUplinkController;
 import matter_manipulator.common.uplink.UplinkState;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
@@ -95,7 +95,7 @@ public class BlockUplinkController extends BlockContainer {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new ExtendedBlockState(this, new IProperty[] { STATE }, new IUnlistedProperty[] { MachineModelRegistry.EXTENDED_FACING });
+        return new ExtendedBlockState(this, new IProperty[] { STATE }, new IUnlistedProperty[] { MachineModelProperty.EXTENDED_FACING });
     }
 
     @Override
@@ -114,6 +114,6 @@ public class BlockUplinkController extends BlockContainer {
         TileUplinkController controller = (TileUplinkController) world.getTileEntity(pos);
 
         return ((IExtendedBlockState) state)
-            .withProperty(MachineModelRegistry.EXTENDED_FACING, controller.getOrientation());
+            .withProperty(MachineModelProperty.EXTENDED_FACING, controller.getOrientation());
     }
 }
