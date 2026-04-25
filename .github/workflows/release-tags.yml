@@ -12,3 +12,10 @@ jobs:
   release-tags:
     uses: GTNewHorizons/GTNH-Actions-Workflows/.github/workflows/release-tags.yml@master
     secrets: inherit
+    permissions:
+      packages: write
+      contents: read
+    env:
+      GITHUB_PACKAGE_TARGET: ${{ github.GITHUB_REPOSITORY }}
+      MAVEN_USERNAME: ${{ github.actor }}
+      MAVEN_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
