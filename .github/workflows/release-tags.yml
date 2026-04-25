@@ -105,16 +105,17 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Maven Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: RecursivePineapple/mvn-repo
+          path: /home/runner/work/mvn-repo
 
       - name: Publish to Maven
-        run: ./gradlew --build-cache --info --stacktrace -Dmaven.repo.local=/home/runner/work/RecursivePineapple/mvn-repo assemble publishToMavenLocal -x test
+        run: ./gradlew --build-cache --info --stacktrace -Dmaven.repo.local=/home/runner/work/mvn-repo assemble publishToMavenLocal -x test
         continue-on-error: true
 
       - name: Update Maven Repo
-        working-directory: /home/runner/work/RecursivePineapple/mvn-repo
+        working-directory: /home/runner/work/mvn-repo
         run: |
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/RecursivePineapple/mvn-repo.git
           git add -A
