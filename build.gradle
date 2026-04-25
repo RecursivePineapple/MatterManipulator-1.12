@@ -1336,7 +1336,6 @@ def addModrinthDep(String scope, String type, String name) {
 }
 
 String publishedVersion = version
-String githubPackagesTarget = providers.environmentVariable('GITHUB_PACKAGE_TARGET').getOrNull()
 
 publishing {
     publications {
@@ -1357,8 +1356,8 @@ publishing {
 
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/${githubPackagesTarget}")
+            url = customMavenPublishUrl
+            allowInsecureProtocol = !customMavenPublishUrl.startsWith('https')
             credentials {
                 username = providers.environmentVariable('MAVEN_USER').getOrElse('NONE')
                 password = providers.environmentVariable('MAVEN_PASSWORD').getOrElse('NONE')
