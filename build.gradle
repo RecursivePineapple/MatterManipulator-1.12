@@ -1336,7 +1336,7 @@ def addModrinthDep(String scope, String type, String name) {
 }
 
 String publishedVersion = version
-String githubPackagesTarget = providers.environmentVariable('GITHUB_PACKAGE_TARGET')
+String githubPackagesTarget = providers.environmentVariable('GITHUB_PACKAGE_TARGET').getOrNull()
 
 publishing {
     publications {
