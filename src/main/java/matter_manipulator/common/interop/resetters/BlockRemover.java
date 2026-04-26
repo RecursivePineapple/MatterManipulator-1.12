@@ -38,16 +38,20 @@ public class BlockRemover implements BlockResetter {
 
         boolean isOre = false;
 
-        for (int id : OreDictionary.getOreIDs(stack.toStackFast(1))) {
-            if (OreDictionary.getOreName(id).startsWith("ore")) {
-                isOre = true;
-                break;
+        ItemStack stackFast = stack.toStackFast(1);
+
+        if (!stackFast.isEmpty()) {
+            for (int id : OreDictionary.getOreIDs(stackFast)) {
+                if (OreDictionary.getOreName(id).startsWith("ore")) {
+                    isOre = true;
+                    break;
+                }
             }
         }
 
         List<ResourceStack> resources = new ArrayList<>();
 
-        try (var guard = BlockCaptureDrops.mm$captureDrops(world, resources::addAll)) {
+        try (var ignored = BlockCaptureDrops.mm$captureDrops(world, resources::addAll)) {
             NonNullList<ItemStack> drops = NonNullList.create();
 
             state.getBlock().getDrops(drops, world, pos, state, 0);

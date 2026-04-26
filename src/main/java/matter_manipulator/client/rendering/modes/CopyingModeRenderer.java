@@ -24,12 +24,14 @@ public class CopyingModeRenderer extends StandardModeRenderer<CopyingConfig, Sta
 
         if (Location.areCompatible(config.copyA, config.copyB)) {
             if (config.copyA.worldId == context.getWorld().provider.getDimension()) {
-                context.drawBox(config.getCopyVisualDeltas(), MMRenderUtils.BLUE);
+                var box = config.getCopyVisualDeltas();
+                if (box != null) context.drawBox(box, MMRenderUtils.BLUE);
             }
         }
 
         if (Location.isInWorld(config.paste, context.getWorld())) {
-            context.drawBox(config.getPasteVisualDeltas(), MMRenderUtils.ORANGE);
+            var box = config.getPasteVisualDeltas();
+            if (box != null) context.drawBox(box, MMRenderUtils.ORANGE);
         }
     }
 }

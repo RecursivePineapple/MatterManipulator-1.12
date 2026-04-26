@@ -26,7 +26,7 @@ public class CopyingConfig {
     public Transform transform = new Transform();
 
     public Vector3i calculateStack(Vector3i lookingAt) {
-        if (!Location.areCompatible(copyA, copyB)) return new Vector3i(1);
+        if (!Location.areCompatible(copyA, copyB, paste)) return new Vector3i(1);
 
         Vector3i array = new Vector3i(lookingAt).sub(paste);
 
@@ -57,9 +57,7 @@ public class CopyingConfig {
             aabb.scale(stack.x, stack.y, stack.z);
         }
 
-        if (this.transform != null) {
-            this.transform.apply(aabb);
-        }
+        this.transform.apply(aabb);
 
         return aabb;
     }
