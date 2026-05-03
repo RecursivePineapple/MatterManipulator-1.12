@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -145,24 +144,6 @@ public class StandardBuild implements IPendingBlockBuildable {
                 }
             }
 
-            // Check block dependencies for things like levers by placing it in a fake world and mocking a block update.
-            // If it removes itself, then it can't be placed here yet.
-            proxiedWorld.overrides.clear();
-            proxiedWorld.setBlockState(pos, pendingState);
-            pendingState.getBlock().neighborChanged(pendingState, proxiedWorld, pos, Blocks.AIR, pos.add(0, 1, 0));
-
-            if (proxiedWorld.getBlockState(pos) != pendingState) {
-                pendingBlocks.addLast(pendingBlocks.removeFirst());
-                shuffleCount++;
-
-                // if we've shuffled every block, then we'll never be able to place any of them
-                if (shuffleCount > pendingBlocks.size()) {
-                    break;
-                } else {
-                    continue;
-                }
-            }
-
             if (!visited.add(pos)) {
                 MMMod.LOG.warn("Tried to place block twice! {}", pendingBlock);
                 pendingBlocks.removeFirst();
@@ -171,12 +152,23 @@ public class StandardBuild implements IPendingBlockBuildable {
 
             placingContext.setTarget(pos, pendingBlock.spec);
 
-            ResourceStack existingResource = existing.getResource();
-
             EnumSet<ApplyResult> result = EnumSet.noneOf(ApplyResult.class);
 
             // If there's already a block at this location, we need to remove it if it's different
-            if (!existing.isAir() && !ResourceStack.areStacksEqual(pendingResource, existingResource)) {
+            if (!existing.isAir() && !pendingBlock.spec.matches(existing)) {
+                if (!pendingBlock.spec.canPlaceAt(proxiedWorld, pos)) {
+                    pendingBlocks.addLast(pendingBlocks.removeFirst());
+                    visited.remove(pos);
+                    shuffleCount++;
+
+                    // if we've shuffled every block, then we'll never be able to place any of them
+                    if (shuffleCount > pendingBlocks.size()) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+
                 placingContext.removeBlock();
                 result.add(ApplyResult.DidSomething);
 
@@ -224,11 +216,6 @@ public class StandardBuild implements IPendingBlockBuildable {
             }
 
             pendingBlocks.remove();
-
-            if (result.contains(ApplyResult.DidSomething) || result.contains(ApplyResult.Wrenched)) {
-                quota--;
-            }
-
             quota--;
         }
 

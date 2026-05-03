@@ -5,6 +5,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import org.jetbrains.annotations.NotNull;
+
 import matter_manipulator.core.interop.BlockAdapter;
 import matter_manipulator.core.item.ItemStackLike;
 import matter_manipulator.core.resources.ResourceStack;
@@ -25,12 +27,12 @@ public class AirBlockAdapter implements BlockAdapter {
     }
 
     @Override
-    public ResourceStack getResourceForm(IBlockState state) {
+    public @NotNull ResourceStack getResourceForm(IBlockState state) {
         return new ItemStackWrapper(ItemStack.EMPTY);
     }
 
     @Override
-    public IBlockState getBlockForm(ResourceStack stack) {
+    public @NotNull IBlockState getBlockForm(ResourceStack stack) {
         return Blocks.AIR.getDefaultState();
     }
 }

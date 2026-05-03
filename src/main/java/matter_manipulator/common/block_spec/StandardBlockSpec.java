@@ -6,14 +6,17 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.MMMod;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
+import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.IBlockSpec;
 import matter_manipulator.core.block_spec.IBlockSpecLoader;
@@ -45,9 +48,13 @@ public class StandardBlockSpec implements IBlockSpec {
         return StandardBlockSpecLoader.INSTANCE;
     }
 
+    private @Nullable BlockAdapter getBlockAdapter() {
+        return MMRegistriesInternal.getBlockAdapter(state);
+    }
+
     @Override
     public boolean isValid() {
-        return MMRegistriesInternal.getBlockAdapter(state) != null;
+        return getBlockAdapter() != null;
     }
 
     @Override
@@ -59,7 +66,7 @@ public class StandardBlockSpec implements IBlockSpec {
     public ResourceStack getResource() {
         if (hasResource) return resource;
 
-        BlockAdapter adapter = MMRegistriesInternal.getBlockAdapter(state);
+        BlockAdapter adapter = getBlockAdapter();
 
         if (adapter == null) {
             MMMod.LOG.warn("Could not determine stack form of the following IBlockState because an adapter for this state does not exist: {}", state);
@@ -70,6 +77,25 @@ public class StandardBlockSpec implements IBlockSpec {
         hasResource = true;
 
         return resource;
+    }
+
+    @Override
+    public boolean canPlaceAt(ProxiedWorld world, BlockPos pos) {
+        var adapter = getBlockAdapter();
+
+        return adapter != null && adapter.canPlaceAt(world, pos, this.state);
+    }
+
+    @Override
+    public boolean matches(IBlockSpec other) {
+        if (!(other instanceof StandardBlockSpec standard)) return false;
+
+        var ourAdapter = this.getBlockAdapter();
+        var theirAdapter = standard.getBlockAdapter();
+
+        if (ourAdapter == null || ourAdapter != theirAdapter) return false;
+
+        return ourAdapter.areMatch(this, other);
     }
 
     @Override
@@ -96,29 +122,34 @@ public class StandardBlockSpec implements IBlockSpec {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public ApplyResult place(BlockPlacingContext context) {
-        BlockAdapter adapter = MMRegistriesInternal.getBlockAdapter(state);
+        BlockAdapter adapter = getBlockAdapter();
 
         if (adapter == null) return ApplyResult.Error;
 
         ResourceStack stack = adapter.getResourceForm(context.getSpec().getBlockState());
 
         ResourceProvider resource = context.resource(stack.getResource());
+        ResourceStack extracted = null;
 
-        ResourceStack extracted = resource.extract(stack);
+        if (!stack.isEmpty()) {
+            extracted = resource.extract(stack);
 
-        if (ResourceStack.getStackAmount(extracted) != ResourceStack.getStackAmount(stack)) {
-            // We couldn't extract the right amount of items/fluids/etc. Reinsert whatever we got and try again later.
-            resource.insert(extracted);
-            context.extractionFailure(stack);
-            return ApplyResult.Retry;
+            if (ResourceStack.getStackAmount(extracted) != ResourceStack.getStackAmount(stack)) {
+                // We couldn't extract the right amount of items/fluids/etc. Reinsert whatever we got and try again later.
+                resource.insert(extracted);
+                context.extractionFailure(stack);
+                return ApplyResult.Retry;
+            }
         }
 
-        ApplyResult result = adapter.place(context.getWorld(), context.getPos(), stack);
+        ApplyResult result = adapter.place(context, stack);
 
         switch (result) {
             case DidNothing, NotApplicable, Retry, Error -> {
-                // For whatever reason the adapter couldn't place the block, so we have to reinsert it.
-                resource.insert(extracted);
+                if (!stack.isEmpty()) {
+                    // For whatever reason the adapter couldn't place the block, so we have to reinsert it.
+                    resource.insert(extracted);
+                }
             }
             default -> {
 

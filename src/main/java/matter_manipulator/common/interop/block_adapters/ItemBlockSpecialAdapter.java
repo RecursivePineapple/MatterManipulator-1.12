@@ -6,6 +6,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemBlockSpecial;
 import net.minecraft.item.ItemStack;
 
+import org.jetbrains.annotations.NotNull;
+
 import matter_manipulator.core.interop.BlockAdapter;
 import matter_manipulator.core.item.ItemStackLike;
 import matter_manipulator.core.resources.ResourceStack;
@@ -24,7 +26,7 @@ public class ItemBlockSpecialAdapter implements BlockAdapter {
     }
 
     @Override
-    public ResourceStack getResourceForm(IBlockState state) {
+    public @NotNull ResourceStack getResourceForm(IBlockState state) {
         return new ItemStackWrapper(new ItemStack(
             state.getBlock().getItemDropped(state, ThreadLocalRandom.current(), 0),
             state.getBlock().quantityDropped(ThreadLocalRandom.current()),
@@ -32,7 +34,7 @@ public class ItemBlockSpecialAdapter implements BlockAdapter {
     }
 
     @Override
-    public IBlockState getBlockForm(ResourceStack resource) {
+    public @NotNull IBlockState getBlockForm(ResourceStack resource) {
         if (!(resource instanceof ItemStackLike itemStack)) return null;
 
         ItemBlockSpecial item = (ItemBlockSpecial) itemStack.getItem();

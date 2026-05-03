@@ -5,11 +5,13 @@ import java.util.EnumSet;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.ApiStatus.NonExtendable;
 
 import matter_manipulator.common.block_spec.StandardBlockSpec;
 import matter_manipulator.common.utils.math.Transform;
+import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
@@ -28,6 +30,11 @@ public interface IBlockSpec {
 
     IBlockState getBlockState();
     ResourceStack getResource();
+
+    /// Checks if this spec can be placed at the given location.
+    boolean canPlaceAt(ProxiedWorld world, BlockPos pos);
+    
+    boolean matches(IBlockSpec other);
 
     Localized getDisplayName();
 
