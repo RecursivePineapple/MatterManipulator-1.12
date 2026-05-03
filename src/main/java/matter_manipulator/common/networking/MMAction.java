@@ -121,5 +121,7 @@ public class MMAction extends MMPacketEncoder<ActionPacket> {
         } else {
             MMMod.LOG.warn("Not running callback for packet {} (should be client: {}, is client: {}, player: {})", id, shouldBeClient, isClient, player);
         }
+
+        player = null;
     }
 }
