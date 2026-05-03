@@ -78,9 +78,7 @@ jobs:
       - name: Release under current tag
         run: |
           PRERELEASE_FLAG=""
-          # DreamAssemblerXXL unfortunately breaks if prereleases are tagged as such on GitHub, so we only check for
-          # $SNAPSHOT here.
-          if [[ "$SNAPSHOT" == "true" ]]; then
+          if [[ "$SNAPSHOT" == "true" || "$PRERELEASE" == "true" ]]; then
             PRERELEASE_FLAG="--prerelease"
           fi
           CHANGELOG_OVERRIDE=".changelogs/${RELEASE_VERSION}.md"
@@ -91,11 +89,7 @@ jobs:
           else
             echo "Generating changelog notes..."
             export "CHANGELOG_FILE=$(mktemp --suffix=.md)"
-            echo "CHANGELOG_FILE=${CHANGELOG_FILE}" >> $GITHUB_ENV
-            gh api --method POST -H "Accept: application/vnd.github+json" \
-              "/repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
-              -f tag_name="${RELEASE_VERSION}" \
-              --jq ".body" > "${CHANGELOG_FILE}"
+            git log $(git describe --always --tags $(git rev-parse ${RELEASE_VERSION}~1))..${RELEASE_VERSION} --pretty='%h %s (%an, %ah)' > "${CHANGELOG_FILE}"
           fi
           cat "${CHANGELOG_FILE}"
           gh release create "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}" ${PRERELEASE_FLAG} ./build/libs/*.jar
