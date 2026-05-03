@@ -65,6 +65,16 @@ public class ProxiedWorld extends DummyWorld {
         return 15;
     }
 
+    @Override
+    public int getLight(BlockPos pos, boolean checkNeighbors) {
+        return base.getLight(pos, checkNeighbors);
+    }
+
+    @Override
+    public int getLight(BlockPos pos) {
+        return base.getLight(pos);
+    }
+
     @Method(modid = Mods.Names.ALFHEIM)
     public int alfheim$getLight(BlockPos pos, boolean checkNeighbors) {
         return 15;
