@@ -2,8 +2,7 @@ package matter_manipulator.common.resources.item.ios;
 
 import java.util.Optional;
 
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.ItemStackHandler;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +21,7 @@ public class PlayerInventoryItemStackIOFactory implements ResourceIOFactory<Item
 
     @Override
     public Optional<ItemStackIO> getIO(ManipulatorContext context, IDataStorage storage) {
-        InventoryPlayer inv = context.getRealPlayer().inventory;
+        var inv = context.getRealPlayer().inventory.mainInventory;
 
         return Optional.of(new ItemStackIO() {
 
@@ -55,7 +54,7 @@ public class PlayerInventoryItemStackIOFactory implements ResourceIOFactory<Item
                     public ItemStackIterator build() {
                         if (patterns) return ItemStackIterator.EMPTY;
 
-                        return new ItemHandlerIterator(new InvWrapper(inv), filter);
+                        return new ItemHandlerIterator(new ItemStackHandler(inv), filter);
                     }
                 };
             }
