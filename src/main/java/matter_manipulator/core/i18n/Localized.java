@@ -5,14 +5,11 @@ import java.util.Collection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
-
 import net.minecraftforge.fluids.FluidStack;
 
 import matter_manipulator.MatterManipulator;
-import matter_manipulator.Tags;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.networking.MMActionWithPayload;
 import matter_manipulator.common.networking.MMPacketBuffer;
@@ -29,8 +26,15 @@ import matter_manipulator.common.utils.MCUtils;
 public class Localized {
 
     public static final MMActionWithPayload<Localized> CHAT = MMActionWithPayload.client(
-        new ResourceLocation(Tags.MODNAME, "chat"),
-        (player, packet) -> packet.sendChat(player), Localized::encode,
+        MatterManipulator.loc("chat"),
+        (player, packet) -> packet.sendChat(player),
+        Localized::encode,
+        Localized::new);
+
+    public static final MMActionWithPayload<Localized> ACTION_CHAT = MMActionWithPayload.client(
+        MatterManipulator.loc("action-chat"),
+        (player, packet) -> packet.sendActionChat(player),
+        Localized::encode,
         Localized::new);
 
     public Object key;
@@ -168,6 +172,14 @@ public class Localized {
             CHAT.sendToPlayer(playerMP, this);
         } else {
             player.sendStatusMessage(new TextComponentString(MCUtils.processFormatStacks(this.toString())), false);
+        }
+    }
+
+    public void sendActionChat(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP playerMP) {
+            ACTION_CHAT.sendToPlayer(playerMP, this);
+        } else {
+            player.sendStatusMessage(new TextComponentString(MCUtils.processFormatStacks(this.toString())), true);
         }
     }
 

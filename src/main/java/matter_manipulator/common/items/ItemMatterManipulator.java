@@ -59,6 +59,7 @@ import matter_manipulator.common.ui.ManipulatorRadialMenuUI;
 import matter_manipulator.common.ui.ManipulatorUIFactory;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.core.building.Buildable;
+import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.manipulator_resource.EnergyManipulatorResource;
 import matter_manipulator.core.meta.MetadataContainer;
 import matter_manipulator.core.modes.ManipulatorMode;
@@ -359,14 +360,14 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                     MatterManipulator.LOG.error("Could not wait for build to compile", e);
                     // Fatal
                     container.done = true;
-                    MCUtils.sendErrorToPlayer(player, MCUtils.translate("mm.info.error.build_compile_crash"));
+                    MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.build_compile_crash"));
                 } catch (TimeoutException e) {
                     // Not finished, do nothing
                 }
             }
 
             if (ticksUsed > 40 && ticksUsed % 20 == 0) {
-                MCUtils.sendErrorToPlayer(player, MCUtils.translate("mm.info.error.build_compile_waiting"));
+                MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.build_compile_waiting"));
             }
         }
 
@@ -388,7 +389,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                     }
                 } catch (Throwable t) {
                     MatterManipulator.LOG.error("Could not place blocks", t);
-                    MCUtils.sendErrorToPlayer(player, MCUtils.translate("mm.info.error.build_place_crash"));
+                    MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.build_place_crash"));
                 }
             }
         }

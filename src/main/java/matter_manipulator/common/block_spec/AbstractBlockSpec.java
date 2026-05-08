@@ -12,6 +12,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.EqualsAndHashCode;
@@ -113,8 +115,16 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
     }
 
     @Override
-    public Localized getDisplayName() {
-        Localized name = getResource().getName();
+    public @NotNull Localized getDisplayName() {
+        ResourceStack stack = getResource();
+
+        Localized name;
+
+        if (stack.isEmpty()) {
+            name = new Localized("tile.air.name");
+        } else {
+            name = stack.getName();
+        }
 
         List<Localized> details = new ArrayList<>();
 

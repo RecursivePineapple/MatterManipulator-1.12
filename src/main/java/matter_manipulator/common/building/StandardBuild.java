@@ -232,9 +232,9 @@ public class StandardBuild implements PendingBlockBuildable {
 
         if (quota == placeSpeed) {
             if (pendingBlocks.isEmpty()) {
-                MCUtils.sendInfoToPlayer(placingContext.getRealPlayer(), MCUtils.translate("mm.info.finished_placing"));
+                MCUtils.sendInfoToPlayer(placingContext.getRealPlayer(), new Localized("mm.info.finished_placing"));
             } else {
-                MCUtils.sendErrorToPlayer(placingContext.getRealPlayer(), MCUtils.translate("mm.info.error.could_not_place", pendingBlocks.size()));
+                MCUtils.sendErrorToPlayer(placingContext.getRealPlayer(), new Localized("mm.info.error.could_not_place", pendingBlocks.size()));
             }
 
             this.done = true;

@@ -3,9 +3,12 @@ package matter_manipulator.common.block_spec.specs;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
+import org.jetbrains.annotations.NotNull;
+
 import matter_manipulator.common.block_spec.SingletonBlockSpec;
 import matter_manipulator.common.block_spec.adapters.AirBlockSpecAdapter;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 
@@ -28,5 +31,10 @@ public class AirBlockSpec extends SingletonBlockSpec {
     @Override
     public ResourceStack getResource() {
         return IntItemResourceStack.EMPTY;
+    }
+
+    @Override
+    public @NotNull Localized getDisplayName() {
+        return new Localized("tile.air.name");
     }
 }

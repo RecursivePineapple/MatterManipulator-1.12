@@ -55,16 +55,32 @@ public class MCUtils {
         player.sendStatusMessage(new TextComponentString(processFormatStacks(RED + msg)), true);
     }
 
+    public static void sendErrorToPlayer(EntityPlayer player, Localized msg) {
+        new Localized("mm.misc.colored", RED, msg).sendActionChat(player);
+    }
+
     public static void sendWarningToPlayer(EntityPlayer player, String msg) {
         player.sendStatusMessage(new TextComponentString(processFormatStacks(GOLD + msg)), true);
+    }
+
+    public static void sendWarningToPlayer(EntityPlayer player, Localized msg) {
+        new Localized("mm.misc.colored", GOLD, msg).sendActionChat(player);
     }
 
     public static void sendInfoToPlayer(EntityPlayer player, String msg) {
         player.sendStatusMessage(new TextComponentString(processFormatStacks(DARK_GRAY + msg)), true);
     }
 
+    public static void sendInfoToPlayer(EntityPlayer player, Localized msg) {
+        new Localized("mm.misc.colored", DARK_GRAY, msg).sendActionChat(player);
+    }
+
     public static void sendChatToPlayer(EntityPlayer player, String msg) {
         player.sendStatusMessage(new TextComponentString(msg), true);
+    }
+
+    public static void sendChatToPlayer(EntityPlayer player, Localized msg) {
+        msg.sendActionChat(player);
     }
 
     public static String translate(String key, Object... args) {

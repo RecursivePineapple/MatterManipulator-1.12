@@ -79,7 +79,7 @@ public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildabl
 
             BlockPos pos = pendingBlock.toPos();
 
-            if (pendingBlock.spec.isAir() && world.isAirBlock(pos)) continue;
+            if (pendingBlock.spec == null || pendingBlock.spec.isAir() && world.isAirBlock(pos)) continue;
 
             if (++i > RenderingConfig.maxHints) break;
 

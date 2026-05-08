@@ -7,6 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.ApiStatus.NonExtendable;
+import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.block_spec.specs.AirBlockSpec;
 import matter_manipulator.common.utils.math.Transform;
@@ -40,7 +41,7 @@ public interface BlockSpec {
     /// Checks if this spec can be placed at the given location.
     boolean canPlaceAt(ProxiedWorld world, BlockPos pos);
 
-    Localized getDisplayName();
+    @NotNull Localized getDisplayName();
 
     void transform(Transform transform);
 

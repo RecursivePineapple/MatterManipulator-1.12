@@ -26,6 +26,7 @@ import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.util.Coroutine;
 
 @EqualsAndHashCode
@@ -58,6 +59,10 @@ public class GeometryConfig implements GeometryBlockPalette {
     }
 
     public void updateBlock(BlockSelect blockSelect, BlockSpec spec, boolean printChat, EntityPlayer player) {
+        if (spec == null) {
+            spec = BlockSpec.AIR;
+        }
+
         switch (blockSelect) {
             case ALL -> {
                 this.faces = spec;
@@ -79,16 +84,16 @@ public class GeometryConfig implements GeometryBlockPalette {
             }
         }
 
-        if (printChat) {
-            String name = switch (blockSelect) {
-                case ALL ->  MCUtils.translate("mm.info.geom.all");
-                case FACES ->  MCUtils.translate("mm.info.geom.faces");
-                case EDGES ->  MCUtils.translate("mm.info.geom.edges");
-                case CORNERS ->  MCUtils.translate("mm.info.geom.corners");
-                case VOLUMES ->  MCUtils.translate("mm.info.geom.volumes");
+        if (printChat && player.world.isRemote) {
+            var name = switch (blockSelect) {
+                case ALL ->  new Localized("mm.info.geom.all");
+                case FACES ->  new Localized("mm.info.geom.faces");
+                case EDGES ->  new Localized("mm.info.geom.edges");
+                case CORNERS ->  new Localized("mm.info.geom.corners");
+                case VOLUMES ->  new Localized("mm.info.geom.volumes");
             };
 
-            MCUtils.sendInfoToPlayer(player, MCUtils.translate("mm.info.set", name, spec.getDisplayName().toString()));
+            MCUtils.sendInfoToPlayer(player, new Localized("mm.info.set", name, spec.getDisplayName()));
         }
     }
 

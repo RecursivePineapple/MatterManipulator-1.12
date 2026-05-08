@@ -1,11 +1,14 @@
 package matter_manipulator.common.block_spec;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+
+import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
@@ -77,8 +80,8 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
     }
 
     @Override
-    public Localized getDisplayName() {
-        return getResource().getName();
+    public @NotNull Localized getDisplayName() {
+        return Objects.requireNonNull(getResource().getName(), "getResource().getName() cannot equal null");
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
