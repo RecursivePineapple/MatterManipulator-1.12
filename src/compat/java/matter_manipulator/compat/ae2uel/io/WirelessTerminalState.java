@@ -29,7 +29,7 @@ import appeng.tile.networking.TileWireless;
 import appeng.tile.qnb.TileQuantumBridge;
 import appeng.util.Platform;
 import com.github.bsideup.jabel.Desugar;
-import matter_manipulator.compat.ae2uel.util.InvSlotHandle;
+import matter_manipulator.compat.util.InvSlotHandle;
 
 @Desugar
 public record WirelessTerminalState(InvSlotHandle slot, IWirelessTermHandler handler, TileSecurityStation securityStation,

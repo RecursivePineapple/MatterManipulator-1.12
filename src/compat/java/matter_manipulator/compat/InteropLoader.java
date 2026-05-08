@@ -5,6 +5,7 @@ import java.util.List;
 
 import matter_manipulator.compat.ae2uel.AE2UELInteropPlugin;
 import matter_manipulator.compat.eio.EIOInteropPlugin;
+import matter_manipulator.compat.emc.ProjectEInteropPlugin;
 import matter_manipulator.core.misc.Reflected;
 
 public class InteropLoader {
@@ -41,6 +42,10 @@ public class InteropLoader {
 
         if (Mods.EnderIO.isModLoaded()) {
             PLUGINS.add(new EIOInteropPlugin());
+        }
+
+        if (Mods.ProjectEX.isModLoaded()) {
+            PLUGINS.add(new ProjectEInteropPlugin());
         }
     }
 }

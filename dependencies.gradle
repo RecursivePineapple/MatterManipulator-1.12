@@ -46,6 +46,8 @@ def ae2uel = false;
 def gtce = false;
 def gtceu = false;
 def rftools = false;
+def emc = false;
+def aa = false;
 
 dependencies {
     shadowImplementation("it.unimi.dsi:fastutil:8.5.15") // Apache 2.0
@@ -80,14 +82,18 @@ project.afterEvaluate {
         // Mods
         addCompat(eio, "crazypants:enderio:5.3.72")
         addCompat(ae2uel, rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
-        addCompat(gtceu, rfg.deobf("curse.maven:gtce-tj-edition-597032:5721346"))
+        addCompat(gtce, rfg.deobf("curse.maven:gtce-tj-edition-597032:5721346"))
         addCompat(rftools, rfg.deobf("curse.maven:rftools-224641:2861573"))
+        addCompat(gtceu, rfg.deobf("curse.maven:gregtech-ce-unofficial-557242:5519022"))
+        addCompat(emc, rfg.deobf("curse.maven:projecte-226410:2702991"))
+        addCompat(emc, rfg.deobf("curse.maven:projectex-311378:3014173"))
+        addCompat(aa, rfg.deobf("curse.maven:actually-additions-228404:3117927"))
 
         // Libraries needed by mods
         compatCompileOnly("team.chisel.ctm:CTM:MC1.12.2-1.0.2.31")
         addCompat(eio, "com.enderio:endercore:0.5.78")
         addCompat(ae2uel, rfg.deobf("curse.maven:baubles-227083:2518667"))
-        addCompat(gtceu, rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848"))
+        addCompat(gtce, rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848"))
         addCompat(rftools, rfg.deobf("curse.maven:mcjtylib-233105:2745846"))
     }
 }

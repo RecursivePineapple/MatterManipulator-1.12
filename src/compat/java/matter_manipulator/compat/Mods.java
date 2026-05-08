@@ -68,6 +68,8 @@ public enum Mods {
     NuclearCraftOverhauled(Names.NUCLEAR_CRAFT, versionContains("2o")),
     OpenComputers(Names.OPEN_COMPUTERS),
     ProjectRedCore(Names.PROJECT_RED_CORE),
+    ProjectE(Names.PROJECT_E),
+    ProjectEX(Names.PROJECT_EX),
     Railcraft(Names.RAILCRAFT),
     RefinedStorage(Names.REFINED_STORAGE),
     TechReborn(Names.TECH_REBORN),
@@ -144,6 +146,8 @@ public enum Mods {
         public static final String NUCLEAR_CRAFT = "nuclearcraft";
         public static final String OPEN_COMPUTERS = "opencomputers";
         public static final String PROJECT_RED_CORE = "projred-core";
+        public static final String PROJECT_E = "projecte";
+        public static final String PROJECT_EX = "projectex";
         public static final String RAILCRAFT = "railcraft";
         public static final String REFINED_STORAGE = "refinedstorage";
         public static final String TECH_REBORN = "techreborn";

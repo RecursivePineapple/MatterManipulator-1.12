@@ -1,4 +1,4 @@
-package matter_manipulator.compat.ae2uel.util;
+package matter_manipulator.compat.util;
 
 import java.util.function.Predicate;
 
