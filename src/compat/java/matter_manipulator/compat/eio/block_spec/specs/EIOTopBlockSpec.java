@@ -1,12 +1,12 @@
-package matter_manipulator.common.block_spec.specs;
+package matter_manipulator.compat.eio.block_spec.specs;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 
 import crazypants.enderio.base.machine.base.block.BlockMachineExtension;
 import matter_manipulator.common.block_spec.AbstractBlockSpec;
-import matter_manipulator.common.block_spec.adapters.EIOTopBlockSpecAdapter;
 import matter_manipulator.common.utils.world.ProxiedWorld;
+import matter_manipulator.compat.eio.block_spec.adapters.EIOTopBlockSpecAdapter;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;

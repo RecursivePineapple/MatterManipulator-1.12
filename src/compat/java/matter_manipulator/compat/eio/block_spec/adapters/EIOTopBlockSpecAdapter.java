@@ -1,4 +1,4 @@
-package matter_manipulator.common.block_spec.adapters;
+package matter_manipulator.compat.eio.block_spec.adapters;
 
 import net.minecraft.block.state.IBlockState;
 
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import crazypants.enderio.base.machine.base.block.BlockMachineExtension;
-import matter_manipulator.common.block_spec.specs.EIOTopBlockSpec;
+import matter_manipulator.compat.eio.block_spec.specs.EIOTopBlockSpec;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.BlockSpecLoader;

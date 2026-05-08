@@ -225,3 +225,10 @@ building=Building
 mm.recipe.upgrades=Manipulator Upgrades
 
 itemGroup.matter-manipulator=Matter Manipulator
+
+# AE2UEL Compat Chat Messages
+mm+ae2uel.chat.cannot_install_part=Cannot install part %s on side %s
+mm+ae2uel.chat.cannot_install_cable=Cannot install cable %s
+
+mm+ae2uel.chat.not_facade=Item is not facade: %s
+mm+ae2uel.chat.cannot_install_facade=Cannot install facade: %s

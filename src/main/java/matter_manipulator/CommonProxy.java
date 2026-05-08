@@ -1,5 +1,7 @@
 package matter_manipulator;
 
+import java.lang.reflect.InvocationTargetException;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -51,14 +53,28 @@ public class CommonProxy {
         MMNetwork.init();
         GuiManager.registerFactory(ManipulatorUIFactory.INSTANCE);
         MMKeybinds.init();
+
+        try {
+            Class.forName("matter_manipulator.compat.InteropLoader").getMethod("preInit").invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void init(FMLInitializationEvent event) {
-
+        try {
+            Class.forName("matter_manipulator.compat.InteropLoader").getMethod("init").invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void postInit(FMLPostInitializationEvent event) {
-
+        try {
+            Class.forName("matter_manipulator.compat.InteropLoader").getMethod("postInit").invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void serverStarting(FMLServerStartingEvent event) {

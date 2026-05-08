@@ -6,13 +6,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.border.WorldBorder;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.Optional.Method;
 
 import com.cleanroommc.modularui.utils.fakeworld.DummyWorld;
 import dev.redstudio.alfheim.lighting.LightingEngine;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import matter_manipulator.common.utils.Mods;
 
 @SuppressWarnings("NullableProblems")
 public class FakeWorld extends DummyWorld {
@@ -29,7 +29,7 @@ public class FakeWorld extends DummyWorld {
         blocks.defaultReturnValue(Blocks.AIR.getDefaultState());
 
         // De-allocate alfheim lighting engine
-        if (Mods.Alfheim.isModLoaded()) {
+        if (Loader.isModLoaded("alfheim")) {
             ObfuscationReflectionHelper.setPrivateValue(World.class, this, null,
                 "alfheim$lightingEngine");
         }
@@ -58,23 +58,23 @@ public class FakeWorld extends DummyWorld {
     }
 
     @Override
-    @Method(modid = Mods.Names.ALFHEIM)
+    @Method(modid = "alfheim")
     public World init() {
         return this;
     }
 
     @Override
-    @Method(modid = Mods.Names.ALFHEIM)
+    @Method(modid = "alfheim")
     public int getLightFromNeighborsFor(EnumSkyBlock type, BlockPos pos) {
         return 15;
     }
 
-    @Method(modid = Mods.Names.ALFHEIM)
+    @Method(modid = "alfheim")
     public int alfheim$getLight(BlockPos pos, boolean checkNeighbors) {
         return 15;
     }
 
-    @Method(modid = Mods.Names.ALFHEIM)
+    @Method(modid = "alfheim")
     public LightingEngine getAlfheim$lightingEngine() {
         return null;
     }

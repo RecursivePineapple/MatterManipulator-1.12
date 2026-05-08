@@ -40,24 +40,17 @@
 
 def asmVersion = "9.7"
 
-dependencies {
-//    implementation("com.github.GTNewHorizons:StructureLib:1.4.24:dev")
-//    implementation("com.github.GTNewHorizons:GTNHLib:0.8.32:dev")
+// Make sure these are false before comitting
+def eio = false;
+def ae2uel = false;
+def gtce = false;
+def gtceu = false;
+def rftools = false;
 
+dependencies {
     shadowImplementation("it.unimi.dsi:fastutil:8.5.15") // Apache 2.0
 
     api("com.cleanroommc:modularui:3.1.5") { transitive = false }
-
-    // For charging
-//    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:mcjtylib-233105:2745846"))
-//    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:rftools-224641:2861573"))
-
-//    devOnlyNonPublishable(rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
-
-//    devOnlyNonPublishable("com.enderio:endercore:0.5.78")
-    // https://mvnrepository.com/artifact/team.chisel.ctm/CTM
-//    compileOnly("team.chisel.ctm:CTM:MC1.12.2-1.0.2.31")
-//    devOnlyNonPublishable("crazypants:enderio:5.3.72")
 
     compileOnly("com.google.auto.value:auto-value-annotations:1.10.1") { transitive = false }
     annotationProcessor("com.google.auto.value:auto-value:1.10.1")
@@ -70,4 +63,31 @@ dependencies {
 
     testImplementation(platform('org.junit:junit-bom:5.9.2'))
     testImplementation('org.junit.jupiter:junit-jupiter')
+}
+
+project.afterEvaluate {
+    dependencies {
+        def addCompat = {
+            enabled, spec -> {
+                compatCompileOnly(spec);
+
+                if (enabled) {
+                    runtimeOnly(spec);
+                }
+            }
+        };
+
+        // Mods
+        addCompat(eio, "crazypants:enderio:5.3.72")
+        addCompat(ae2uel, rfg.deobf("curse.maven:ae2-extended-life-570458:5378163"))
+        addCompat(gtceu, rfg.deobf("curse.maven:gtce-tj-edition-597032:5721346"))
+        addCompat(rftools, rfg.deobf("curse.maven:rftools-224641:2861573"))
+
+        // Libraries needed by mods
+        compatCompileOnly("team.chisel.ctm:CTM:MC1.12.2-1.0.2.31")
+        addCompat(eio, "com.enderio:endercore:0.5.78")
+        addCompat(ae2uel, rfg.deobf("curse.maven:baubles-227083:2518667"))
+        addCompat(gtceu, rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848"))
+        addCompat(rftools, rfg.deobf("curse.maven:mcjtylib-233105:2745846"))
+    }
 }

@@ -730,18 +730,50 @@ sourceSets {
     external {
         java {
             srcDir 'src/external/java'
+
+            compileClasspath += patchedMc.output + mcLauncher.output + sourceSets.injectedTags.output
+            runtimeClasspath += patchedMc.output + mcLauncher.output + sourceSets.injectedTags.output
         }
     }
     main {
         compileClasspath += sourceSets.external.output
         runtimeClasspath += sourceSets.external.output
     }
+    compat {
+        java {
+            srcDir 'src/compat/java'
+
+            compileClasspath += sourceSets.main.output + sourceSets.external.output + patchedMc.output + mcLauncher.output + sourceSets.injectedTags.output
+            runtimeClasspath += sourceSets.main.output + sourceSets.external.output + patchedMc.output + mcLauncher.output + sourceSets.injectedTags.output
+        }
+    }
+}
+
+// Inherit the config of `main` into `external`.
+configurations.each { cfg ->
+    if (!cfg.name.startsWith('external')) return
+    def suffix = cfg.name.substring('external'.length())
+    if (suffix.isEmpty()) return
+    def mainCfg = configurations.findByName(suffix[0].toLowerCase() + suffix[1..-1])
+    if (mainCfg != null) cfg.extendsFrom(mainCfg)
+}
+
+// Inherit the config of `main` into `compat`.
+configurations.each { cfg ->
+    if (!cfg.name.startsWith('compat')) return
+    def suffix = cfg.name.substring('compat'.length())
+    if (suffix.isEmpty()) return
+    def mainCfg = configurations.findByName(suffix[0].toLowerCase() + suffix[1..-1])
+    if (mainCfg != null) cfg.extendsFrom(mainCfg)
 }
 
 jar {
     manifest {
         attributes(getManifestAttributes())
     }
+
+    from sourceSets.compat.output
+    dependsOn compatClasses
 
     // Add all embedded dependencies into the jar
     from provider {
@@ -810,6 +842,8 @@ if (usesShadowedDependencies.toBoolean()) {
                 project.configurations.shadowImplementation,
                 project.configurations.shadowCompile
         ]
+        from sourceSets.compat.output
+        dependsOn compatClasses
         archiveClassifier.set('dev')
         if (relocateShadowedDependencies.toBoolean()) {
             relocationPrefix = modGroup + '.shadow'
