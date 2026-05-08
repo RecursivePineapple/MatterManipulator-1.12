@@ -318,12 +318,12 @@ public class GeometryConfig implements GeometryBlockPalette {
             @Override
             public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
                 return ctx -> {
-                    Vector3i a = config.a;
-                    Vector3i b = config.b;
+                    Vector3i min = new Vector3i(config.a).min(config.b);
+                    Vector3i max = new Vector3i(config.a).max(config.b);
 
                     XSTR rng = new XSTR(config.hashCode());
 
-                    ArrayList<PendingBlock> blocks = GeometryModeSphere.iterateSphere(config, context.getWorld(), a.x, a.y, a.z, b.x, b.y, b.z);
+                    ArrayList<PendingBlock> blocks = GeometryModeSphere.iterateSphere(config, context.getWorld(), min.x, min.y, min.z, max.x, max.y, max.z);
 
                     ctx.stop(new StandardBuild(new ArrayDeque<>(blocks)));
                 };
