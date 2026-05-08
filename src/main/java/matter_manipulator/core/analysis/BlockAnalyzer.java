@@ -13,8 +13,8 @@ import org.joml.Vector3i;
 import com.github.bsideup.jabel.Desugar;
 import matter_manipulator.GlobalMMConfig.DebugConfig;
 import matter_manipulator.MMMod;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
 import matter_manipulator.common.context.AnalysisContextImpl;
+import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.core.block_spec.IBlockSpec;
@@ -54,7 +54,7 @@ public class BlockAnalyzer {
 
                 analysisContext.setPos(pos);
 
-                IBlockSpec spec = StandardBlockSpec.fromWorld(analysisContext);
+                IBlockSpec spec = MMRegistriesInternal.getFullBlockSpec(analysisContext);
 
                 analysis.add(new PendingBlock(world, pos.getX() - a.x, pos.getY() - a.y, pos.getZ() - a.z, spec));
             }

@@ -24,11 +24,6 @@ public class AnalysisContextImpl extends ManipulatorContextImpl implements Block
     }
 
     @Override
-    public World getWorld() {
-        return world;
-    }
-
-    @Override
     public BlockPos getPos() {
         return pos;
     }

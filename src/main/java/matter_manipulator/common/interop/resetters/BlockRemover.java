@@ -12,9 +12,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.oredict.OreDictionary;
 
-import matter_manipulator.core.context.ManipulatorContext;
+import org.jetbrains.annotations.NotNull;
+
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.interop.BlockAdapter;
+import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.item.ItemStackLike;
 import matter_manipulator.core.resources.ResourceStack;
@@ -24,17 +26,19 @@ import matter_manipulator.mixin.BlockCaptureDrops;
 public class BlockRemover implements BlockResetter {
 
     @Override
-    public List<ResourceStack> resetBlock(ManipulatorContext context, BlockPos pos) {
+    public @NotNull List<ResourceStack> resetBlock(@NotNull TargetedManipulatorContext context) {
         World world = context.getWorld();
+        IBlockState state = context.getBlockState();
+        BlockPos pos = context.getPos();
 
-        IBlockState state = world.getBlockState(pos);
+        if (state.getBlockHardness(world, pos) < 0) return Collections.emptyList();
 
-        BlockAdapter adapter = MMRegistriesInternal.getBlockAdapter(state);
+        IBlockSpec spec = MMRegistriesInternal.getPartialBlockSpec(context);
 
         // Something strange that the MM doesn't understand
-        if (adapter == null) return Collections.emptyList();
+        if (spec == null) return Collections.emptyList();
         // A fluid or something
-        if (!(adapter.getResourceForm(state) instanceof ItemStackLike stack)) return Collections.emptyList();
+        if (!(spec.getResource() instanceof ItemStackLike stack)) return Collections.emptyList();
 
         boolean isOre = false;
 

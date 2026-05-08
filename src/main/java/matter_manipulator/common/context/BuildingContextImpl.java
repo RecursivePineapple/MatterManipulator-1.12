@@ -171,7 +171,7 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
         List<ResourceStack> drops = new ArrayList<>();
 
         for (BlockResetter resetter : MMRegistriesInternal.BLOCK_RESETTERS.sorted()) {
-            drops.addAll(resetter.resetBlock(this, this.pos));
+            drops.addAll(resetter.resetBlock(this));
         }
 
         insert(drops);

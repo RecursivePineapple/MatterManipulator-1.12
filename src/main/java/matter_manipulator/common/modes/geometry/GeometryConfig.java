@@ -11,9 +11,8 @@ import org.joml.Vector3i;
 
 import lombok.EqualsAndHashCode;
 import matter_manipulator.client.rendering.MMRenderUtils;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
 import matter_manipulator.common.building.StandardBuild;
-import matter_manipulator.common.context.AnalysisContextImpl;
+import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.modes.geometry.shapes.GeometryBlockPalette;
 import matter_manipulator.common.modes.geometry.shapes.GeometryModeCube;
 import matter_manipulator.common.modes.geometry.shapes.GeometryModeCylinder;
@@ -162,9 +161,7 @@ public class GeometryConfig implements GeometryBlockPalette {
                 var hit = context.getHitResult();
 
                 if (hit != null) {
-                    AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-                    analysisContext.setPos(hit.getBlockPos());
-                    selected = StandardBlockSpec.fromWorld(analysisContext);
+                    selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
                 }
 
                 config.updateBlock(BlockSelect.ALL, selected, !forPreview, context.getRealPlayer());
@@ -186,9 +183,7 @@ public class GeometryConfig implements GeometryBlockPalette {
                 var hit = context.getHitResult();
 
                 if (hit != null) {
-                    AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-                    analysisContext.setPos(hit.getBlockPos());
-                    selected = StandardBlockSpec.fromWorld(analysisContext);
+                    selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
                 }
 
                 config.updateBlock(BlockSelect.FACES, selected, !forPreview, context.getRealPlayer());
@@ -210,9 +205,7 @@ public class GeometryConfig implements GeometryBlockPalette {
                 var hit = context.getHitResult();
 
                 if (hit != null) {
-                    AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-                    analysisContext.setPos(hit.getBlockPos());
-                    selected = StandardBlockSpec.fromWorld(analysisContext);
+                    selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
                 }
 
                 config.updateBlock(BlockSelect.EDGES, selected, !forPreview, context.getRealPlayer());
@@ -234,9 +227,7 @@ public class GeometryConfig implements GeometryBlockPalette {
                 var hit = context.getHitResult();
 
                 if (hit != null) {
-                    AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-                    analysisContext.setPos(hit.getBlockPos());
-                    selected = StandardBlockSpec.fromWorld(analysisContext);
+                    selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
                 }
 
                 config.updateBlock(BlockSelect.CORNERS, selected, !forPreview, context.getRealPlayer());
@@ -258,9 +249,7 @@ public class GeometryConfig implements GeometryBlockPalette {
                 var hit = context.getHitResult();
 
                 if (hit != null) {
-                    AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-                    analysisContext.setPos(hit.getBlockPos());
-                    selected = StandardBlockSpec.fromWorld(analysisContext);
+                    selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
                 }
 
                 config.updateBlock(BlockSelect.VOLUMES, selected, !forPreview, context.getRealPlayer());

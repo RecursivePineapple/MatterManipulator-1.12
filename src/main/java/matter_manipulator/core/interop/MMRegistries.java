@@ -1,14 +1,14 @@
 package matter_manipulator.core.interop;
 
-import net.minecraft.block.Block;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import it.unimi.dsi.fastutil.Pair;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.common.utils.deps.IDependencyGraph;
+import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.IBlockSpecLoader;
 import matter_manipulator.core.block_spec.IInteropModule;
 import matter_manipulator.core.fluid.FluidStackIO;
@@ -59,10 +59,14 @@ public class MMRegistries {
         return MMRegistriesInternal.TANK_ADAPTERS;
     }
 
-    /// Block adapters are used to convert between a [Block] and an [ItemStack]. They do not handle drops from block
-    /// destruction, those are handled by [BlockResetter]s. This is only used for determining which
-    public static IDependencyGraph<BlockAdapter> blockAdapters() {
-        return MMRegistriesInternal.BLOCK_ADAPTERS;
+    /// A [BlockSpecExtractor] is used to extract [IBlockSpec]s from in-world blocks.
+    public static IDependencyGraph<BlockSpecExtractor> blockSpecExtractors() {
+        return MMRegistriesInternal.SPEC_EXTRACTORS;
+    }
+
+    /// A [IBlockSpecLoader] is used to transparently load or save [IBlockSpec] implementations from or to json.
+    public static void registerSpecLoader(IBlockSpecLoader loader) {
+        MMRegistriesInternal.LOADERS.put(loader.getKey(), loader);
     }
 
     /// ItemStackIOFactories are used to create [ItemStackIO]s. They have full access to any piece of state on
@@ -100,10 +104,6 @@ public class MMRegistries {
 
     public static void registerManipulatorResourceLoader(ManipulatorResourceLoader loader) {
         MMRegistriesInternal.RESOURCE_LOADERS.put(loader.getResourceID(), loader);
-    }
-
-    public static void registerSpecLoader(IBlockSpecLoader loader) {
-        MMRegistriesInternal.LOADERS.put(loader.getKey(), loader);
     }
 
     public static IDependencyGraph<BlockStateTransformer> blockStateTransformers() {

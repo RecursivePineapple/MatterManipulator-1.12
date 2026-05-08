@@ -175,6 +175,7 @@ mm.info.error.move_overlapping=Cannot move when the cut and paste regions overla
 mm.info.error.build_compile_crash=Could not determine which blocks to place due to a crash. Check your server logs for more info.
 mm.info.error.build_compile_waiting=Your Matter Manipulator is taking a while to determine which blocks to place.
 mm.info.error.build_place_crash=Could not place blocks due to a crash. Items may have been voided. Check your server logs for more info.
+mm.info.error.existing_block_missing_spec=Existing block could not be understood by your Matter Manipulator.
 mm.info.geom.all=all blocks
 mm.info.geom.faces=faces
 mm.info.geom.edges=edges

@@ -4,14 +4,16 @@ import java.util.EnumSet;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.ApiStatus.NonExtendable;
+import org.jetbrains.annotations.Nullable;
 
-import matter_manipulator.common.block_spec.StandardBlockSpec;
+import matter_manipulator.common.block_spec.specs.AirBlockSpec;
+import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
+import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
@@ -22,7 +24,7 @@ import matter_manipulator.core.resources.ResourceStack;
 @NonExtendable
 public interface IBlockSpec {
 
-    IBlockSpec AIR = new StandardBlockSpec(Blocks.AIR.getDefaultState());
+    IBlockSpec AIR = AirBlockSpec.INSTANCE;
 
     IBlockSpecLoader getLoader();
 
@@ -31,10 +33,15 @@ public interface IBlockSpec {
     IBlockState getBlockState();
     ResourceStack getResource();
 
+    /// Checks if the resource needed to place this spec differs from another.
+    /// When this returns false, the existing block will be removed entirely and this spec will be placed in its
+    /// location.
+    /// When this returns true, [#canPlaceAt(ProxiedWorld, BlockPos)] and [#place(BlockPlacingContext)] will not be
+    /// called.
+    boolean matches(IBlockSpec other);
+
     /// Checks if this spec can be placed at the given location.
     boolean canPlaceAt(ProxiedWorld world, BlockPos pos);
-    
-    boolean matches(IBlockSpec other);
 
     Localized getDisplayName();
 
@@ -48,7 +55,6 @@ public interface IBlockSpec {
     EnumSet<ApplyResult> update(BlockPlacingContext context);
 
     IBlockSpec clone();
-    IBlockSpec cloneWithState(IBlockState newState);
 
     /// Returns a copy of this spec with the [IBlockState] set to the default variant for the resource.
     IBlockSpec sanitized();

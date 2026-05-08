@@ -17,9 +17,8 @@ import matter_manipulator.Tags;
 import matter_manipulator.client.gui.BranchableRadialMenu;
 import matter_manipulator.client.rendering.ModeRenderer;
 import matter_manipulator.client.rendering.modes.GeometryModeRenderer;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
 import matter_manipulator.common.building.StandardBuild;
-import matter_manipulator.common.context.AnalysisContextImpl;
+import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.modes.ResettableMode;
 import matter_manipulator.common.modes.geometry.GeometryConfig.PendingAction;
 import matter_manipulator.common.modes.geometry.GeometryConfig.Shape;
@@ -153,9 +152,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
         IBlockSpec selected = IBlockSpec.AIR;
 
         if (hit != null) {
-            AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
-            analysisContext.setPos(hit.getBlockPos());
-            selected = StandardBlockSpec.fromWorld(analysisContext);
+            selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
         }
 
         geometryConfig.updateBlock(geometryConfig.blockSelect, selected, true, context.getRealPlayer());

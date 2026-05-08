@@ -6,10 +6,11 @@ import java.util.List;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
+
+import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.resources.ResourceStack;
@@ -18,8 +19,8 @@ import matter_manipulator.core.resources.item.ItemResourceStack;
 public class InventoryEmptier implements BlockResetter {
 
     @Override
-    public List<ResourceStack> resetBlock(ManipulatorContext context, BlockPos pos) {
-        TileEntity te = context.getWorld().getTileEntity(pos);
+    public @NotNull List<ResourceStack> resetBlock(@NotNull TargetedManipulatorContext context) {
+        TileEntity te = context.getTileEntity();
 
         if (te == null) return Collections.emptyList();
 

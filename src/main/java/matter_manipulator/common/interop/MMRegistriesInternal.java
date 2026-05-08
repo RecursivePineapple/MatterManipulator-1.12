@@ -12,6 +12,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.ApiStatus.Internal;
@@ -24,14 +25,14 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.MMMod;
 import matter_manipulator.common.analysis.InventoryInteropModule;
-import matter_manipulator.common.block_spec.StandardBlockSpecLoader;
-import matter_manipulator.common.interop.block_adapters.AirBlockAdapter;
-import matter_manipulator.common.interop.block_adapters.DroppedBlockAdapter;
-import matter_manipulator.common.interop.block_adapters.ItemBlockSpecialAdapter;
-import matter_manipulator.common.interop.block_adapters.RedstoneBlockAdapter;
-import matter_manipulator.common.interop.block_adapters.SlabBlockAdapter;
-import matter_manipulator.common.interop.block_adapters.StandardBlockAdapter;
-import matter_manipulator.common.interop.block_state_transformers.PropertyCopyStateTransformer;
+import matter_manipulator.common.block_spec.adapters.AirBlockSpecAdapter;
+import matter_manipulator.common.block_spec.adapters.EIOTopBlockSpecAdapter;
+import matter_manipulator.common.block_spec.adapters.RedstoneBlockSpecAdapter;
+import matter_manipulator.common.block_spec.adapters.SimpleBlockSpecAdapter;
+import matter_manipulator.common.block_spec.adapters.SlabBlockSpecAdapter;
+import matter_manipulator.common.block_spec.adapters.SpecialBlockSpecAdapter;
+import matter_manipulator.common.context.AnalysisContextImpl;
+import matter_manipulator.common.interop.block_state_mutators.PropertyCopyStateTransformer;
 import matter_manipulator.common.interop.resetters.BlockRemover;
 import matter_manipulator.common.interop.resetters.InventoryEmptier;
 import matter_manipulator.common.interop.resetters.TankEmptier;
@@ -43,12 +44,16 @@ import matter_manipulator.common.resources.item.ios.DroppingItemStackIOFactory;
 import matter_manipulator.common.resources.item.ios.PlayerInventoryItemStackIOFactory;
 import matter_manipulator.common.utils.deps.DependencyGraph;
 import matter_manipulator.core.block_spec.ApplyResult;
+import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.IBlockSpecLoader;
 import matter_manipulator.core.block_spec.IInteropModule;
+import matter_manipulator.core.context.BlockAnalysisContext;
+import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.fluid.FluidStackIO;
 import matter_manipulator.core.i18n.ILocalizer;
 import matter_manipulator.core.i18n.JoiningLocalizer;
-import matter_manipulator.core.interop.BlockAdapter;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.interop.BlockStateTransformer;
 import matter_manipulator.core.interop.MMRegistries;
@@ -77,7 +82,7 @@ public class MMRegistriesInternal {
     public static final DependencyGraph<IInteropModule<?>> INTEROP_MODULES = new DependencyGraph<IInteropModule<?>>(new IInteropModule[0]);
     public static final DependencyGraph<InventoryAdapterFactory<? extends IntItemResourceStack>> INV_ADAPTERS = new DependencyGraph<InventoryAdapterFactory<? extends IntItemResourceStack>>(new InventoryAdapterFactory[0]);
     public static final DependencyGraph<InventoryAdapterFactory<? extends FluidResourceStack>> TANK_ADAPTERS = new DependencyGraph<InventoryAdapterFactory<? extends FluidResourceStack>>(new InventoryAdapterFactory[0]);
-    public static final DependencyGraph<BlockAdapter> BLOCK_ADAPTERS = new DependencyGraph<>(new BlockAdapter[0]);
+    public static final DependencyGraph<BlockSpecExtractor> SPEC_EXTRACTORS = new DependencyGraph<>(new BlockSpecExtractor[0]);
     public static final DependencyGraph<ResourceIOFactory<ItemStackIO>> ITEM_IO_FACTORIES = new DependencyGraph<ResourceIOFactory<ItemStackIO>>(new ResourceIOFactory[0]);
     public static final DependencyGraph<ResourceIOFactory<FluidStackIO>> FLUID_IO_FACTORIES = new DependencyGraph<ResourceIOFactory<FluidStackIO>>(new ResourceIOFactory[0]);
     public static final Map<ResourceLocation, ManipulatorMode<?, ?>> MODES = new Object2ObjectOpenHashMap<>();
@@ -116,6 +121,7 @@ public class MMRegistriesInternal {
         INTEROP_MODULES.addSubgraph("tile-config", "after:block-identity");
 
         INTEROP_MODULES.addObject("tile-config/std-inventories", new InventoryInteropModule());
+        // AbstractMachineEntity
     }
 
     static {
@@ -124,12 +130,21 @@ public class MMRegistriesInternal {
     }
 
     static {
-        BLOCK_ADAPTERS.addObject("redstone", new RedstoneBlockAdapter(), "before:standard");
-        BLOCK_ADAPTERS.addObject("air", new AirBlockAdapter(), "before:standard");
-        BLOCK_ADAPTERS.addObject("special", new ItemBlockSpecialAdapter(), "before:standard");
-        BLOCK_ADAPTERS.addObject("slab", new SlabBlockAdapter(), "before:standard");
-        BLOCK_ADAPTERS.addObject("standard", new StandardBlockAdapter());
-        BLOCK_ADAPTERS.addObject("dropped", new DroppedBlockAdapter(), "after:standard");
+        SPEC_EXTRACTORS.addObject("redstone", RedstoneBlockSpecAdapter.INSTANCE, "before:simple");
+        SPEC_EXTRACTORS.addObject("air", AirBlockSpecAdapter.INSTANCE, "before:simple");
+        SPEC_EXTRACTORS.addObject("special", SpecialBlockSpecAdapter.INSTANCE, "before:simple");
+        SPEC_EXTRACTORS.addObject("slab", SlabBlockSpecAdapter.INSTANCE, "before:simple");
+        SPEC_EXTRACTORS.addObject("eio-top", EIOTopBlockSpecAdapter.INSTANCE);
+        SPEC_EXTRACTORS.addObject("simple", SimpleBlockSpecAdapter.INSTANCE);
+    }
+
+    static {
+        MMRegistries.registerSpecLoader(RedstoneBlockSpecAdapter.INSTANCE);
+        MMRegistries.registerSpecLoader(AirBlockSpecAdapter.INSTANCE);
+        MMRegistries.registerSpecLoader(SpecialBlockSpecAdapter.INSTANCE);
+        MMRegistries.registerSpecLoader(SlabBlockSpecAdapter.INSTANCE);
+        MMRegistries.registerSpecLoader(EIOTopBlockSpecAdapter.INSTANCE);
+        MMRegistries.registerSpecLoader(SimpleBlockSpecAdapter.INSTANCE);
     }
 
     static {
@@ -143,7 +158,7 @@ public class MMRegistriesInternal {
         ITEM_IO_FACTORIES.addSubgraph("backpack", "after:external");
         // Any player inventories
         ITEM_IO_FACTORIES.addSubgraph("player", "after:backpack");
-        // Anything that interact with the world directly (like items on the ground)
+        // Anything that interacts with the world directly (like items on the ground)
         ITEM_IO_FACTORIES.addSubgraph("world", "after:player");
 
         ITEM_IO_FACTORIES.addObject("player/player-inv", new PlayerInventoryItemStackIOFactory());
@@ -157,10 +172,6 @@ public class MMRegistriesInternal {
 
     static {
         MMRegistries.registerManipulatorResourceLoader(new RFEnergyResourceLoader());
-    }
-
-    static {
-        MMRegistries.registerSpecLoader(StandardBlockSpecLoader.INSTANCE);
     }
 
     static {
@@ -197,12 +208,31 @@ public class MMRegistriesInternal {
     }
 
     @Nullable
-    public static BlockAdapter getBlockAdapter(IBlockState state) {
-        for (var adapter : BLOCK_ADAPTERS.sorted()) {
-            if (adapter.canAdapt(state)) return adapter;
+    public static IBlockSpec getPartialBlockSpec(TargetedManipulatorContext context) {
+        for (var extractor : SPEC_EXTRACTORS.sorted()) {
+            IBlockSpec spec = extractor.getSpecPartial(context);
+
+            if (spec != null) return spec;
         }
 
         return null;
+    }
+
+    @Nullable
+    public static IBlockSpec getFullBlockSpec(BlockAnalysisContext context) {
+        for (var extractor : SPEC_EXTRACTORS.sorted()) {
+            IBlockSpec spec = extractor.getSpecFull(context);
+
+            if (spec != null) return spec;
+        }
+
+        return null;
+    }
+
+    public static IBlockSpec getFullBlockSpec(ManipulatorContext context, BlockPos pos) {
+        AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
+        analysisContext.setPos(pos);
+        return getFullBlockSpec(analysisContext);
     }
 
     public static void transformBlock(MutableObject<IBlockState> state, IBlockState target, EnumSet<ApplyResult> result) {

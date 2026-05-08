@@ -4,7 +4,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 
 import matter_manipulator.client.rendering.MMRenderUtils;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
+import matter_manipulator.common.block_spec.specs.SimpleBlockSpec;
 import matter_manipulator.core.meta.MetaKey;
 
 /// A simple [IStructureElement] that only checks if the block is a specific [IBlockState].
@@ -34,7 +34,7 @@ public class BlockStateStructureElement<T> implements IStructureElement<T> {
     @Override
     public void emitHint(StructureContext<? extends T> context, BlockPos pos) {
         if (!check(context, pos)) {
-            context.emitHint(pos, new StandardBlockSpec(state), MMRenderUtils.WHITE);
+            context.emitHint(pos, new SimpleBlockSpec(state), MMRenderUtils.WHITE);
         }
     }
 }

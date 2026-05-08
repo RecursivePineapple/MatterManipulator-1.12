@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
@@ -16,17 +15,16 @@ import org.joml.Vector3i;
 
 import matter_manipulator.CommonProxy;
 import matter_manipulator.GlobalMMConfig.RenderingConfig;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
+import matter_manipulator.common.block_spec.specs.SimpleBlockSpec;
 import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.data.Lazy;
 import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.building.IPendingBlockBuildable;
 import matter_manipulator.core.building.PendingBlock;
+import matter_manipulator.core.building.IPendingBlockBuildable;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.color.RGBColor;
 import matter_manipulator.core.context.ManipulatorRenderingContext;
-import matter_manipulator.core.interop.BlockAdapter;
 import matter_manipulator.core.misc.BuildFeedback;
 
 public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildable>
@@ -37,10 +35,10 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
     private static final ImmutableColor WARNING = RGBColor.fromRGB(0xFFAA00);
     private static final ImmutableColor ERROR = RGBColor.fromRGB(0xFF5555);
 
-    public static final Lazy<IBlockSpec> HINT_BLANK = new Lazy<>(() -> new StandardBlockSpec(CommonProxy.HINT_BLANK.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_DOT = new Lazy<>(() -> new StandardBlockSpec(CommonProxy.HINT_DOT.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_WARNING = new Lazy<>(() -> new StandardBlockSpec(CommonProxy.HINT_WARNING.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_X = new Lazy<>(() -> new StandardBlockSpec(CommonProxy.HINT_X.getDefaultState()));
+    public static final Lazy<IBlockSpec> HINT_BLANK = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_BLANK.getDefaultState()));
+    public static final Lazy<IBlockSpec> HINT_DOT = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_DOT.getDefaultState()));
+    public static final Lazy<IBlockSpec> HINT_WARNING = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_WARNING.getDefaultState()));
+    public static final Lazy<IBlockSpec> HINT_X = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_X.getDefaultState()));
 
     @Override
     public void renderOverlay(ManipulatorRenderingContext context, Config config, Buildable buildable) {
@@ -97,11 +95,13 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
                 };
             }
 
-            IBlockState target = pendingBlock.spec.getBlockState();
+            IBlockSpec sanitizedTarget = pendingBlock.spec.sanitized();
 
-            BlockAdapter adapter = MMRegistriesInternal.getBlockAdapter(target);
+            analysisContext.setPos(pos);
 
-            if (adapter == null) {
+            IBlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
+
+            if (existing == null) {
                 MMHintRenderer.INSTANCE.addHint(
                     pendingBlock.x,
                     pendingBlock.y,
@@ -112,20 +112,15 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
                 continue;
             }
 
-            IBlockSpec sanitizedTarget = pendingBlock.spec.sanitized();
+            IBlockSpec sanitizedExisting = existing.sanitized();
 
-            analysisContext.setPos(pos);
-            IBlockSpec sanitizedExisting = StandardBlockSpec.fromWorld(analysisContext)
-                .sanitized();
-
-            if (sanitizedTarget.equals(sanitizedExisting)) continue;
+            if (sanitizedTarget.matches(sanitizedExisting)) continue;
 
             MMHintRenderer.INSTANCE.addHint(
                 pendingBlock.x,
                 pendingBlock.y,
                 pendingBlock.z,
-                sanitizedTarget.getBlockState()
-                    .getBlock() == Blocks.AIR ? HINT_X.get() : sanitizedTarget,
+                sanitizedTarget.getBlockState().getBlock() == Blocks.AIR ? HINT_X.get() : sanitizedTarget,
                 tint);
         }
 

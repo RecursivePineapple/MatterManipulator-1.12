@@ -15,7 +15,6 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import matter_manipulator.MMMod;
-import matter_manipulator.common.block_spec.StandardBlockSpec;
 import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.items.ItemMatterManipulator;
@@ -23,8 +22,9 @@ import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.building.IPendingBlockBuildable;
+import matter_manipulator.core.block_spec.IBlockSpec;
 import matter_manipulator.core.building.PendingBlock;
+import matter_manipulator.core.building.IPendingBlockBuildable;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
@@ -112,7 +112,13 @@ public class StandardBuild implements IPendingBlockBuildable {
             if (filter != null && !pendingResource.isSameType(filter)) break;
 
             analysisContext.setPos(pos);
-            StandardBlockSpec existing = StandardBlockSpec.fromWorld(analysisContext);
+            IBlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
+
+            if (existing == null) {
+                placingContext.error(new Localized("mm.info.error.existing_block_missing_spec"));
+                pendingBlocks.removeFirst();
+                continue;
+            }
 
             // Check if the existing block is removable
 //            boolean canPlace = switch (state.config.removeMode) {
@@ -155,7 +161,7 @@ public class StandardBuild implements IPendingBlockBuildable {
             EnumSet<ApplyResult> result = EnumSet.noneOf(ApplyResult.class);
 
             // If there's already a block at this location, we need to remove it if it's different
-            if (!existing.isAir() && !pendingBlock.spec.matches(existing)) {
+            if (!pendingBlock.spec.matches(existing)) {
                 if (!pendingBlock.spec.canPlaceAt(proxiedWorld, pos)) {
                     pendingBlocks.addLast(pendingBlocks.removeFirst());
                     visited.remove(pos);
