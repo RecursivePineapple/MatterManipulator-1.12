@@ -25,18 +25,18 @@ public class DataStorage implements IDataStorage {
     }
 
     @Override
-    public @NotNull IStateSandbox getSandbox(String domain, String name) {
+    public @NotNull StateSandbox getSandbox(String domain, String name) {
         String key = domain + ":" + name;
 
-        return new StateSandbox(key, state.get(key));
+        return new StateSandboxImpl(key, state.get(key));
     }
 
-    private class StateSandbox implements IStateSandbox {
+    private class StateSandboxImpl implements StateSandbox {
 
         public final String key;
         public JsonElement existing;
 
-        public StateSandbox(String key, JsonElement existing) {
+        public StateSandboxImpl(String key, JsonElement existing) {
             this.key = key;
             this.existing = existing;
         }
@@ -74,7 +74,8 @@ public class DataStorage implements IDataStorage {
             }
 
             if (type instanceof Class<?> clazz) {
-                return (T) clazz.newInstance();
+                //noinspection unchecked
+                return (T) clazz.getConstructor().newInstance();
             }
 
             return null;

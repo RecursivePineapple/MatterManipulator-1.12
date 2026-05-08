@@ -36,7 +36,7 @@ import matter_manipulator.MMMod;
 import matter_manipulator.client.rendering.vbo.StreamingVertexBuffer;
 import matter_manipulator.client.rendering.vertex.QuadCentroidComparator;
 import matter_manipulator.common.utils.world.ProxiedWorld;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.mixin.mixins.minecraft.AccessorMinecraft;
 
@@ -92,7 +92,7 @@ public class MMHintRenderer {
         pending = new RenderState(new ArrayList<>());
     }
 
-    public void addHint(int x, int y, int z, IBlockSpec spec, ImmutableColor tint) {
+    public void addHint(int x, int y, int z, BlockSpec spec, ImmutableColor tint) {
         pending.hints.add(new Hint(x, y, z, spec, tint));
     }
 
@@ -330,10 +330,10 @@ public class MMHintRenderer {
 
     private static class Hint extends BlockPos {
 
-        public final IBlockSpec spec;
+        public final BlockSpec spec;
         public final ImmutableColor tint;
 
-        public Hint(int x, int y, int z, IBlockSpec spec, ImmutableColor tint) {
+        public Hint(int x, int y, int z, BlockSpec spec, ImmutableColor tint) {
             super(x, y, z);
             this.spec = spec;
             this.tint = tint;

@@ -20,7 +20,7 @@ import net.minecraft.world.WorldServer;
 
 import lombok.Setter;
 import matter_manipulator.client.rendering.MMHintRenderer;
-import matter_manipulator.common.structure.IAlignment;
+import matter_manipulator.common.structure.Alignment;
 import matter_manipulator.common.structure.IAlignmentLimits;
 import matter_manipulator.common.structure.IStructureDefinition;
 import matter_manipulator.common.structure.MultiblockController;
@@ -32,7 +32,7 @@ import matter_manipulator.common.utils.enums.ExtendedFacing;
 import matter_manipulator.common.utils.math.VoxelAABB;
 
 public class TileUplinkController extends TileEntity implements MultiblockController<TileUplinkController>, ITickable,
-    IAlignment {
+    Alignment {
 
     private static final String[][] SHAPE = {
         {

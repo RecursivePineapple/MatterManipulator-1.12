@@ -7,13 +7,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.ApiStatus.NonExtendable;
-import org.jetbrains.annotations.Nullable;
 
 import matter_manipulator.common.block_spec.specs.AirBlockSpec;
-import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
-import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
@@ -22,11 +19,11 @@ import matter_manipulator.core.resources.ResourceStack;
 /// Note that some specs may not completely erase whatever was previously present - as an example, a spec placing an AE
 /// cable may keep any existing parts in the same block.
 @NonExtendable
-public interface IBlockSpec {
+public interface BlockSpec {
 
-    IBlockSpec AIR = AirBlockSpec.INSTANCE;
+    BlockSpec AIR = AirBlockSpec.INSTANCE;
 
-    IBlockSpecLoader getLoader();
+    BlockSpecLoader getLoader();
 
     boolean isValid();
 
@@ -38,7 +35,7 @@ public interface IBlockSpec {
     /// location.
     /// When this returns true, [#canPlaceAt(ProxiedWorld, BlockPos)] and [#place(BlockPlacingContext)] will not be
     /// called.
-    boolean matches(IBlockSpec other);
+    boolean matches(BlockSpec other);
 
     /// Checks if this spec can be placed at the given location.
     boolean canPlaceAt(ProxiedWorld world, BlockPos pos);
@@ -54,10 +51,10 @@ public interface IBlockSpec {
     /// Updates the spec's interop data at the context's location but does not place the block at all.
     EnumSet<ApplyResult> update(BlockPlacingContext context);
 
-    IBlockSpec clone();
+    BlockSpec clone();
 
     /// Returns a copy of this spec with the [IBlockState] set to the default variant for the resource.
-    IBlockSpec sanitized();
+    BlockSpec sanitized();
 
     default boolean isAir() {
         return getBlockState().getMaterial() == Material.AIR;

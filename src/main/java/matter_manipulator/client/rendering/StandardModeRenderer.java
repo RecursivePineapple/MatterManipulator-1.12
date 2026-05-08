@@ -19,15 +19,15 @@ import matter_manipulator.common.block_spec.specs.SimpleBlockSpec;
 import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.data.Lazy;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
-import matter_manipulator.core.building.IPendingBlockBuildable;
+import matter_manipulator.core.building.PendingBlockBuildable;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.color.RGBColor;
 import matter_manipulator.core.context.ManipulatorRenderingContext;
 import matter_manipulator.core.misc.BuildFeedback;
 
-public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildable>
+public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildable>
     implements ModeRenderer<Config, Buildable> {
 
     private static final ImmutableColor WHITE = RGBColor.fromRGB(0xE5F2FF);
@@ -35,10 +35,10 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
     private static final ImmutableColor WARNING = RGBColor.fromRGB(0xFFAA00);
     private static final ImmutableColor ERROR = RGBColor.fromRGB(0xFF5555);
 
-    public static final Lazy<IBlockSpec> HINT_BLANK = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_BLANK.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_DOT = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_DOT.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_WARNING = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_WARNING.getDefaultState()));
-    public static final Lazy<IBlockSpec> HINT_X = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_X.getDefaultState()));
+    public static final Lazy<BlockSpec> HINT_BLANK = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_BLANK.getDefaultState()));
+    public static final Lazy<BlockSpec> HINT_DOT = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_DOT.getDefaultState()));
+    public static final Lazy<BlockSpec> HINT_WARNING = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_WARNING.getDefaultState()));
+    public static final Lazy<BlockSpec> HINT_X = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_X.getDefaultState()));
 
     @Override
     public void renderOverlay(ManipulatorRenderingContext context, Config config, Buildable buildable) {
@@ -95,11 +95,11 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
                 };
             }
 
-            IBlockSpec sanitizedTarget = pendingBlock.spec.sanitized();
+            BlockSpec sanitizedTarget = pendingBlock.spec.sanitized();
 
             analysisContext.setPos(pos);
 
-            IBlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
+            BlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
 
             if (existing == null) {
                 MMHintRenderer.INSTANCE.addHint(
@@ -112,7 +112,7 @@ public class StandardModeRenderer<Config, Buildable extends IPendingBlockBuildab
                 continue;
             }
 
-            IBlockSpec sanitizedExisting = existing.sanitized();
+            BlockSpec sanitizedExisting = existing.sanitized();
 
             if (sanitizedTarget.matches(sanitizedExisting)) continue;
 

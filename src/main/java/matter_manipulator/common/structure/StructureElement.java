@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 
 import matter_manipulator.core.meta.MetaKey;
 
-public interface IStructureElement<T> {
+public interface StructureElement<T> {
 
     /// Gets some metadata about this element. Using this method is preferred over using interfaces or casting for
     /// element introspection as it can be chained arbitrarily for nested elements.

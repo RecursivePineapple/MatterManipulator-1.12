@@ -11,14 +11,14 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import matter_manipulator.common.block_spec.specs.SpecialBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.persist.NBTPersist;
 
-public class SpecialBlockSpecAdapter implements BlockSpecExtractor, IBlockSpecLoader {
+public class SpecialBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoader {
 
     public static final SpecialBlockSpecAdapter INSTANCE = new SpecialBlockSpecAdapter();
 
@@ -63,7 +63,7 @@ public class SpecialBlockSpecAdapter implements BlockSpecExtractor, IBlockSpecLo
     }
 
     @Override
-    public JsonElement save(IBlockSpec spec2) {
+    public JsonElement save(BlockSpec spec2) {
         SpecialBlockSpec spec = (SpecialBlockSpec) spec2;
 
         JsonObject obj = new JsonObject();

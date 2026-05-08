@@ -43,7 +43,7 @@ import com.google.gson.JsonPrimitive;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.analysis.InventoryAnalysis.InventoryAnalysisJsonAdapter;
 import matter_manipulator.core.persist.adapters.BlockSpecJsonAdapter;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.persist.adapters.BitSetJsonAdapter;
 import matter_manipulator.core.persist.adapters.BlockStateJsonAdapter;
 import matter_manipulator.core.persist.adapters.DataStorageJsonAdapter;
@@ -65,7 +65,7 @@ public class NBTPersist {
         .registerTypeAdapter(DataStorage.class, new DataStorageJsonAdapter())
         .registerTypeAdapter(ItemStack.class, new ItemStackJsonAdapter())
         .registerTypeAdapter(FluidStack.class, new FluidStackJsonAdapter())
-        .registerTypeAdapter(IBlockSpec.class, new BlockSpecJsonAdapter())
+        .registerTypeAdapter(BlockSpec.class, new BlockSpecJsonAdapter())
         .registerTypeAdapter(IBlockState.class, new BlockStateJsonAdapter())
         .registerTypeAdapter(InventoryAnalysis.class, new InventoryAnalysisJsonAdapter())
         .registerTypeAdapter(DirectionMap.class, new DirectionMapJsonAdapter())

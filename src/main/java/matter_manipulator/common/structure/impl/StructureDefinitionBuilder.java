@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.chars.Char2CharOpenHashMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.common.structure.IStructureDefinition;
-import matter_manipulator.common.structure.IStructureElement;
+import matter_manipulator.common.structure.StructureElement;
 import matter_manipulator.common.structure.coords.Offset;
 import matter_manipulator.common.structure.coords.StructureDefinitionCoords;
 
@@ -13,7 +13,7 @@ public class StructureDefinitionBuilder<T> {
     private final Object2ObjectOpenHashMap<String, String[][]> parts = new Object2ObjectOpenHashMap<>();
     private final Object2ObjectOpenHashMap<String, Offset<StructureDefinitionCoords>> offsets = new Object2ObjectOpenHashMap<>();
 
-    private final Char2ObjectOpenHashMap<IStructureElement<? super T>> elements = new Char2ObjectOpenHashMap<>();
+    private final Char2ObjectOpenHashMap<StructureElement<? super T>> elements = new Char2ObjectOpenHashMap<>();
 
     private final Char2CharOpenHashMap sockets = new Char2CharOpenHashMap();
 
@@ -27,7 +27,7 @@ public class StructureDefinitionBuilder<T> {
         return this;
     }
 
-    public StructureDefinitionBuilder<T> addElement(char name, IStructureElement<? super T> element) {
+    public StructureDefinitionBuilder<T> addElement(char name, StructureElement<? super T> element) {
         elements.put(name, element);
         return this;
     }

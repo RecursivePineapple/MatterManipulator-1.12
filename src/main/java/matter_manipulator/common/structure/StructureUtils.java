@@ -18,20 +18,20 @@ import matter_manipulator.core.meta.MetaKey;
 public class StructureUtils {
 
     @SuppressWarnings("Convert2MethodRef")
-    private static final IStructureElement<?> AIR = block(() -> Blocks.AIR.getDefaultState());
+    private static final StructureElement<?> AIR = block(() -> Blocks.AIR.getDefaultState());
 
     public interface BlockStateSupplier extends Supplier<IBlockState> {
 
     }
 
-    public static <T> IStructureElement<T> block(BlockStateSupplier supplier) {
+    public static <T> StructureElement<T> block(BlockStateSupplier supplier) {
         return lazy(() -> new BlockStateStructureElement<>(supplier.get()));
     }
 
-    public static <T> IStructureElement<T> lazy(Supplier<IStructureElement<T>> next) {
-        Lazy<IStructureElement<T>> element = new Lazy<>(next);
+    public static <T> StructureElement<T> lazy(Supplier<StructureElement<T>> next) {
+        Lazy<StructureElement<T>> element = new Lazy<>(next);
 
-        return new IStructureElement<>() {
+        return new StructureElement<>() {
 
             @Override
             public <K> K getMetadata(MetaKey<K> key) {
@@ -55,9 +55,9 @@ public class StructureUtils {
         };
     }
 
-    public static <T> IStructureElement<T> air() {
+    public static <T> StructureElement<T> air() {
         //noinspection unchecked
-        return (IStructureElement<T>) AIR;
+        return (StructureElement<T>) AIR;
     }
 
     public static boolean wrench(EntityPlayer player, World world, BlockPos pos) {
@@ -67,8 +67,8 @@ public class StructureUtils {
             return player instanceof EntityPlayerMP;
         }
 
-        if (player instanceof EntityPlayerMP && tTileEntity instanceof IAlignmentProvider) {
-            IAlignment alignment = ((IAlignmentProvider) tTileEntity).getAlignment();
+        if (player instanceof EntityPlayerMP && tTileEntity instanceof AlignmentProvider) {
+            Alignment alignment = ((AlignmentProvider) tTileEntity).getAlignment();
 
             if (alignment != null) {
                 if (player.isSneaking()) {

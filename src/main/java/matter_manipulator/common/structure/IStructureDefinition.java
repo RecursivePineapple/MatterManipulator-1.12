@@ -9,7 +9,7 @@ public interface IStructureDefinition<T> {
 
     StructureDefinitionCoords getPartOffset(String part);
 
-    IStructureElement<? super T> getStructureElement(String part, Position<StructureDefinitionCoords> pos);
+    StructureElement<? super T> getStructureElement(String part, Position<StructureDefinitionCoords> pos);
     Position<StructureRelativeCoords> getMinCorner(String part);
     Position<StructureRelativeCoords> getMaxCorner(String part);
 

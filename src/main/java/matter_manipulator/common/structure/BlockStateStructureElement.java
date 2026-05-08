@@ -7,8 +7,8 @@ import matter_manipulator.client.rendering.MMRenderUtils;
 import matter_manipulator.common.block_spec.specs.SimpleBlockSpec;
 import matter_manipulator.core.meta.MetaKey;
 
-/// A simple [IStructureElement] that only checks if the block is a specific [IBlockState].
-public class BlockStateStructureElement<T> implements IStructureElement<T> {
+/// A simple [StructureElement] that only checks if the block is a specific [IBlockState].
+public class BlockStateStructureElement<T> implements StructureElement<T> {
 
     public final IBlockState state;
 

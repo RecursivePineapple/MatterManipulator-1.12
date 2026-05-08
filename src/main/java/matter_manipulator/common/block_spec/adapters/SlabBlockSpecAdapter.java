@@ -11,15 +11,15 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import matter_manipulator.common.block_spec.specs.SlabBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.persist.NBTPersist;
 import matter_manipulator.mixin.mixins.minecraft.AccessorItemSlab;
 
-public class SlabBlockSpecAdapter implements BlockSpecExtractor, IBlockSpecLoader {
+public class SlabBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoader {
 
     public static final SlabBlockSpecAdapter INSTANCE = new SlabBlockSpecAdapter();
 
@@ -66,7 +66,7 @@ public class SlabBlockSpecAdapter implements BlockSpecExtractor, IBlockSpecLoade
     }
 
     @Override
-    public JsonElement save(IBlockSpec spec2) {
+    public JsonElement save(BlockSpec spec2) {
         SlabBlockSpec spec = (SlabBlockSpec) spec2;
 
         JsonObject obj = new JsonObject();

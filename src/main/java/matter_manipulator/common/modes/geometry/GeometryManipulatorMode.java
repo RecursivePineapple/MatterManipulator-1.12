@@ -23,7 +23,7 @@ import matter_manipulator.common.modes.ResettableMode;
 import matter_manipulator.common.modes.geometry.GeometryConfig.PendingAction;
 import matter_manipulator.common.modes.geometry.GeometryConfig.Shape;
 import matter_manipulator.common.networking.MMPacketBuffer;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.IDataStorage;
@@ -149,7 +149,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     public Optional<GeometryConfig> onPickBlock(GeometryConfig geometryConfig, ManipulatorContext context) {
         var hit = context.getHitResult();
 
-        IBlockSpec selected = IBlockSpec.AIR;
+        BlockSpec selected = BlockSpec.AIR;
 
         if (hit != null) {
             selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());

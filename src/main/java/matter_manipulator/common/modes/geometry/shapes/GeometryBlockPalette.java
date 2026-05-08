@@ -1,12 +1,12 @@
 package matter_manipulator.common.modes.geometry.shapes;
 
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 
 public interface GeometryBlockPalette {
 
-    IBlockSpec corners();
-    IBlockSpec edges();
-    IBlockSpec faces();
-    IBlockSpec volumes();
+    BlockSpec corners();
+    BlockSpec edges();
+    BlockSpec faces();
+    BlockSpec volumes();
 
 }

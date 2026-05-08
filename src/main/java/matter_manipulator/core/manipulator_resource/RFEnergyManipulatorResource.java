@@ -20,14 +20,14 @@ import matter_manipulator.common.items.ManipulatorTier;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.core.context.ManipulatorContext;
-import matter_manipulator.core.persist.IStateSandbox;
+import matter_manipulator.core.persist.StateSandbox;
 
 public class RFEnergyManipulatorResource implements EnergyManipulatorResource, IEnergyStorage {
 
     private final ManipulatorTier tier;
-    private final IStateSandbox state;
+    private final StateSandbox state;
 
-    public RFEnergyManipulatorResource(ManipulatorTier tier, IStateSandbox state) {
+    public RFEnergyManipulatorResource(ManipulatorTier tier, StateSandbox state) {
         this.tier = tier;
         this.state = state;
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import net.minecraft.world.World;
 
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 
 public class GeometryModeCube {
@@ -30,12 +30,12 @@ public class GeometryModeCube {
                     if (y > minY && y < maxY) insideCount++;
                     if (z > minZ && z < maxZ) insideCount++;
 
-                    IBlockSpec spec = switch (insideCount) {
+                    BlockSpec spec = switch (insideCount) {
                         case 0 -> palette.corners();
                         case 1 -> palette.edges();
                         case 2 -> palette.faces();
                         case 3 -> palette.volumes();
-                        default -> IBlockSpec.AIR;
+                        default -> BlockSpec.AIR;
                     };
 
                     blocks.add(new PendingBlock(world, x, y, z, spec));

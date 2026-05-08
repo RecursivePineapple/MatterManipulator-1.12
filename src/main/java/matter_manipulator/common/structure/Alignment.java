@@ -7,7 +7,7 @@ import matter_manipulator.common.utils.enums.ExtendedFacing;
 import matter_manipulator.common.utils.enums.Flip;
 import matter_manipulator.common.utils.enums.Rotation;
 
-public interface IAlignment extends IAlignmentLimits, IAlignmentProvider {
+public interface Alignment extends IAlignmentLimits, AlignmentProvider {
 
     ExtendedFacing getExtendedFacing();
 
@@ -20,7 +20,7 @@ public interface IAlignment extends IAlignmentLimits, IAlignmentProvider {
     IAlignmentLimits getAlignmentLimits();
 
     @Override
-    default IAlignment getAlignment() {
+    default Alignment getAlignment() {
         return this;
     }
 

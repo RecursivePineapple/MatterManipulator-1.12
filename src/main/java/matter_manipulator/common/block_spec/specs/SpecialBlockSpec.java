@@ -18,11 +18,11 @@ import matter_manipulator.common.block_spec.adapters.SpecialBlockSpecAdapter;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
-/// A [IBlockSpec] that places a block, along with some interop state. The block must be backed 1:1 by a standard
+/// A [BlockSpec] that places a block, along with some interop state. The block must be backed 1:1 by a standard
 /// [ItemBlock].
 @EqualsAndHashCode(callSuper = false)
 public class SpecialBlockSpec extends AbstractBlockSpec {
@@ -39,7 +39,7 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public IBlockSpecLoader getLoader() {
+    public BlockSpecLoader getLoader() {
         return SpecialBlockSpecAdapter.INSTANCE;
     }
 
@@ -94,7 +94,7 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public IBlockSpec sanitized() {
+    public BlockSpec sanitized() {
         ItemStackWrapper stack = getResource();
 
         if (!(stack.getItem() instanceof ItemBlock itemBlock)) return clone();

@@ -22,7 +22,7 @@ import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.data.XSTR;
 import matter_manipulator.common.utils.math.Location;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.context.ManipulatorContext;
@@ -34,30 +34,30 @@ public class GeometryConfig implements GeometryBlockPalette {
     public PendingAction action;
     public Shape shape = Shape.CUBE;
     public BlockSelect blockSelect = BlockSelect.ALL;
-    public IBlockSpec faces, edges, corners, volumes;
+    public BlockSpec faces, edges, corners, volumes;
     public Location a, b, c;
 
     @Override
-    public IBlockSpec corners() {
-        return corners == null ? IBlockSpec.AIR : corners;
+    public BlockSpec corners() {
+        return corners == null ? BlockSpec.AIR : corners;
     }
 
     @Override
-    public IBlockSpec edges() {
-        return edges == null ? IBlockSpec.AIR : edges;
+    public BlockSpec edges() {
+        return edges == null ? BlockSpec.AIR : edges;
     }
 
     @Override
-    public IBlockSpec faces() {
-        return faces == null ? IBlockSpec.AIR : faces;
+    public BlockSpec faces() {
+        return faces == null ? BlockSpec.AIR : faces;
     }
 
     @Override
-    public IBlockSpec volumes() {
-        return volumes == null ? IBlockSpec.AIR : volumes;
+    public BlockSpec volumes() {
+        return volumes == null ? BlockSpec.AIR : volumes;
     }
 
-    public void updateBlock(BlockSelect blockSelect, IBlockSpec spec, boolean printChat, EntityPlayer player) {
+    public void updateBlock(BlockSelect blockSelect, BlockSpec spec, boolean printChat, EntityPlayer player) {
         switch (blockSelect) {
             case ALL -> {
                 this.faces = spec;
@@ -156,7 +156,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                IBlockSpec selected = IBlockSpec.AIR;
+                BlockSpec selected = BlockSpec.AIR;
 
                 var hit = context.getHitResult();
 
@@ -178,7 +178,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                IBlockSpec selected = IBlockSpec.AIR;
+                BlockSpec selected = BlockSpec.AIR;
 
                 var hit = context.getHitResult();
 
@@ -200,7 +200,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                IBlockSpec selected = IBlockSpec.AIR;
+                BlockSpec selected = BlockSpec.AIR;
 
                 var hit = context.getHitResult();
 
@@ -222,7 +222,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                IBlockSpec selected = IBlockSpec.AIR;
+                BlockSpec selected = BlockSpec.AIR;
 
                 var hit = context.getHitResult();
 
@@ -244,7 +244,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                IBlockSpec selected = IBlockSpec.AIR;
+                BlockSpec selected = BlockSpec.AIR;
 
                 var hit = context.getHitResult();
 

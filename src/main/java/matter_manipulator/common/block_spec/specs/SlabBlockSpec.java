@@ -20,8 +20,8 @@ import matter_manipulator.common.block_spec.adapters.SlabBlockSpecAdapter;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 import matter_manipulator.mixin.mixins.minecraft.AccessorItemSlab;
@@ -41,7 +41,7 @@ public class SlabBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public IBlockSpecLoader getLoader() {
+    public BlockSpecLoader getLoader() {
         return SlabBlockSpecAdapter.INSTANCE;
     }
 
@@ -100,7 +100,7 @@ public class SlabBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public IBlockSpec sanitized() {
+    public BlockSpec sanitized() {
         ItemStackWrapper stack = getResource();
 
         if (!(stack.getItem() instanceof ItemBlock itemBlock)) return clone();

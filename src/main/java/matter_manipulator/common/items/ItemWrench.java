@@ -12,8 +12,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import matter_manipulator.Tags;
-import matter_manipulator.common.structure.IAlignment;
-import matter_manipulator.common.structure.IAlignmentProvider;
+import matter_manipulator.common.structure.Alignment;
+import matter_manipulator.common.structure.AlignmentProvider;
 import matter_manipulator.common.structure.StructureUtils;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.MathUtils;
@@ -33,8 +33,8 @@ public class ItemWrench extends Item {
         RayTraceResult hit = MathUtils.getHitResult(player);
 
         if (hit != null) {
-            if (world.getTileEntity(hit.getBlockPos()) instanceof IAlignmentProvider provider) {
-                IAlignment alignment = provider.getAlignment();
+            if (world.getTileEntity(hit.getBlockPos()) instanceof AlignmentProvider provider) {
+                Alignment alignment = provider.getAlignment();
 
                 if (alignment != null) {
                     EnumFacing wrenchSide = StructureUtils.determineWrenchingSide(hit.sideHit, hitX, hitY, hitZ);

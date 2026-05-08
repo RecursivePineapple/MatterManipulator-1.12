@@ -10,18 +10,18 @@ import net.minecraft.util.math.BlockPos;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 
-public abstract class SingletonBlockSpec implements IBlockSpec, Cloneable {
+public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
 
     @Override
-    public abstract IBlockSpecLoader getLoader();
+    public abstract BlockSpecLoader getLoader();
 
     @Override
     public abstract IBlockState getBlockState();
@@ -72,7 +72,7 @@ public abstract class SingletonBlockSpec implements IBlockSpec, Cloneable {
     }
 
     @Override
-    public boolean matches(IBlockSpec other) {
+    public boolean matches(BlockSpec other) {
         return this == other;
     }
 

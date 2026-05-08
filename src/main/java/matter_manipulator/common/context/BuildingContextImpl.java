@@ -23,7 +23,7 @@ import matter_manipulator.MMMod;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.items.MMUpgrades;
 import matter_manipulator.common.state.MMState;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.i18n.Localized;
@@ -45,7 +45,7 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
     private final Map<Resource<?>, ResourceProvider> cachedProviders = new Object2ObjectArrayMap<>();
 
     public BlockPos pos;
-    public IBlockSpec spec;
+    public BlockSpec spec;
     public double dist, distEUMult;
 
     public final ObjectArrayList<Localized> feedbackContext = new ObjectArrayList<>();
@@ -69,7 +69,7 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
     }
 
     @Override
-    public void setTarget(BlockPos pos, IBlockSpec spec) {
+    public void setTarget(BlockPos pos, BlockSpec spec) {
         this.pos = pos;
         this.spec = spec;
 
@@ -82,7 +82,7 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
     }
 
     @Override
-    public IBlockSpec getSpec() {
+    public BlockSpec getSpec() {
         return spec;
     }
 

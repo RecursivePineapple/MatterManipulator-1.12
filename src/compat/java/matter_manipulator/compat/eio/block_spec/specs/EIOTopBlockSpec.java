@@ -8,8 +8,8 @@ import matter_manipulator.common.block_spec.AbstractBlockSpec;
 import matter_manipulator.common.block_spec.adapters.EIOTopBlockSpecAdapter;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
@@ -23,7 +23,7 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public IBlockSpecLoader getLoader() {
+    public BlockSpecLoader getLoader() {
         return EIOTopBlockSpecAdapter.INSTANCE;
     }
 
@@ -43,7 +43,7 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public boolean matches(IBlockSpec other) {
+    public boolean matches(BlockSpec other) {
         if (!(other instanceof EIOTopBlockSpec topSpec)) return false;
 
         return this.state == topSpec.state;

@@ -28,7 +28,7 @@ import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.state.MMState;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.math.VoxelAABB;
-import matter_manipulator.core.building.IBuildable;
+import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.context.ManipulatorRenderingContext;
 import matter_manipulator.core.misc.BuildFeedback;
@@ -46,7 +46,7 @@ public class MMRenderer {
 
     private ModeRenderer lastRenderer = null;
     private Object lastAnalyzedConfig = null;
-    private IBuildable lastAnalysis = null;
+    private Buildable lastAnalysis = null;
 
     private long lastExceptionPrint = 0;
 
@@ -114,7 +114,7 @@ public class MMRenderer {
                 }
 
                 if (needsAnalysis || lastAnalysis == null || !Objects.equals(config, lastAnalyzedConfig)) {
-                    lastAnalysis = (IBuildable) mode.startAnalysis(config, context).get();
+                    lastAnalysis = (Buildable) mode.startAnalysis(config, context).get();
                     lastAnalyzedConfig = config;
                     lastAnalysisMS = System.currentTimeMillis();
                     needsAnalysis = false;

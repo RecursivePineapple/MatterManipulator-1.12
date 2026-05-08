@@ -13,7 +13,7 @@ import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
 import matter_manipulator.common.structure.coords.Offset;
 import matter_manipulator.common.structure.coords.StructureRelativeCoords;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.color.ImmutableColor;
 
 public class MultiblockStructureContext<T extends TileEntity & MultiblockController<T>> implements StructureContext<T> {
@@ -83,7 +83,7 @@ public class MultiblockStructureContext<T extends TileEntity & MultiblockControl
     }
 
     @Override
-    public void emitHint(BlockPos pos, IBlockSpec spec, ImmutableColor tint) {
+    public void emitHint(BlockPos pos, BlockSpec spec, ImmutableColor tint) {
         MMHintRenderer.INSTANCE.addHint(pos.getX(), pos.getY(), pos.getZ(), spec, tint);
     }
 

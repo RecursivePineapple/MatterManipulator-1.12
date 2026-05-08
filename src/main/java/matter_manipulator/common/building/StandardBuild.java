@@ -22,14 +22,14 @@ import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
-import matter_manipulator.core.building.IPendingBlockBuildable;
+import matter_manipulator.core.building.PendingBlockBuildable;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceStack;
 
-public class StandardBuild implements IPendingBlockBuildable {
+public class StandardBuild implements PendingBlockBuildable {
 
     public final ArrayDeque<PendingBlock> pendingBlocks;
     private final ObjectOpenHashSet<BlockPos> visited = new ObjectOpenHashSet<>();
@@ -112,7 +112,7 @@ public class StandardBuild implements IPendingBlockBuildable {
             if (filter != null && !pendingResource.isSameType(filter)) break;
 
             analysisContext.setPos(pos);
-            IBlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
+            BlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
 
             if (existing == null) {
                 placingContext.error(new Localized("mm.info.error.existing_block_missing_spec"));

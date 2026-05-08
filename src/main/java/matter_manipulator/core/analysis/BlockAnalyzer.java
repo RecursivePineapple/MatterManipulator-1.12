@@ -17,7 +17,7 @@ import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.math.Location;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.util.Coroutine;
@@ -54,7 +54,7 @@ public class BlockAnalyzer {
 
                 analysisContext.setPos(pos);
 
-                IBlockSpec spec = MMRegistriesInternal.getFullBlockSpec(analysisContext);
+                BlockSpec spec = MMRegistriesInternal.getFullBlockSpec(analysisContext);
 
                 analysis.add(new PendingBlock(world, pos.getX() - a.x, pos.getY() - a.y, pos.getZ() - a.z, spec));
             }

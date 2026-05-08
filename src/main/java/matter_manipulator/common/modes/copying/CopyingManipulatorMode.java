@@ -32,7 +32,7 @@ import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.analysis.BlockAnalyzer;
 import matter_manipulator.core.analysis.BlockAnalyzer.RegionAnalysis;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.modes.ManipulatorMode;
@@ -207,7 +207,7 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
             Vector3i deltas = analysis.deltas();
             List<PendingBlock> blocks = analysis.blocks();
 
-            Object2IntOpenHashMap<IBlockSpec> order = new Object2IntOpenHashMap<>();
+            Object2IntOpenHashMap<BlockSpec> order = new Object2IntOpenHashMap<>();
 
             for (PendingBlock block : blocks) {
                 int index = order.getOrDefault(block.spec, -1);

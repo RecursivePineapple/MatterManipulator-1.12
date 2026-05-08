@@ -28,8 +28,8 @@ import matter_manipulator.client.rendering.overlays.transform.Scale;
 import matter_manipulator.client.rendering.overlays.transform.Transformation;
 import matter_manipulator.client.rendering.overlays.transform.Translation;
 import matter_manipulator.common.items.MMItemList;
-import matter_manipulator.common.structure.IAlignment;
-import matter_manipulator.common.structure.IAlignmentProvider;
+import matter_manipulator.common.structure.Alignment;
+import matter_manipulator.common.structure.AlignmentProvider;
 
 @EventBusSubscriber(Side.CLIENT)
 public class WrenchOverlayRenderer {
@@ -89,7 +89,7 @@ public class WrenchOverlayRenderer {
     }
 
     private static boolean isWrenchable(@SuppressWarnings("unused") IBlockState state, TileEntity tile) {
-        return tile instanceof IAlignmentProvider provider && provider.getAlignment() != null;
+        return tile instanceof AlignmentProvider provider && provider.getAlignment() != null;
     }
 
     private static void drawGrid(DrawBlockHighlightEvent event, boolean isSneaking) {
@@ -171,8 +171,8 @@ public class WrenchOverlayRenderer {
 
         int connections = 0;
 
-        if (tile instanceof IAlignmentProvider provider) {
-            IAlignment alignment = provider.getAlignment();
+        if (tile instanceof AlignmentProvider provider) {
+            Alignment alignment = provider.getAlignment();
 
             if (alignment != null) {
                 connections |= 1 << alignment.getExtendedFacing().getDirection().ordinal();
@@ -239,8 +239,8 @@ public class WrenchOverlayRenderer {
         GL11.glEnd();
 
         // draw turning indicator
-        if (tile instanceof IAlignmentProvider provider) {
-            final IAlignment alignment = provider.getAlignment();
+        if (tile instanceof AlignmentProvider provider) {
+            final Alignment alignment = provider.getAlignment();
 
             if (alignment != null) {
                 for (var transform : getTransform(alignment.getDirection(), sideHit)) {
@@ -271,7 +271,7 @@ public class WrenchOverlayRenderer {
         }
     }
 
-    private static void drawExtendedRotationMarker(Transformation transform, boolean sneaking, IAlignment alignment) {
+    private static void drawExtendedRotationMarker(Transformation transform, boolean sneaking, Alignment alignment) {
         if (sneaking) {
             if (alignment.isFlipChangeAllowed()) {
                 drawFlipMarker(transform);

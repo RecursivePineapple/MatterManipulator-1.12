@@ -6,7 +6,7 @@ import java.util.Collection;
 import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.core.i18n.Localized.ArgProcessor;
 
-public class JoiningLocalizer implements ILocalizer {
+public class JoiningLocalizer implements Localizer {
 
     public static final JoiningLocalizer NOTHING = new JoiningLocalizer("");
     public static final JoiningLocalizer COLONS = new JoiningLocalizer(": ");

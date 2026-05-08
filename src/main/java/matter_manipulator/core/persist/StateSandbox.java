@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
-public interface IStateSandbox {
+public interface StateSandbox {
 
     boolean isMutable();
 

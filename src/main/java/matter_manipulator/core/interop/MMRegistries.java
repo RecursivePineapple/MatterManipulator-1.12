@@ -7,12 +7,12 @@ import it.unimi.dsi.fastutil.Pair;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.common.utils.deps.IDependencyGraph;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
-import matter_manipulator.core.block_spec.IInteropModule;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.fluid.FluidStackIO;
-import matter_manipulator.core.i18n.ILocalizer;
+import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
 import matter_manipulator.core.item.ImmutableItemStack;
@@ -41,7 +41,7 @@ public class MMRegistries {
 
     /// These are used to copy, save, load, and apply some configuration item from a block. They have free rein over
     /// any field or trait of the block, so long as they only affect the requested block.
-    public static IDependencyGraph<IInteropModule<?>> interop() {
+    public static IDependencyGraph<InteropModule<?>> interop() {
         return MMRegistriesInternal.INTEROP_MODULES;
     }
 
@@ -59,13 +59,13 @@ public class MMRegistries {
         return MMRegistriesInternal.TANK_ADAPTERS;
     }
 
-    /// A [BlockSpecExtractor] is used to extract [IBlockSpec]s from in-world blocks.
+    /// A [BlockSpecExtractor] is used to extract [BlockSpec]s from in-world blocks.
     public static IDependencyGraph<BlockSpecExtractor> blockSpecExtractors() {
         return MMRegistriesInternal.SPEC_EXTRACTORS;
     }
 
-    /// A [IBlockSpecLoader] is used to transparently load or save [IBlockSpec] implementations from or to json.
-    public static void registerSpecLoader(IBlockSpecLoader loader) {
+    /// A [BlockSpecLoader] is used to transparently load or save [BlockSpec] implementations from or to json.
+    public static void registerSpecLoader(BlockSpecLoader loader) {
         MMRegistriesInternal.LOADERS.put(loader.getKey(), loader);
     }
 
@@ -118,8 +118,8 @@ public class MMRegistries {
         return MMRegistriesInternal.KEYBINDS.get(id);
     }
 
-    public static void registerLocalizer(ResourceLocation id, ILocalizer localizer) {
-        ILocalizer existing = MMRegistriesInternal.LOCALIZERS.put(id, localizer);
+    public static void registerLocalizer(ResourceLocation id, Localizer localizer) {
+        Localizer existing = MMRegistriesInternal.LOCALIZERS.put(id, localizer);
 
         if (existing != null) {
             throw new IllegalArgumentException("Localizer ID " + id + " is already used by " + existing);

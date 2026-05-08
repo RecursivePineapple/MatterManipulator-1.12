@@ -7,7 +7,7 @@ import net.minecraft.item.ItemStack;
 
 import matter_manipulator.common.block_spec.SingletonBlockSpec;
 import matter_manipulator.common.block_spec.adapters.RedstoneBlockSpecAdapter;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
@@ -18,7 +18,7 @@ public class RedstoneBlockSpec extends SingletonBlockSpec {
     private RedstoneBlockSpec() { }
 
     @Override
-    public IBlockSpecLoader getLoader() {
+    public BlockSpecLoader getLoader() {
         return RedstoneBlockSpecAdapter.INSTANCE;
     }
 

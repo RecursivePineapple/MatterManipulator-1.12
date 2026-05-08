@@ -11,13 +11,13 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import matter_manipulator.MMMod;
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
 
-public class BlockSpecJsonAdapter implements JsonSerializer<IBlockSpec>, JsonDeserializer<IBlockSpec> {
+public class BlockSpecJsonAdapter implements JsonSerializer<BlockSpec>, JsonDeserializer<BlockSpec> {
 
     @Override
-    public IBlockSpec deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+    public BlockSpec deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
         if (!(json instanceof JsonObject obj)) {
             MMMod.LOG.error("Expected JsonObject, got {}", json, new Exception());
@@ -25,7 +25,7 @@ public class BlockSpecJsonAdapter implements JsonSerializer<IBlockSpec>, JsonDes
         }
 
         for (var e : obj.entrySet()) {
-            IBlockSpecLoader loader = MMRegistriesInternal.LOADERS.get(e.getKey());
+            BlockSpecLoader loader = MMRegistriesInternal.LOADERS.get(e.getKey());
 
             if (loader == null) {
                 MMMod.LOG.error(
@@ -43,7 +43,7 @@ public class BlockSpecJsonAdapter implements JsonSerializer<IBlockSpec>, JsonDes
     }
 
     @Override
-    public JsonElement serialize(IBlockSpec src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(BlockSpec src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject obj = new JsonObject();
 
         obj.add(

@@ -17,9 +17,9 @@ import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
-import matter_manipulator.core.block_spec.IInteropModule;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
@@ -30,13 +30,13 @@ import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 
-public abstract class AbstractBlockSpec implements IBlockSpec, Cloneable {
+public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
 
     @SuppressWarnings("rawtypes")
-    public final Object2ObjectOpenHashMap<IInteropModule, Object> interop = new Object2ObjectOpenHashMap<>(0);
+    public final Object2ObjectOpenHashMap<InteropModule, Object> interop = new Object2ObjectOpenHashMap<>(0);
 
     @Override
-    public abstract IBlockSpecLoader getLoader();
+    public abstract BlockSpecLoader getLoader();
 
     @Override
     public abstract IBlockState getBlockState();
@@ -67,7 +67,7 @@ public abstract class AbstractBlockSpec implements IBlockSpec, Cloneable {
     protected abstract void resetResource();
 
     @Override
-    public abstract IBlockSpec sanitized();
+    public abstract BlockSpec sanitized();
 
     @Override
     @OverridingMethodsMustInvokeSuper
@@ -99,7 +99,7 @@ public abstract class AbstractBlockSpec implements IBlockSpec, Cloneable {
     }
 
     @Override
-    public boolean matches(IBlockSpec other) {
+    public boolean matches(BlockSpec other) {
         if (this.getClass() != other.getClass()) return false;
 
         return this.getResource().isSameType(other.getResource());
@@ -199,7 +199,7 @@ public abstract class AbstractBlockSpec implements IBlockSpec, Cloneable {
             DataStorage storage = NBTPersist.GSON.fromJson(specRoot.get("interop"), DataStorage.class);
 
             //noinspection rawtypes
-            for (IInteropModule interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
+            for (InteropModule interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
                 @SuppressWarnings("rawtypes")
                 Optional result = interop.load(storage);
 
@@ -211,7 +211,7 @@ public abstract class AbstractBlockSpec implements IBlockSpec, Cloneable {
     }
 
     public void analyze(BlockAnalysisContext context) {
-        for (IInteropModule<?> interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
+        for (InteropModule<?> interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
             var result = interop.analyze(context);
 
             if (!result.isPresent()) continue;

@@ -15,7 +15,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.item.ItemStackLike;
@@ -33,7 +33,7 @@ public class BlockRemover implements BlockResetter {
 
         if (state.getBlockHardness(world, pos) < 0) return Collections.emptyList();
 
-        IBlockSpec spec = MMRegistriesInternal.getPartialBlockSpec(context);
+        BlockSpec spec = MMRegistriesInternal.getPartialBlockSpec(context);
 
         // Something strange that the MM doesn't understand
         if (spec == null) return Collections.emptyList();

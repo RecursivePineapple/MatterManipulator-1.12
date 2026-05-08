@@ -6,7 +6,7 @@ import java.util.List;
 import it.unimi.dsi.fastutil.chars.Char2CharOpenHashMap;
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import matter_manipulator.common.structure.IStructureElement;
+import matter_manipulator.common.structure.StructureElement;
 import matter_manipulator.common.structure.StructureUtils;
 import matter_manipulator.common.structure.coords.Offset;
 import matter_manipulator.common.structure.coords.Position;
@@ -16,12 +16,12 @@ import matter_manipulator.common.utils.MathUtils;
 class StructurePart<T> {
 
     public final StructureDefinitionCoords offset;
-    public final Long2ObjectLinkedOpenHashMap<IStructureElement<? super T>> elements = new Long2ObjectLinkedOpenHashMap<>();
+    public final Long2ObjectLinkedOpenHashMap<StructureElement<? super T>> elements = new Long2ObjectLinkedOpenHashMap<>();
     public final Char2ObjectOpenHashMap<List<Position<StructureDefinitionCoords>>> sockets = new Char2ObjectOpenHashMap<>();
 
     public final int depth, width, height;
 
-    public StructurePart(String name, String[][] shape, Char2ObjectOpenHashMap<IStructureElement<? super T>> elements, Char2CharOpenHashMap sockets, Offset<StructureDefinitionCoords> offset) {
+    public StructurePart(String name, String[][] shape, Char2ObjectOpenHashMap<StructureElement<? super T>> elements, Char2CharOpenHashMap sockets, Offset<StructureDefinitionCoords> offset) {
         int x = 0, y = 0, z = 0;
 
         StructureDefinitionCoords offsetTemp = offset == null ? null : new StructureDefinitionCoords(offset.x, offset.y, offset.z);
@@ -53,7 +53,7 @@ class StructurePart<T> {
 
                         offsetTemp = new StructureDefinitionCoords(x, y, z);
                     } else {
-                        IStructureElement<? super T> element = getStructureElement(name, c, elements);
+                        StructureElement<? super T> element = getStructureElement(name, c, elements);
 
                         if (element != null) {
                             this.elements.put(MathUtils.pack(x, y, z), element);
@@ -76,12 +76,12 @@ class StructurePart<T> {
         this.depth = z;
     }
 
-    private static <T> IStructureElement<? super T> getStructureElement(String partName, char c, Char2ObjectOpenHashMap<IStructureElement<? super T>> elements) {
+    private static <T> StructureElement<? super T> getStructureElement(String partName, char c, Char2ObjectOpenHashMap<StructureElement<? super T>> elements) {
         return switch (c) {
             case '~', ' ' -> null;
             case '+' -> StructureUtils.air();
             default -> {
-                IStructureElement<? super T> el = elements.get(c);
+                StructureElement<? super T> el = elements.get(c);
 
                 if (el == null) {
                     throw new IllegalStateException("Missing element for character '" + c + "' in part " + partName);

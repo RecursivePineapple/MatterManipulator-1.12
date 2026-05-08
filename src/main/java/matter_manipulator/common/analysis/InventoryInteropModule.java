@@ -12,12 +12,12 @@ import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.analysis.ApplyMode;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IInteropModule;
+import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.persist.IDataStorage;
 
-public class InventoryInteropModule implements IInteropModule<InventoryAnalysis> {
+public class InventoryInteropModule implements InteropModule<InventoryAnalysis> {
 
     @Override
     public Optional<InventoryAnalysis> analyze(BlockAnalysisContext context) {

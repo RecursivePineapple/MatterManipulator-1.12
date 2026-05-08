@@ -31,7 +31,7 @@ public class MMTextBuilder {
         this.key = langKey;
     }
 
-    public MMTextBuilder(ILocalizer message) {
+    public MMTextBuilder(Localizer message) {
         this.key = message;
     }
 

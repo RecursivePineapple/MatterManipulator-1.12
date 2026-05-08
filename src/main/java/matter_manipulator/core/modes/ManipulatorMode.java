@@ -13,12 +13,12 @@ import com.cleanroommc.modularui.api.drawable.IKey;
 import matter_manipulator.client.gui.BranchableRadialMenu;
 import matter_manipulator.client.rendering.ModeRenderer;
 import matter_manipulator.common.networking.MMPacketBuffer;
-import matter_manipulator.core.building.IBuildable;
+import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.util.Coroutine;
 
-public interface ManipulatorMode<Config, Buildable extends IBuildable> {
+public interface ManipulatorMode<TConfig, TBuildable extends Buildable> {
 
     @Contract(pure = true)
     ResourceLocation getModeID();
@@ -28,7 +28,7 @@ public interface ManipulatorMode<Config, Buildable extends IBuildable> {
 
     @Contract(pure = true)
     @SideOnly(Side.CLIENT)
-    ModeRenderer<Config, Buildable> getRenderer(ManipulatorContext context);
+    ModeRenderer<TConfig, TBuildable> getRenderer(ManipulatorContext context);
 
     void addTooltipInfo(ManipulatorContext context, List<String> lines);
 
@@ -45,22 +45,22 @@ public interface ManipulatorMode<Config, Buildable extends IBuildable> {
     }
 
     @Contract(pure = true)
-    default Config getPreviewConfig(Config config, ManipulatorContext context) {
+    default TConfig getPreviewConfig(TConfig config, ManipulatorContext context) {
         return config;
     }
 
     @Contract(mutates = "param2")
-    Optional<Config> onPickBlock(Config config, ManipulatorContext context);
+    Optional<TConfig> onPickBlock(TConfig config, ManipulatorContext context);
 
     @Contract(mutates = "param2")
-    Optional<Config> onRightClick(Config config, ManipulatorContext context);
+    Optional<TConfig> onRightClick(TConfig config, ManipulatorContext context);
 
     default boolean handleRickClick(ManipulatorContext context) {
         IDataStorage storage = context.getState().getActiveModeConfigStorage();
 
-        Config config = this.loadConfig(storage);
+        TConfig config = this.loadConfig(storage);
 
-        Optional<Config> newConfig = this.onRightClick(config, context);
+        Optional<TConfig> newConfig = this.onRightClick(config, context);
 
         if (newConfig.isPresent()) {
             this.saveConfig(storage, newConfig.get());
@@ -73,16 +73,16 @@ public interface ManipulatorMode<Config, Buildable extends IBuildable> {
         }
     }
 
-    /// Creates a coroutine which will produce a [Buildable] once finished. This method should just create the objects,
+    /// Creates a coroutine which will produce a [TBuildable] once finished. This method should just create the objects,
     /// no analysis should be done until the coroutine is executed.
     @Contract(mutates = "param2")
-    Coroutine<Buildable> startAnalysis(Config config, ManipulatorContext context);
+    Coroutine<TBuildable> startAnalysis(TConfig config, ManipulatorContext context);
 
-    Config loadConfig(IDataStorage storage);
-    void saveConfig(IDataStorage storage, Config config);
+    TConfig loadConfig(IDataStorage storage);
+    void saveConfig(IDataStorage storage, TConfig config);
 
     boolean needsSync();
 
-    void write(MMPacketBuffer buffer, Buildable buildable);
-    Buildable read(MMPacketBuffer buffer);
+    void write(MMPacketBuffer buffer, TBuildable buildable);
+    TBuildable read(MMPacketBuffer buffer);
 }

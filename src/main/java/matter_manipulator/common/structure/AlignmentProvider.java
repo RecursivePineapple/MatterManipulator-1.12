@@ -2,8 +2,8 @@ package matter_manipulator.common.structure;
 
 import javax.annotation.Nullable;
 
-public interface IAlignmentProvider {
+public interface AlignmentProvider {
 
     @Nullable
-    IAlignment getAlignment();
+    Alignment getAlignment();
 }

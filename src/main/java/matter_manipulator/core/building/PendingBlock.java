@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import lombok.EqualsAndHashCode;
 import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.common.utils.math.Location;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.persist.NBTPersist;
 
 /**
@@ -22,23 +22,23 @@ import matter_manipulator.core.persist.NBTPersist;
 @EqualsAndHashCode(callSuper = true)
 public class PendingBlock extends Location {
 
-    public IBlockSpec spec;
+    public BlockSpec spec;
 
     public PendingBlock() {
 
     }
 
-    public PendingBlock(World world, int x, int y, int z, @NotNull IBlockSpec spec) {
+    public PendingBlock(World world, int x, int y, int z, @NotNull BlockSpec spec) {
         super(world.provider.getDimension(), x, y, z);
         this.spec = spec;
     }
 
-    public PendingBlock(int worldId, int x, int y, int z, @NotNull IBlockSpec spec) {
+    public PendingBlock(int worldId, int x, int y, int z, @NotNull BlockSpec spec) {
         super(worldId, x, y, z);
         this.spec = spec;
     }
 
-    public PendingBlock(World world, Vector3i voxel, IBlockSpec spec) {
+    public PendingBlock(World world, Vector3i voxel, BlockSpec spec) {
         this(world.provider.getDimension(), voxel.x, voxel.y, voxel.z, spec);
     }
 
@@ -68,7 +68,7 @@ public class PendingBlock extends Location {
         this.y = pos.getY();
         this.z = pos.getZ();
 
-        this.spec = NBTPersist.GSON.fromJson(buffer.readBSON(), IBlockSpec.class);
+        this.spec = NBTPersist.GSON.fromJson(buffer.readBSON(), BlockSpec.class);
     }
 
     public static PendingBlock decodeNew(MMPacketBuffer buffer) {

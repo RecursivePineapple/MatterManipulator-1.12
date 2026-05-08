@@ -16,13 +16,13 @@ import com.google.gson.JsonElement;
 ///   }
 /// }
 /// ```
-public interface IBlockSpecLoader {
+public interface BlockSpecLoader {
 
     /// A short string that uniquely identifies this loader. Note that this is attached to all block specs that this
     /// loader is associated with, so please keep it terse.
     String getKey();
 
-    IBlockSpec load(JsonElement element);
+    BlockSpec load(JsonElement element);
 
-    JsonElement save(IBlockSpec spec);
+    JsonElement save(BlockSpec spec);
 }

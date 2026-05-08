@@ -16,7 +16,7 @@ import matter_manipulator.core.context.BlockPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.interop.MMRegistries;
 import matter_manipulator.core.persist.IDataStorage;
-import matter_manipulator.core.persist.IStateSandbox;
+import matter_manipulator.core.persist.StateSandbox;
 import matter_manipulator.core.resources.ResourceStack;
 
 /// A module that allows a matter manipulator to interact with a block or tile entity. This may do anything so long as
@@ -27,43 +27,43 @@ import matter_manipulator.core.resources.ResourceStack;
 /// <br />
 /// 1. A manipulator starts analyzing a block in the world.
 /// <br />
-/// 2. It loops over all registered [IInteropModule] objects and calls [#analyze(BlockAnalysisContext)].
+/// 2. It loops over all registered [InteropModule] objects and calls [#analyze(BlockAnalysisContext)].
 /// <br />
 /// 3. The analysis results are stored in a `Map<IInteropModule<AnalysisResult>, AnalysisResult>` within a
-/// [IBlockSpec].
+/// [BlockSpec].
 /// <p />
-/// From here, the [IBlockSpec] can either be saved, applied to a block, or discarded entirely.
+/// From here, the [BlockSpec] can either be saved, applied to a block, or discarded entirely.
 /// <p />
 /// When saving, this is the data flow:
 /// <br />
-/// 1. An [IBlockSpec] loops over its stored analysis results and calls [#save(IDataStorage, Object)].
+/// 1. An [BlockSpec] loops over its stored analysis results and calls [#save(IDataStorage , Object)].
 /// <br />
 /// 2. Each interop module retrieves a sandboxed state storage via one of the [IDataStorage#getSandbox(String, String)]
 /// overloads and writes its data to a [JsonElement], which is persisted by calling
-/// [IStateSandbox#setValue(JsonElement)]. [IStateSandbox#save(Object)] compacts the two operations into one call if the
+/// [StateSandbox#setValue(JsonElement)]. [StateSandbox#save(Object)] compacts the two operations into one call if the
 /// exact format doesn't matter.
 /// <br />
-/// 3. The [IBlockSpec] saves its own state into a [JsonObject] via a [IBlockSpecLoader], which is then converted to a
+/// 3. The [BlockSpec] saves its own state into a [JsonObject] via a [BlockSpecLoader], which is then converted to a
 /// [NBTTagCompound].
 /// <p />
 /// When loading, this is the data flow:
 /// <br />
-/// 1. An [IBlockSpec] is loaded from a [NBTTagCompound]. In the process, the state sandbox is loaded and the
-/// [IBlockSpec] loops over all analysis results (which are identified by their name, see [MMRegistries#interop()]) and
+/// 1. An [BlockSpec] is loaded from a [NBTTagCompound]. In the process, the state sandbox is loaded and the
+/// [BlockSpec] loops over all analysis results (which are identified by their name, see [MMRegistries#interop()]) and
 /// loads their results via [#load(IDataStorage)].
 /// <br />
-/// 2. Each [IInteropModule] loads its sandbox and deserializes its state into its object, which is stored in a
-/// `Map<IInteropModule<AnalysisResult>, AnalysisResult>` within the [IBlockSpec].
+/// 2. Each [InteropModule] loads its sandbox and deserializes its state into its object, which is stored in a
+/// `Map<IInteropModule<AnalysisResult>, AnalysisResult>` within the [BlockSpec].
 /// <br />
-/// 3. As before, the [IBlockSpec] can either be saved again, applied to a block, or discarded entirely.
+/// 3. As before, the [BlockSpec] can either be saved again, applied to a block, or discarded entirely.
 ///
 /// @param <AnalysisResult> The analysis result.
 ///
-/// @see IBlockSpec
-/// @see IStateSandbox
+/// @see BlockSpec
+/// @see StateSandbox
 /// @see IDataStorage
 /// @see MMRegistries#interop()
-public interface IInteropModule<AnalysisResult> {
+public interface InteropModule<AnalysisResult> {
 
     /// Analyzes a block in the world and returns this interop module's analysis result. Returns [Optional#empty()] if
     /// this module cannot analyze or affect the requested block.

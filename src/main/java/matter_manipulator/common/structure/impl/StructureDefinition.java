@@ -4,7 +4,7 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.common.structure.IStructureDefinition;
-import matter_manipulator.common.structure.IStructureElement;
+import matter_manipulator.common.structure.StructureElement;
 import matter_manipulator.common.structure.StructureContext;
 import matter_manipulator.common.structure.StructureWalker;
 import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
@@ -24,7 +24,7 @@ public class StructureDefinition<T> implements IStructureDefinition<T> {
     }
 
     @Override
-    public IStructureElement<? super T> getStructureElement(String part, Position<StructureDefinitionCoords> pos) {
+    public StructureElement<? super T> getStructureElement(String part, Position<StructureDefinitionCoords> pos) {
         return parts.get(part).elements.get(MathUtils.pack(pos.x, pos.y, pos.z));
     }
 
@@ -54,7 +54,7 @@ public class StructureDefinition<T> implements IStructureDefinition<T> {
             var e = iter.next();
 
             long key = e.getLongKey();
-            IStructureElement<? super T> element = e.getValue();
+            StructureElement<? super T> element = e.getValue();
 
             pos.x = MathUtils.unpackX(key);
             pos.y = MathUtils.unpackY(key);

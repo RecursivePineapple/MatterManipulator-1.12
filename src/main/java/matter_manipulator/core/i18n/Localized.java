@@ -22,7 +22,7 @@ import matter_manipulator.common.utils.MCUtils;
 /**
  * A data structure that represents an unlocalized message. This can be sent over the network easily.
  *
- * @see ILocalizer
+ * @see Localizer
  * @see MCUtils#processFormatStacks(String)
  * @see MMTextBuilder
  */
@@ -64,8 +64,8 @@ public class Localized {
         this.args = args;
     }
 
-    /** Localizes an {@link ILocalizer}, which may have additional processing on the client */
-    public Localized(ILocalizer key, Object... args) {
+    /** Localizes an {@link Localizer}, which may have additional processing on the client */
+    public Localized(Localizer key, Object... args) {
         this.key = key;
         this.args = args;
     }
@@ -77,9 +77,9 @@ public class Localized {
         this.args = args.toArray(new Object[0]);
     }
 
-    /** Localizes an {@link ILocalizer}, which may have additional processing on the client */
+    /** Localizes an {@link Localizer}, which may have additional processing on the client */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public Localized(ILocalizer key, Collection args) {
+    public Localized(Localizer key, Collection args) {
         this.key = key;
         this.args = args.toArray(new Object[0]);
     }
@@ -97,7 +97,7 @@ public class Localized {
     private static final byte KEY_LANG = 1;
 
     public void encode(MMPacketBuffer buffer) {
-        if (key instanceof ILocalizer message) {
+        if (key instanceof Localizer message) {
             buffer.writeByte(KEY_LOCALIZER);
             buffer.writeResourceLocation(MMRegistriesInternal.getLocalizerID(message));
         } else {
@@ -151,7 +151,7 @@ public class Localized {
         String colour = baseColour == null ? "" : baseColour.toString();
 
         // §s and §t are format stack codes, see processFormatStacks for more info
-        if (key instanceof ILocalizer message) {
+        if (key instanceof Localizer message) {
             return "§s" + colour + message.localize(argProcessor, args) + "§t";
         } else {
             return "§s" + colour + MCUtils.translate((String) key, argProcessor.process(args)) + "§t";

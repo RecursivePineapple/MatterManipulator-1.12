@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 
 import matter_manipulator.common.context.BuildingContextImpl;
 import matter_manipulator.common.items.ItemMatterManipulator;
-import matter_manipulator.core.building.IBuildable;
+import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.meta.MetaKey;
 import matter_manipulator.core.util.CoroutineFuture;
 
@@ -17,12 +17,12 @@ public class BuildContainer {
 
     public BuildingContextImpl context;
 
-    public CoroutineFuture<IBuildable> task;
+    public CoroutineFuture<Buildable> task;
 
-    public IBuildable buildable;
+    public Buildable buildable;
     public boolean done = false;
 
-    public BuildContainer(World world, EntityPlayerMP player, EnumHand hand, CoroutineFuture<IBuildable> task) {
+    public BuildContainer(World world, EntityPlayerMP player, EnumHand hand, CoroutineFuture<Buildable> task) {
         this.player = player;
         this.hand = hand;
         this.task = task;

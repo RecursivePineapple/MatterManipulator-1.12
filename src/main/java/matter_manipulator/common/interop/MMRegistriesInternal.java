@@ -44,15 +44,15 @@ import matter_manipulator.common.resources.item.ios.DroppingItemStackIOFactory;
 import matter_manipulator.common.resources.item.ios.PlayerInventoryItemStackIOFactory;
 import matter_manipulator.common.utils.deps.DependencyGraph;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
-import matter_manipulator.core.block_spec.IBlockSpecLoader;
-import matter_manipulator.core.block_spec.IInteropModule;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.fluid.FluidStackIO;
-import matter_manipulator.core.i18n.ILocalizer;
+import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.interop.BlockStateTransformer;
@@ -79,7 +79,7 @@ import matter_manipulator.core.settings.ManipulatorSetting;
 public class MMRegistriesInternal {
 
     public static final DependencyGraph<BlockResetter> BLOCK_RESETTERS = new DependencyGraph<>(new BlockResetter[0]);
-    public static final DependencyGraph<IInteropModule<?>> INTEROP_MODULES = new DependencyGraph<IInteropModule<?>>(new IInteropModule[0]);
+    public static final DependencyGraph<InteropModule<?>> INTEROP_MODULES = new DependencyGraph<InteropModule<?>>(new InteropModule[0]);
     public static final DependencyGraph<InventoryAdapterFactory<? extends IntItemResourceStack>> INV_ADAPTERS = new DependencyGraph<InventoryAdapterFactory<? extends IntItemResourceStack>>(new InventoryAdapterFactory[0]);
     public static final DependencyGraph<InventoryAdapterFactory<? extends FluidResourceStack>> TANK_ADAPTERS = new DependencyGraph<InventoryAdapterFactory<? extends FluidResourceStack>>(new InventoryAdapterFactory[0]);
     public static final DependencyGraph<BlockSpecExtractor> SPEC_EXTRACTORS = new DependencyGraph<>(new BlockSpecExtractor[0]);
@@ -88,12 +88,12 @@ public class MMRegistriesInternal {
     public static final Map<ResourceLocation, ManipulatorMode<?, ?>> MODES = new Object2ObjectOpenHashMap<>();
     public static final Map<ResourceLocation, ManipulatorSetting<?>> SETTINGS = new Object2ObjectOpenHashMap<>();
     public static final Map<Resource, ResourceProviderFactory> RESOURCES = new Object2ObjectOpenHashMap<>();
-    public static final Object2ObjectMap<String, IBlockSpecLoader> LOADERS = new Object2ObjectOpenHashMap<>();
+    public static final Object2ObjectMap<String, BlockSpecLoader> LOADERS = new Object2ObjectOpenHashMap<>();
     public static Pair<Resource, ResourceProviderFactory>[] RESOURCE_ARRAY = new Pair[0];
     public static final Map<ResourceLocation, ManipulatorResourceLoader<?>> RESOURCE_LOADERS = new Object2ObjectOpenHashMap<>();
     public static final DependencyGraph<BlockStateTransformer> BLOCK_STATE_TRANSFORMERS = new DependencyGraph<>(new BlockStateTransformer[0]);
     public static final Map<ResourceLocation, ManipulatorKeybind> KEYBINDS = new HashMap<>();
-    public static final BiMap<ResourceLocation, ILocalizer> LOCALIZERS = HashBiMap.create();
+    public static final BiMap<ResourceLocation, Localizer> LOCALIZERS = HashBiMap.create();
     public static ImmutableItemStack[] FREE_ITEMS = new ImmutableItemStack[0];
 
     static {
@@ -208,9 +208,9 @@ public class MMRegistriesInternal {
     }
 
     @Nullable
-    public static IBlockSpec getPartialBlockSpec(TargetedManipulatorContext context) {
+    public static BlockSpec getPartialBlockSpec(TargetedManipulatorContext context) {
         for (var extractor : SPEC_EXTRACTORS.sorted()) {
-            IBlockSpec spec = extractor.getSpecPartial(context);
+            BlockSpec spec = extractor.getSpecPartial(context);
 
             if (spec != null) return spec;
         }
@@ -219,9 +219,9 @@ public class MMRegistriesInternal {
     }
 
     @Nullable
-    public static IBlockSpec getFullBlockSpec(BlockAnalysisContext context) {
+    public static BlockSpec getFullBlockSpec(BlockAnalysisContext context) {
         for (var extractor : SPEC_EXTRACTORS.sorted()) {
-            IBlockSpec spec = extractor.getSpecFull(context);
+            BlockSpec spec = extractor.getSpecFull(context);
 
             if (spec != null) return spec;
         }
@@ -229,7 +229,7 @@ public class MMRegistriesInternal {
         return null;
     }
 
-    public static IBlockSpec getFullBlockSpec(ManipulatorContext context, BlockPos pos) {
+    public static BlockSpec getFullBlockSpec(ManipulatorContext context, BlockPos pos) {
         AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
         analysisContext.setPos(pos);
         return getFullBlockSpec(analysisContext);
@@ -243,11 +243,11 @@ public class MMRegistriesInternal {
         }
     }
 
-    public static ILocalizer getLocalizer(ResourceLocation id) {
+    public static Localizer getLocalizer(ResourceLocation id) {
         return LOCALIZERS.get(id);
     }
 
-    public static ResourceLocation getLocalizerID(ILocalizer message) {
+    public static ResourceLocation getLocalizerID(Localizer message) {
         return LOCALIZERS.inverse().get(message);
     }
 }

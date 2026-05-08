@@ -11,7 +11,7 @@ import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
 import matter_manipulator.common.structure.coords.Offset;
 import matter_manipulator.common.structure.coords.StructureRelativeCoords;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
-import matter_manipulator.core.block_spec.IBlockSpec;
+import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.color.ImmutableColor;
 
 public interface StructureContext<T> {
@@ -36,7 +36,7 @@ public interface StructureContext<T> {
     @Nullable
     ItemStack getTrigger();
 
-    void emitHint(BlockPos pos, IBlockSpec spec, ImmutableColor tint);
+    void emitHint(BlockPos pos, BlockSpec spec, ImmutableColor tint);
 
     /// Attempts to consume one block of placing quota and returns true when this was possible.
     boolean consumePlaceQuota();

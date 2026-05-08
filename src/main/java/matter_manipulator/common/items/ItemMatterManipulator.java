@@ -58,7 +58,7 @@ import matter_manipulator.common.ui.ManipulatorGuiData;
 import matter_manipulator.common.ui.ManipulatorRadialMenuUI;
 import matter_manipulator.common.ui.ManipulatorUIFactory;
 import matter_manipulator.common.utils.MCUtils;
-import matter_manipulator.core.building.IBuildable;
+import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.manipulator_resource.EnergyManipulatorResource;
 import matter_manipulator.core.meta.MetadataContainer;
 import matter_manipulator.core.modes.ManipulatorMode;
@@ -344,9 +344,9 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                 ManipulatorContextImpl context = new ManipulatorContextImpl(player.getEntityWorld(), player, stack, state);
 
                 @SuppressWarnings("unchecked")
-                Coroutine<IBuildable> analysis = mode.startAnalysis(config, context);
+                Coroutine<Buildable> analysis = mode.startAnalysis(config, context);
 
-                CoroutineFuture<IBuildable> future = CoroutineExecutor.SERVER.schedule(analysis);
+                CoroutineFuture<Buildable> future = CoroutineExecutor.SERVER.schedule(analysis);
 
                 container = new BuildContainer(player.getEntityWorld(), player, player.getActiveHand(), future);
 
