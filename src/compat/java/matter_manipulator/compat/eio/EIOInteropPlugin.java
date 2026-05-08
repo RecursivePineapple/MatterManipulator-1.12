@@ -10,5 +10,7 @@ public class EIOInteropPlugin implements ModInteropPlugin {
     public void preInit() {
         MMRegistries.blockSpecExtractors().addObject("eio-top", EIOTopBlockSpecAdapter.INSTANCE, "before:simple");
         MMRegistries.registerSpecLoader(EIOTopBlockSpecAdapter.INSTANCE);
+
+        // AbstractMachineEntity
     }
 }

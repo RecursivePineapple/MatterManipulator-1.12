@@ -1,6 +1,7 @@
 package matter_manipulator.compat.eio.block_spec.specs;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
 import crazypants.enderio.base.machine.base.block.BlockMachineExtension;
@@ -34,7 +35,7 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
 
     @Override
     public IBlockState getBlockState() {
-        return state;
+        return Blocks.AIR.getDefaultState();
     }
 
     @Override
