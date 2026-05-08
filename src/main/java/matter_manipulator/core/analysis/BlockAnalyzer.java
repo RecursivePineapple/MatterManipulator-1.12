@@ -12,7 +12,7 @@ import org.joml.Vector3i;
 
 import com.github.bsideup.jabel.Desugar;
 import matter_manipulator.GlobalMMConfig.DebugConfig;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.MathUtils;
@@ -62,7 +62,7 @@ public class BlockAnalyzer {
             if (DebugConfig.debug) {
                 long post = System.nanoTime();
 
-                MMMod.LOG.info("Analysis took {} ms", (post - pre) / 1e6);
+                MatterManipulator.LOG.info("Analysis took {} ms", (post - pre) / 1e6);
             }
 
             ctx.stop(new RegionAnalysis(deltas, analysis));

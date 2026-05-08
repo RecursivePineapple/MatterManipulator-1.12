@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.items.MMUpgrades;
 import matter_manipulator.common.state.MMState;
@@ -104,7 +104,7 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
         ResourceProviderFactory<P> factory = MMRegistriesInternal.RESOURCES.get(resource);
 
         if (factory == null) {
-            MMMod.LOG.error("Tried to get a ResourceProvider for a Resource that does not have a registered ResourceProviderFactory: {}", resource);
+            MatterManipulator.LOG.error("Tried to get a ResourceProvider for a Resource that does not have a registered ResourceProviderFactory: {}", resource);
             return null;
         }
 

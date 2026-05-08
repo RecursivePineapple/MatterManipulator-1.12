@@ -7,7 +7,7 @@ import java.util.Set;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.analysis.ApplyMode;
@@ -83,7 +83,7 @@ public class InventoryInteropModule implements InteropModule<InventoryAnalysis> 
         return analysis.apply(context, adapter, ApplyMode.SIMULATE_EMPTY);
     }
 
-    private static final ResourceLocation LOC = MMMod.loc("inv");
+    private static final ResourceLocation LOC = MatterManipulator.loc("inv");
 
     @Override
     public void save(IDataStorage storage, InventoryAnalysis analysis) {

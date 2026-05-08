@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
@@ -20,7 +20,7 @@ public class BlockSpecJsonAdapter implements JsonSerializer<BlockSpec>, JsonDese
     public BlockSpec deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
         throws JsonParseException {
         if (!(json instanceof JsonObject obj)) {
-            MMMod.LOG.error("Expected JsonObject, got {}", json, new Exception());
+            MatterManipulator.LOG.error("Expected JsonObject, got {}", json, new Exception());
             return null;
         }
 
@@ -28,7 +28,7 @@ public class BlockSpecJsonAdapter implements JsonSerializer<BlockSpec>, JsonDese
             BlockSpecLoader loader = MMRegistriesInternal.LOADERS.get(e.getKey());
 
             if (loader == null) {
-                MMMod.LOG.error(
+                MatterManipulator.LOG.error(
                     "Could not load spec {}: spec loader {} was not found",
                     e.getValue(),
                     e.getKey(),

@@ -10,7 +10,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.core.meta.MetadataContainer;
 import matter_manipulator.core.resources.IteratorUsage;
 import matter_manipulator.core.resources.fluid.FluidResourceProvider;
@@ -79,14 +79,14 @@ public interface FluidStackIO {
                     result.amount += extracted.amount;
                     remaining -= extracted.amount;
                 } else {
-                    MMMod.LOG.error("FluidStackIO.pull() has misbehaved! extract() returned a stack that was supposed to be something else! Trying to reinsert the stack - Fluids may be voided. Expected={} Actual={} Iterator={}", result, extracted, iter);
+                    MatterManipulator.LOG.error("FluidStackIO.pull() has misbehaved! extract() returned a stack that was supposed to be something else! Trying to reinsert the stack - Fluids may be voided. Expected={} Actual={} Iterator={}", result, extracted, iter);
                     store(new InsertionFluidStack(extracted));
                 }
             }
         }
 
         if (result.amount < amount) {
-            MMMod.LOG.error("FluidStackIO.pull() has misbehaved! The iterator reported having more Fluids than could be extracted! Reported amount={} Extracted={} Iterator={}", sum, result, iter);
+            MatterManipulator.LOG.error("FluidStackIO.pull() has misbehaved! The iterator reported having more Fluids than could be extracted! Reported amount={} Extracted={} Iterator={}", sum, result, iter);
             store(new InsertionFluidStack(result));
             result = null;
         }

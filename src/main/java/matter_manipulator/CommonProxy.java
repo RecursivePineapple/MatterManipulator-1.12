@@ -45,7 +45,7 @@ public class CommonProxy {
     public static final BlockUplinkController UPLINK_CONTROLLER = new BlockUplinkController();
 
     public void preInit(FMLPreInitializationEvent event) {
-        MMMod.LOG.info("Loading Matter Manipulator version " + Tags.VERSION);
+        MatterManipulator.LOG.info("Loading Matter Manipulator version " + Tags.VERSION);
 
         GlobalMMConfig.init();
         MMNetwork.init();
@@ -70,7 +70,7 @@ public class CommonProxy {
     }
 
     public void registerItems(RegistryEvent.Register<Item> event) {
-        MMMod.LOG.info("Registering Items");
+        MatterManipulator.LOG.info("Registering Items");
 
         MMItemList.Cluster.set(registerItem(new ItemCluster()));
 
@@ -110,7 +110,7 @@ public class CommonProxy {
     }
 
     public void registerBlocks(Register<Block> event) {
-        MMMod.LOG.info("Registering Items");
+        MatterManipulator.LOG.info("Registering Blocks");
 
         registerBlock(HINT_BLANK);
         registerBlock(HINT_DOT);

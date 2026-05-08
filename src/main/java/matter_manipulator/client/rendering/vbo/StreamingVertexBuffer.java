@@ -16,7 +16,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.glu.GLU;
 
 import lombok.Getter;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 
 public class StreamingVertexBuffer implements AutoCloseable {
 
@@ -236,7 +236,7 @@ public class StreamingVertexBuffer implements AutoCloseable {
         mappedBuffer = GL30.glMapBufferRange(GL15.GL_ARRAY_BUFFER, 0, length, access, mappedBuffer);
 
         if (mappedBuffer == null) {
-            MMMod.LOG.error("Error mapping buffer: {}", GLU.gluErrorString(GL11.glGetError()));
+            MatterManipulator.LOG.error("Error mapping buffer: {}", GLU.gluErrorString(GL11.glGetError()));
         } else {
             mapped = true;
         }
@@ -263,7 +263,7 @@ public class StreamingVertexBuffer implements AutoCloseable {
         int error = GL11.glGetError();
 
         if (error != 0) {
-            MMMod.LOG.error("Error unmapping buffer: {}", GLU.gluErrorString(error));
+            MatterManipulator.LOG.error("Error unmapping buffer: {}", GLU.gluErrorString(error));
         }
 
         mapped = false;

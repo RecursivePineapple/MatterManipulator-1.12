@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Type;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.building.BuildStatusTracker;
 import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.state.MMState;
@@ -67,7 +67,7 @@ public class MMRenderer {
         try {
             renderSelectionImpl(event);
         } catch (Throwable t) {
-            MMMod.LOG.error("Could not draw matter manipulator preview", t);
+            MatterManipulator.LOG.error("Could not draw matter manipulator preview", t);
 
             long now = System.currentTimeMillis();
             if (now - lastExceptionPrint > 10_000) {

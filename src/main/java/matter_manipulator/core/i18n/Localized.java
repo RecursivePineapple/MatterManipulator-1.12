@@ -11,7 +11,7 @@ import net.minecraft.util.text.TextFormatting;
 
 import net.minecraftforge.fluids.FluidStack;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.Tags;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.networking.MMActionWithPayload;
@@ -231,7 +231,7 @@ public class Localized {
 
         buffer.writeByte(TYPE_INVALID);
 
-        MMMod.LOG.error("Attempted to send illegal Localized argument over the network: {}", arg, new Exception());
+        MatterManipulator.LOG.error("Attempted to send illegal Localized argument over the network: {}", arg, new Exception());
     }
 
     private static Object decodeArg(MMPacketBuffer buffer) {

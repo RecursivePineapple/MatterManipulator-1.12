@@ -366,10 +366,10 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                     container.buildable = container.task.get(1, TimeUnit.MILLISECONDS);
                     container.task = null;
                 } catch (InterruptedException e) {
-                    MMMod.LOG.error("Could not wait for build to compile", e);
+                    MatterManipulator.LOG.error("Could not wait for build to compile", e);
                     // Not fatal, but definitely weird
                 } catch (ExecutionException e) {
-                    MMMod.LOG.error("Could not wait for build to compile", e);
+                    MatterManipulator.LOG.error("Could not wait for build to compile", e);
                     // Fatal
                     container.done = true;
                     MCUtils.sendErrorToPlayer(player, MCUtils.translate("mm.info.error.build_compile_crash"));
@@ -400,7 +400,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                         container.done = true;
                     }
                 } catch (Throwable t) {
-                    MMMod.LOG.error("Could not place blocks", t);
+                    MatterManipulator.LOG.error("Could not place blocks", t);
                     MCUtils.sendErrorToPlayer(player, MCUtils.translate("mm.info.error.build_place_crash"));
                 }
             }

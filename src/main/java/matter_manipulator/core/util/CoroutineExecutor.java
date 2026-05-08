@@ -18,7 +18,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.GlobalMMConfig;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.MCUtils;
 
 /// A simple coroutine scheduler that will run expensive tasks in the background without multithreading.
@@ -72,7 +72,7 @@ public final class CoroutineExecutor {
             try {
                 future.run();
             } catch (Throwable t) {
-                MMMod.LOG.error(
+                MatterManipulator.LOG.error(
                     "Caught error while running task; it will be cancelled ({} {})",
                     future.name,
                     future.task,
@@ -88,7 +88,7 @@ public final class CoroutineExecutor {
             if (end == 0) end = System.nanoTime();
 
             if (GlobalMMConfig.DebugConfig.schedulerProfileLevel >= 2) {
-                MMMod.LOG.info(
+                MatterManipulator.LOG.info(
                     "Task {} {} took {} microseconds",
                     future.name,
                     future.task,
@@ -101,7 +101,7 @@ public final class CoroutineExecutor {
         }
 
         if (GlobalMMConfig.DebugConfig.schedulerProfileLevel >= 1) {
-            MMMod.LOG.info(
+            MatterManipulator.LOG.info(
                 "Task scheduler took {} microseconds",
                 MCUtils.formatNumbers((System.nanoTime() - start) / 1e3));
         }

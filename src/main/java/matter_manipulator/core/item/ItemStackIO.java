@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.core.meta.MetadataContainer;
 import matter_manipulator.core.resources.IteratorUsage;
@@ -84,14 +84,14 @@ public interface ItemStackIO {
 
                     remaining -= extracted.getCount();
                 } else {
-                    MMMod.LOG.error("ItemStackIO.pull() has misbehaved! extract() returned a stack that was supposed to be something else! Trying to reinsert the stack - items may be voided. Expected={} Actual={} Iterator={}", resultFilter, extracted, iter);
+                    MatterManipulator.LOG.error("ItemStackIO.pull() has misbehaved! extract() returned a stack that was supposed to be something else! Trying to reinsert the stack - items may be voided. Expected={} Actual={} Iterator={}", resultFilter, extracted, iter);
                     store(new InsertionItemStack(extracted));
                 }
             }
         }
 
         if (result.getCount() < amount) {
-            MMMod.LOG.error("ItemStackIO.pull() has misbehaved! The iterator reported having more items than could be extracted! Reported amount={} Extracted={} Iterator={}", sum, result, iter);
+            MatterManipulator.LOG.error("ItemStackIO.pull() has misbehaved! The iterator reported having more items than could be extracted! Reported amount={} Extracted={} Iterator={}", sum, result, iter);
             store(new InsertionItemStack(result));
             result = ItemStack.EMPTY;
         }

@@ -24,7 +24,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.Arrays;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.color.RGBColor;
 
@@ -187,7 +187,7 @@ public class MMRenderUtils {
 
     public static void safeBegin(BufferBuilder buffer, int glMode, VertexFormat format) {
         if (((BufferBuilderExt) buffer).mm$isDrawing()) {
-            MMMod.LOG.warn("Resetting buffer that was being drawn: this indicates a crash or logic error somewhere. Any contained geometry will be discarded.");
+            MatterManipulator.LOG.warn("Resetting buffer that was being drawn: this indicates a crash or logic error somewhere. Any contained geometry will be discarded.");
             buffer.finishDrawing();
         }
 

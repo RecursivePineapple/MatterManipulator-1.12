@@ -17,7 +17,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.DataUtils;
 
 public class BlockStateJsonAdapter implements JsonSerializer<IBlockState>, JsonDeserializer<IBlockState> {
@@ -44,7 +44,7 @@ public class BlockStateJsonAdapter implements JsonSerializer<IBlockState>, JsonD
                 IProperty<?> prop = DataUtils.find(state.getPropertyKeys(), p2 -> p2.getName().equals(kv[0]));
 
                 if (prop == null) {
-                    MMMod.LOG.warn("Tried to set invalid property {} ({}) on block {}", kv[0], kv[1], block);
+                    MatterManipulator.LOG.warn("Tried to set invalid property {} ({}) on block {}", kv[0], kv[1], block);
                     continue;
                 }
 
@@ -59,7 +59,7 @@ public class BlockStateJsonAdapter implements JsonSerializer<IBlockState>, JsonD
         Optional<@NotNull T> parsed = prop.parseValue(value);
 
         if (!parsed.isPresent()) {
-            MMMod.LOG.warn("Tried to set invalid property {} ({}) on block {}", prop.getName(), value, state.getBlock());
+            MatterManipulator.LOG.warn("Tried to set invalid property {} ({}) on block {}", prop.getName(), value, state.getBlock());
             return state;
         }
 

@@ -23,7 +23,7 @@ import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.analysis.InventoryInteropModule;
 import matter_manipulator.common.block_spec.adapters.AirBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.EIOTopBlockSpecAdapter;
@@ -181,8 +181,8 @@ public class MMRegistriesInternal {
     }
 
     static {
-        MMRegistries.registerLocalizer(MMMod.loc("join"), JoiningLocalizer.NOTHING);
-        MMRegistries.registerLocalizer(MMMod.loc("join-colons"), JoiningLocalizer.COLONS);
+        MMRegistries.registerLocalizer(MatterManipulator.loc("join"), JoiningLocalizer.NOTHING);
+        MMRegistries.registerLocalizer(MatterManipulator.loc("join-colons"), JoiningLocalizer.COLONS);
     }
 
     @Nullable

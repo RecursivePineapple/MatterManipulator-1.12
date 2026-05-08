@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
 import lombok.Getter;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 
 @Getter
 @SuppressWarnings("unused")
@@ -28,7 +28,7 @@ public class ShaderProgram implements AutoCloseable {
         try {
             program = createProgram(domain, vertShaderFilename, fragShaderFilename);
         } catch (Exception e) {
-            MMMod.LOG.error("Could not initialize shader program!", e);
+            MatterManipulator.LOG.error("Could not initialize shader program!", e);
             program = 0;
         }
         this.program = program;
@@ -40,7 +40,7 @@ public class ShaderProgram implements AutoCloseable {
         try {
             program = createProgramFromPath(vertexFile, fragmentFile);
         } catch (Exception e) {
-            MMMod.LOG.error("Could not initialize shader program!", e);
+            MatterManipulator.LOG.error("Could not initialize shader program!", e);
             program = 0;
         }
         this.program = program;
@@ -75,7 +75,7 @@ public class ShaderProgram implements AutoCloseable {
         final int shader = GL20.glCreateShader(shaderType);
 
         if (shader == 0) {
-            MMMod.LOG.error(
+            MatterManipulator.LOG.error(
                     "Could not create shader of type {} from {}: {}",
                     shaderType,
                     filename,
@@ -93,7 +93,7 @@ public class ShaderProgram implements AutoCloseable {
         GL20.glCompileShader(shader);
 
         if (GL20.glGetShaderi(shader, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            MMMod.LOG.error("Could not compile shader {}: {}", filename, getShaderLogInfo(shader));
+            MatterManipulator.LOG.error("Could not compile shader {}: {}", filename, getShaderLogInfo(shader));
             GL20.glDeleteShader(shader);
             return 0;
         }
@@ -112,7 +112,7 @@ public class ShaderProgram implements AutoCloseable {
         if (fragShader != 0) GL20.glDeleteShader(fragShader);
 
         if (GL20.glGetProgrami(program, GL20.GL_LINK_STATUS) == GL11.GL_FALSE) {
-            MMMod.LOG.error("Could not link shader: {}", getProgramLogInfo(program));
+            MatterManipulator.LOG.error("Could not link shader: {}", getProgramLogInfo(program));
             GL20.glDeleteProgram(program);
             return 0;
         }
@@ -120,7 +120,7 @@ public class ShaderProgram implements AutoCloseable {
         GL20.glValidateProgram(program);
 
         if (GL20.glGetProgrami(program, GL20.GL_VALIDATE_STATUS) == GL11.GL_FALSE) {
-            MMMod.LOG.error("Could not validate shader: {}", getProgramLogInfo(program));
+            MatterManipulator.LOG.error("Could not validate shader: {}", getProgramLogInfo(program));
             GL20.glDeleteProgram(program);
             return 0;
         }
@@ -156,7 +156,7 @@ public class ShaderProgram implements AutoCloseable {
         GL20.glCompileShader(shader);
 
         if (GL20.glGetShaderi(shader, GL20.GL_COMPILE_STATUS) == GL11.GL_FALSE) {
-            MMMod.LOG.error("Could not compile shader {}: {}", path.toString(), getShaderLogInfo(shader));
+            MatterManipulator.LOG.error("Could not compile shader {}: {}", path.toString(), getShaderLogInfo(shader));
             GL20.glDeleteShader(shader);
             return 0;
         }
@@ -180,7 +180,7 @@ public class ShaderProgram implements AutoCloseable {
 
             return code.toString();
         } catch (Exception e) {
-            MMMod.LOG.error("Could not load shader file!", e);
+            MatterManipulator.LOG.error("Could not load shader file!", e);
         }
 
         return null;
@@ -195,7 +195,7 @@ public class ShaderProgram implements AutoCloseable {
             }
             return code.toString();
         } catch (IOException e) {
-            MMMod.LOG.error("Could not load shader file: " + path, e);
+            MatterManipulator.LOG.error("Could not load shader file: " + path, e);
         }
         return null;
     }

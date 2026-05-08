@@ -11,10 +11,10 @@ import net.minecraft.util.math.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import matter_manipulator.Tags;
 import matter_manipulator.client.rendering.shader.ShaderProgram;
 import matter_manipulator.client.rendering.vbo.StreamingVertexBuffer;
 import matter_manipulator.client.rendering.vertex.QuadCentroidComparator;
-import matter_manipulator.common.utils.Mods;
 import matter_manipulator.core.color.ImmutableColor;
 
 public class BoxRenderer {
@@ -32,7 +32,7 @@ public class BoxRenderer {
 
     public BoxRenderer() {
         program = new ShaderProgram(
-            Mods.MatterManipulator.resourceDomain,
+            Tags.MODID,
             "shaders/fancybox.vert.glsl",
             "shaders/fancybox.frag.glsl"
         );

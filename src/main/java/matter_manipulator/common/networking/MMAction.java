@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
 import com.github.bsideup.jabel.Desugar;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.Tags;
 import matter_manipulator.common.networking.MMAction.ActionPacket;
 
@@ -96,18 +96,18 @@ public class MMAction extends MMPacketEncoder<ActionPacket> {
 
         if (handler instanceof NetHandlerPlayServer server) {
             if (receiver != Side.SERVER) {
-                MMMod.LOG.error("Handling server->client action on server: this packet should only be sent to the client from the server ({})", id);
+                MatterManipulator.LOG.error("Handling server->client action on server: this packet should only be sent to the client from the server ({})", id);
                 return;
             }
 
             player = server.player;
         } else if (handler instanceof NetHandlerPlayClient) {
             if (receiver != Side.CLIENT) {
-                MMMod.LOG.error("Handling client->server action on client: this packet should only be sent to the server from the client ({})", id);
+                MatterManipulator.LOG.error("Handling client->server action on client: this packet should only be sent to the server from the client ({})", id);
                 return;
             }
 
-            player = MMMod.proxy.getThePlayer();
+            player = MatterManipulator.proxy.getThePlayer();
         }
     }
 
@@ -119,7 +119,7 @@ public class MMAction extends MMPacketEncoder<ActionPacket> {
         if (shouldBeClient == isClient) {
             callback.accept(player);
         } else {
-            MMMod.LOG.warn("Not running callback for packet {} (should be client: {}, is client: {}, player: {})", id, shouldBeClient, isClient, player);
+            MatterManipulator.LOG.warn("Not running callback for packet {} (should be client: {}, is client: {}, player: {})", id, shouldBeClient, isClient, player);
         }
 
         player = null;

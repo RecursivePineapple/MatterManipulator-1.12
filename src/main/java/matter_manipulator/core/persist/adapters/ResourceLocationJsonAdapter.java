@@ -11,9 +11,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.DataUtils;
-import matter_manipulator.common.utils.Mods;
 
 public class ResourceLocationJsonAdapter implements JsonSerializer<ResourceLocation>, JsonDeserializer<ResourceLocation> {
 
@@ -22,7 +21,7 @@ public class ResourceLocationJsonAdapter implements JsonSerializer<ResourceLocat
         CommonName common = null;
 
         for (CommonName name : CommonName.values()) {
-            if (name.mod.ID.equals(src.getNamespace()) && name.name.equals(src.getPath())) {
+            if (name.mod.equals(src.getNamespace()) && name.name.equals(src.getPath())) {
                 common = name;
                 break;
             }
@@ -42,7 +41,7 @@ public class ResourceLocationJsonAdapter implements JsonSerializer<ResourceLocat
     @Override
     public ResourceLocation deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (!(json instanceof JsonPrimitive primitive)) {
-            MMMod.LOG.error("cannot parse ResourceLocation: expected number or string, but got {}", json);
+            MatterManipulator.LOG.error("cannot parse ResourceLocation: expected number or string, but got {}", json);
             return new ResourceLocation("minecraft:air");
         }
 
@@ -52,32 +51,32 @@ public class ResourceLocationJsonAdapter implements JsonSerializer<ResourceLocat
             CommonName name = DataUtils.getIndexSafe(CommonName.values(), ordinal);
 
             if (name == null) {
-                MMMod.LOG.error("cannot parse ResourceLocation: illegal common name index: {}", ordinal);
+                MatterManipulator.LOG.error("cannot parse ResourceLocation: illegal common name index: {}", ordinal);
                 return new ResourceLocation("minecraft:air");
             }
 
-            return new ResourceLocation(name.mod.ID + ":" + name.name);
+            return new ResourceLocation(name.mod + ":" + name.name);
         } else if (primitive.isString()) {
             String id = primitive.getAsString();
 
             return new ResourceLocation(id.contains(":") ? id : "minecraft:" + id);
         } else {
-            MMMod.LOG.error("cannot parse ResourceLocation: expected number or string, but got {}", json);
+            MatterManipulator.LOG.error("cannot parse ResourceLocation: expected number or string, but got {}", json);
             return new ResourceLocation("minecraft:air");
         }
     }
 
     private enum CommonName {
 
-        AIR(Mods.Minecraft, "air"),
-        GT_BLOCKMACHINES(Mods.GregTech, "gt.blockmachines"),
-        AE_ITEMPART(Mods.AppliedEnergistics2, "item.ItemMultiPart"),
+        AIR("minecraft", "air"),
+        GT_BLOCKMACHINES("gregtech", "gt.blockmachines"),
+        AE_ITEMPART("appliedenergistics2", "item.ItemMultiPart"),
         ;
 
-        public final Mods mod;
+        public final String mod;
         public final String name;
 
-        CommonName(Mods mod, String name) {
+        CommonName(String mod, String name) {
             this.mod = mod;
             this.name = name;
         }

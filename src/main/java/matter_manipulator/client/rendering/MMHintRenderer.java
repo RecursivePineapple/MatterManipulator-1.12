@@ -32,7 +32,7 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.lwjgl.opengl.GL11;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.client.rendering.vbo.StreamingVertexBuffer;
 import matter_manipulator.client.rendering.vertex.QuadCentroidComparator;
 import matter_manipulator.common.utils.world.ProxiedWorld;
@@ -175,7 +175,7 @@ public class MMHintRenderer {
 
                 vbo.upload(buffer.flip());
             } catch (Throwable t) {
-                MMMod.LOG.error("Error running background render task", t);
+                MatterManipulator.LOG.error("Error running background render task", t);
             }
 
             buildTask = null;
@@ -272,7 +272,7 @@ public class MMHintRenderer {
                     }
                 }
             } catch (Throwable t) {
-                MMMod.LOG.error("Failed to render {}", state, t);
+                MatterManipulator.LOG.error("Failed to render {}", state, t);
                 ((BufferBuilderExt) buffer).mm$setVertexCount(startVert);
                 break;
             }

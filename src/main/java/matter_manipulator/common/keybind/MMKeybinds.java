@@ -4,7 +4,7 @@ import net.minecraftforge.client.settings.KeyModifier;
 
 import org.lwjgl.input.Keyboard;
 
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.modes.CopyableMode;
 import matter_manipulator.common.modes.CuttableMode;
 import matter_manipulator.common.modes.PasteableMode;
@@ -15,7 +15,7 @@ import matter_manipulator.core.keybind.AbstractKeybinding;
 public class MMKeybinds {
 
     public static final AbstractKeybinding RESET = new AbstractKeybinding(
-        MMMod.loc("key-reset"),
+        MatterManipulator.loc("key-reset"),
         "key.mm-reset",
         "key.mm",
         KeyModifier.CONTROL,
@@ -33,7 +33,7 @@ public class MMKeybinds {
     };
 
     public static final AbstractKeybinding CUT = new AbstractKeybinding(
-        MMMod.loc("key-cut"),
+        MatterManipulator.loc("key-cut"),
         "key.mm-cut",
         "key.mm",
         KeyModifier.CONTROL,
@@ -51,7 +51,7 @@ public class MMKeybinds {
     };
 
     public static final AbstractKeybinding COPY = new AbstractKeybinding(
-        MMMod.loc("key-copy"),
+        MatterManipulator.loc("key-copy"),
         "key.mm-copy",
         "key.mm",
         KeyModifier.CONTROL,
@@ -69,7 +69,7 @@ public class MMKeybinds {
     };
 
     public static final AbstractKeybinding PASTE = new AbstractKeybinding(
-        MMMod.loc("key-paste"),
+        MatterManipulator.loc("key-paste"),
         "key.mm-paste",
         "key.mm",
         KeyModifier.CONTROL,
