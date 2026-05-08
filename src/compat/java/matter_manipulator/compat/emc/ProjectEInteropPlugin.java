@@ -9,6 +9,6 @@ public class ProjectEInteropPlugin implements ModInteropPlugin {
     @Override
     public void preInit() {
         MMRegistries.itemIOFactories()
-            .addObject("backpack/arcane-tablet", new ArcaneTabletItemStackIOFactory());
+            .addObject("backpack/arcane-tablet", new ArcaneTabletItemStackIOFactory(), "before:ae-terminal");
     }
 }

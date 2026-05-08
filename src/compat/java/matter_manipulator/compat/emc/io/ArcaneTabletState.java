@@ -11,12 +11,15 @@ import matter_manipulator.compat.util.InvSlotHandle;
 import matter_manipulator.core.item.ItemId;
 import moze_intel.projecte.api.ProjectEAPI;
 import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
+import moze_intel.projecte.gameObjs.items.TransmutationTablet;
 
 @Desugar
 public record ArcaneTabletState(InvSlotHandle tablet, IKnowledgeProvider knowledge, EntityPlayer player, ObjectOpenCustomHashSet<ItemStack> knownStacks) {
 
     public static ArcaneTabletState fromPlayer(EntityPlayer player) {
-        InvSlotHandle tablet = InvSlotHandle.find(player, stack -> stack.getItem() instanceof ItemArcaneTablet);
+        InvSlotHandle tablet = InvSlotHandle.find(player, stack -> {
+            return stack.getItem() instanceof TransmutationTablet || stack.getItem() instanceof ItemArcaneTablet;
+        });
 
         if (tablet == null) return null;
 

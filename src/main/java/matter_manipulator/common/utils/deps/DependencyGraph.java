@@ -187,8 +187,8 @@ public class DependencyGraph<T> implements IDependencyGraph<T> {
 
         ObjectLinkedOpenHashSet<String> path = new ObjectLinkedOpenHashSet<>();
 
-        for (String node : dependencies.keys()) {
-            preventCyclicDeps(node, false, path);
+        for (var e : dependencies.entries()) {
+            preventCyclicDeps(e.getKey(), e.getValue().optional, path);
         }
 
         @SuppressWarnings("rawtypes")
