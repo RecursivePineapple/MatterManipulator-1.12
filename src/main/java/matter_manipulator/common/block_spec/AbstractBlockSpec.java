@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
@@ -30,6 +31,7 @@ import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 
+@EqualsAndHashCode
 public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
 
     @SuppressWarnings("rawtypes")
@@ -102,7 +104,9 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
     public boolean matches(BlockSpec other) {
         if (this.getClass() != other.getClass()) return false;
 
-        return this.getResource().isSameType(other.getResource());
+        if (!this.getResource().isSameType(other.getResource())) return false;
+
+        return ResourceStack.getStackAmount(this.getResource()) == ResourceStack.getStackAmount(other.getResource());
     }
 
     @Override

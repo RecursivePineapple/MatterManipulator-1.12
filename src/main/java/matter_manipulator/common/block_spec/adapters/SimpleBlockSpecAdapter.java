@@ -1,8 +1,7 @@
 package matter_manipulator.common.block_spec.adapters;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +26,7 @@ public class SimpleBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoad
     public @Nullable SimpleBlockSpec getSpecPartial(TargetedManipulatorContext context) {
         IBlockState state = context.getBlockState();
 
-        boolean valid = state.getBlock().getItemDropped(state, ThreadLocalRandom.current(), 0) instanceof ItemBlock;
+        boolean valid = Item.getItemFromBlock(state.getBlock()) instanceof ItemBlock;
 
         if (!valid) return null;
 

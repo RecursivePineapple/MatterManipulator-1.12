@@ -74,10 +74,10 @@ public class CommonProxy {
 
         MMItemList.Cluster.set(registerItem(new ItemCluster()));
 
-        MMItemList.MK0.set(registerItem(new ItemMatterManipulator(ManipulatorTier.Tier0)));
-        MMItemList.MK1.set(registerItem(new ItemMatterManipulator(ManipulatorTier.Tier1)));
-        MMItemList.MK2.set(registerItem(new ItemMatterManipulator(ManipulatorTier.Tier2)));
-        MMItemList.MK3.set(registerItem(new ItemMatterManipulator(ManipulatorTier.Tier3)));
+        MMItemList.MK0.set(registerItem(new ItemMatterManipulator(ManipulatorTier.MK0)));
+        MMItemList.MK1.set(registerItem(new ItemMatterManipulator(ManipulatorTier.MK1)));
+        MMItemList.MK2.set(registerItem(new ItemMatterManipulator(ManipulatorTier.MK2)));
+        MMItemList.MK3.set(registerItem(new ItemMatterManipulator(ManipulatorTier.MK3)));
 
         MMItemList.HologramProjector.set(registerItem(HOLOGRAM_PROJECTOR));
         MMItemList.Wrench.set(registerItem(WRENCH));

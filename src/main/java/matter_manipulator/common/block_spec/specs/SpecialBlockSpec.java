@@ -60,7 +60,7 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
         hasResource = true;
         resource = new ItemStackWrapper(new ItemStack(
             state.getBlock().getItemDropped(state, ThreadLocalRandom.current(), 0),
-            state.getBlock().quantityDropped(ThreadLocalRandom.current()),
+            1,
             state.getBlock().damageDropped(state)));;
 
         return resource;

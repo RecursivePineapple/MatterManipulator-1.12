@@ -1,10 +1,10 @@
 package matter_manipulator.common.block_spec.specs;
 
 import java.util.EnumSet;
-import java.util.concurrent.ThreadLocalRandom;
 
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -59,8 +59,8 @@ public class SimpleBlockSpec extends AbstractBlockSpec {
 
         hasResource = true;
         resource = new ItemStackWrapper(new ItemStack(
-            state.getBlock(),
-            state.getBlock().quantityDropped(ThreadLocalRandom.current()),
+            Item.getItemFromBlock(state.getBlock()),
+            1,
             state.getBlock().damageDropped(state)));;
 
         return resource;

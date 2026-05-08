@@ -26,16 +26,15 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.analysis.InventoryInteropModule;
 import matter_manipulator.common.block_spec.adapters.AirBlockSpecAdapter;
-import matter_manipulator.common.block_spec.adapters.EIOTopBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.RedstoneBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.SimpleBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.SlabBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.SpecialBlockSpecAdapter;
 import matter_manipulator.common.context.AnalysisContextImpl;
-import matter_manipulator.common.interop.block_state_mutators.PropertyCopyStateTransformer;
 import matter_manipulator.common.interop.resetters.BlockRemover;
 import matter_manipulator.common.interop.resetters.InventoryEmptier;
 import matter_manipulator.common.interop.resetters.TankEmptier;
+import matter_manipulator.common.interop.state_mutators.PropertyCopyStateMutator;
 import matter_manipulator.common.inventory_adapter.ItemHandlerInventoryAdapterFactory;
 import matter_manipulator.common.inventory_adapter.StandardInventoryAdapterFactory;
 import matter_manipulator.common.modes.copying.CopyingManipulatorMode;
@@ -52,10 +51,10 @@ import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.context.TargetedManipulatorContext;
 import matter_manipulator.core.fluid.FluidStackIO;
-import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.i18n.JoiningLocalizer;
+import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.interop.BlockResetter;
-import matter_manipulator.core.interop.BlockStateTransformer;
+import matter_manipulator.core.interop.BlockStateMutator;
 import matter_manipulator.core.interop.MMRegistries;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
@@ -91,7 +90,7 @@ public class MMRegistriesInternal {
     public static final Object2ObjectMap<String, BlockSpecLoader> LOADERS = new Object2ObjectOpenHashMap<>();
     public static Pair<Resource, ResourceProviderFactory>[] RESOURCE_ARRAY = new Pair[0];
     public static final Map<ResourceLocation, ManipulatorResourceLoader<?>> RESOURCE_LOADERS = new Object2ObjectOpenHashMap<>();
-    public static final DependencyGraph<BlockStateTransformer> BLOCK_STATE_TRANSFORMERS = new DependencyGraph<>(new BlockStateTransformer[0]);
+    public static final DependencyGraph<BlockStateMutator> BLOCK_STATE_TRANSFORMERS = new DependencyGraph<>(new BlockStateMutator[0]);
     public static final Map<ResourceLocation, ManipulatorKeybind> KEYBINDS = new HashMap<>();
     public static final BiMap<ResourceLocation, Localizer> LOCALIZERS = HashBiMap.create();
     public static ImmutableItemStack[] FREE_ITEMS = new ImmutableItemStack[0];
@@ -134,7 +133,6 @@ public class MMRegistriesInternal {
         SPEC_EXTRACTORS.addObject("air", AirBlockSpecAdapter.INSTANCE, "before:simple");
         SPEC_EXTRACTORS.addObject("special", SpecialBlockSpecAdapter.INSTANCE, "before:simple");
         SPEC_EXTRACTORS.addObject("slab", SlabBlockSpecAdapter.INSTANCE, "before:simple");
-        SPEC_EXTRACTORS.addObject("eio-top", EIOTopBlockSpecAdapter.INSTANCE);
         SPEC_EXTRACTORS.addObject("simple", SimpleBlockSpecAdapter.INSTANCE);
     }
 
@@ -143,7 +141,6 @@ public class MMRegistriesInternal {
         MMRegistries.registerSpecLoader(AirBlockSpecAdapter.INSTANCE);
         MMRegistries.registerSpecLoader(SpecialBlockSpecAdapter.INSTANCE);
         MMRegistries.registerSpecLoader(SlabBlockSpecAdapter.INSTANCE);
-        MMRegistries.registerSpecLoader(EIOTopBlockSpecAdapter.INSTANCE);
         MMRegistries.registerSpecLoader(SimpleBlockSpecAdapter.INSTANCE);
     }
 
@@ -175,9 +172,9 @@ public class MMRegistriesInternal {
     }
 
     static {
-        MMRegistries.blockStateTransformers().addObject("std-facing", new PropertyCopyStateTransformer("facing", EnumFacing.class));
-        MMRegistries.blockStateTransformers().addObject("lever-facing", new PropertyCopyStateTransformer("facing", BlockLever.EnumOrientation.class));
-        MMRegistries.blockStateTransformers().addObject("slab-half", new PropertyCopyStateTransformer("half", BlockSlab.EnumBlockHalf.class));
+        MMRegistries.stateMutators().addObject("std-facing", new PropertyCopyStateMutator("facing", EnumFacing.class));
+        MMRegistries.stateMutators().addObject("lever-facing", new PropertyCopyStateMutator("facing", BlockLever.EnumOrientation.class));
+        MMRegistries.stateMutators().addObject("slab-half", new PropertyCopyStateMutator("half", BlockSlab.EnumBlockHalf.class));
     }
 
     static {

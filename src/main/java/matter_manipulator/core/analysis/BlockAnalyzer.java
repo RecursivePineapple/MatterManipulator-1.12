@@ -56,7 +56,9 @@ public class BlockAnalyzer {
 
                 BlockSpec spec = MMRegistriesInternal.getFullBlockSpec(analysisContext);
 
-                analysis.add(new PendingBlock(world, pos.getX() - a.x, pos.getY() - a.y, pos.getZ() - a.z, spec));
+                if (spec != null) {
+                    analysis.add(new PendingBlock(world, pos.getX() - a.x, pos.getY() - a.y, pos.getZ() - a.z, spec));
+                }
             }
 
             if (DebugConfig.debug) {

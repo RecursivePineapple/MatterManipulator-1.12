@@ -32,7 +32,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.DataUtils;
 
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
@@ -218,7 +218,7 @@ public class MMPacketBuffer extends PacketBuffer {
             IProperty prop = DataUtils.find(state.getPropertyKeys(), p2 -> p2.getName().equals(p.left()));
 
             if (prop == null) {
-                MMMod.LOG.warn("Tried to set invalid property {} ({}) on block {}", p.left(), p.right(), block);
+                MatterManipulator.LOG.warn("Tried to set invalid property {} ({}) on block {}", p.left(), p.right(), block);
                 continue;
             }
 
@@ -256,7 +256,7 @@ public class MMPacketBuffer extends PacketBuffer {
         Optional<T> parsed = prop.parseValue(value);
 
         if (!parsed.isPresent()) {
-            MMMod.LOG.warn("Tried to set invalid property {} ({}) on block {}", prop.getName(), value, state.getBlock());
+            MatterManipulator.LOG.warn("Tried to set invalid property {} ({}) on block {}", prop.getName(), value, state.getBlock());
             return state;
         }
 

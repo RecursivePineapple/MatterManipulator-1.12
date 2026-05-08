@@ -106,7 +106,7 @@ public class MMRegistries {
         MMRegistriesInternal.RESOURCE_LOADERS.put(loader.getResourceID(), loader);
     }
 
-    public static IDependencyGraph<BlockStateTransformer> blockStateTransformers() {
+    public static IDependencyGraph<BlockStateMutator> stateMutators() {
         return MMRegistriesInternal.BLOCK_STATE_TRANSFORMERS;
     }
 
