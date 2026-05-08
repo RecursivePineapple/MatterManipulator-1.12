@@ -17,7 +17,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.context.AnalysisContextImpl;
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.common.items.ItemMatterManipulator;
+import matter_manipulator.common.items.ManipulatorFlags;
 import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.world.ProxiedWorld;
@@ -144,14 +144,14 @@ public class StandardBuild implements PendingBlockBuildable {
 
             // if there's an existing block then skip it if we can't remove it
             if (!world.isAirBlock(pos)) {
-                if (!placingContext.hasCapability(ItemMatterManipulator.ALLOW_REMOVING)) {
+                if (!placingContext.hasCapability(ManipulatorFlags.ALLOW_REMOVING)) {
                     pendingBlocks.removeFirst();
                     continue;
                 }
             }
 
             if (!visited.add(pos)) {
-                MMMod.LOG.warn("Tried to place block twice! {}", pendingBlock);
+                MatterManipulator.LOG.warn("Tried to place block twice! {}", pendingBlock);
                 pendingBlocks.removeFirst();
                 continue;
             }

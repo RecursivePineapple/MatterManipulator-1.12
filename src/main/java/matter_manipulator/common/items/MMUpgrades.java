@@ -6,13 +6,14 @@ import matter_manipulator.CommonProxy;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import matter_manipulator.core.util.FlagSet;
 
 public enum MMUpgrades {
 
-    PowerP2P(IDMetaItem.UpgradePowerP2P, 0, 0),
-    Mining(IDMetaItem.UpgradePrototypeMining, 1, ItemMatterManipulator.ALLOW_REMOVING),
-    Speed(IDMetaItem.UpgradeSpeed, 2, 0),
-    PowerEff(IDMetaItem.UpgradePowerEff, 3, 0),
+    PowerP2P(IDMetaItem.UpgradePowerP2P, 0, FlagSet.of()),
+    Mining(IDMetaItem.UpgradePrototypeMining, 1, FlagSet.of(ManipulatorFlags.ALLOW_REMOVING)),
+    Speed(IDMetaItem.UpgradeSpeed, 2, FlagSet.of()),
+    PowerEff(IDMetaItem.UpgradePowerEff, 3, FlagSet.of()),
     //
     ;
 
@@ -28,9 +29,9 @@ public enum MMUpgrades {
 
     public final int id;
     public final int bit;
-    public final int providesCaps;
+    public final FlagSet providesCaps;
 
-    MMUpgrades(IDMetaItem id, int bit, int providesCaps) {
+    MMUpgrades(IDMetaItem id, int bit, FlagSet providesCaps) {
         this.id = id.ID;
         this.bit = bit;
         this.providesCaps = providesCaps;

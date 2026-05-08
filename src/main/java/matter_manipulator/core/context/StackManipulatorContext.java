@@ -11,6 +11,7 @@ import matter_manipulator.common.items.ManipulatorTier;
 import matter_manipulator.common.state.MMState;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.settings.ManipulatorSetting;
+import matter_manipulator.core.util.Flag;
 
 public interface StackManipulatorContext {
 
@@ -40,8 +41,8 @@ public interface StackManipulatorContext {
         return getState().hasUpgrade(upgrade);
     }
 
-    default boolean hasCapability(int flags) {
-        return getState().hasCap(flags);
+    default boolean hasCapability(Flag flag) {
+        return getState().hasCapability(flag);
     }
 
     default <T> T getSettingValue(ManipulatorSetting<T> setting) {

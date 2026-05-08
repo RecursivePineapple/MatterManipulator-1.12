@@ -30,6 +30,9 @@ public interface ManipulatorMode<TConfig, TBuildable extends Buildable> {
     @SideOnly(Side.CLIENT)
     ModeRenderer<TConfig, TBuildable> getRenderer(ManipulatorContext context);
 
+    /// Checks if the given manipulator is allowed to use this mode.
+    boolean isAllowedOnManipulator(ManipulatorContext context);
+
     void addTooltipInfo(ManipulatorContext context, List<String> lines);
 
     void addMenuItems(ManipulatorContext context, BranchableRadialMenu menu);

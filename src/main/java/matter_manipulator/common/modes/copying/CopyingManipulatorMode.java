@@ -17,11 +17,12 @@ import org.joml.Vector3i;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import matter_manipulator.Tags;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.client.gui.BranchableRadialMenu;
 import matter_manipulator.client.rendering.ModeRenderer;
 import matter_manipulator.client.rendering.modes.CopyingModeRenderer;
 import matter_manipulator.common.building.StandardBuild;
+import matter_manipulator.common.items.ManipulatorFlags;
 import matter_manipulator.common.modes.CopyableMode;
 import matter_manipulator.common.modes.PasteableMode;
 import matter_manipulator.common.modes.ResettableMode;
@@ -42,9 +43,11 @@ import matter_manipulator.core.util.Coroutine;
 public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, StandardBuild>, ResettableMode,
     CopyableMode, PasteableMode {
 
+    public static final ResourceLocation MODE_ID = MatterManipulator.loc("copying");
+
     @Override
     public ResourceLocation getModeID() {
-        return new ResourceLocation(Tags.MODID, "copying");
+        return MODE_ID;
     }
 
     @Override
@@ -55,6 +58,11 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
     @Override
     public ModeRenderer<CopyingConfig, StandardBuild> getRenderer(ManipulatorContext context) {
         return new CopyingModeRenderer();
+    }
+
+    @Override
+    public boolean isAllowedOnManipulator(ManipulatorContext context) {
+        return context.hasCapability(ManipulatorFlags.ALLOW_COPYING);
     }
 
     @Override

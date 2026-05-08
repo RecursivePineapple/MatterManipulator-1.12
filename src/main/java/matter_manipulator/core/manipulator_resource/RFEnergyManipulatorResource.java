@@ -73,10 +73,10 @@ public class RFEnergyManipulatorResource implements EnergyManipulatorResource, I
     @Override
     public double getCapacity() {
         return switch (tier) {
-            case Tier0 -> 10_000_000d;
-            case Tier1 -> 100_000_000d;
-            case Tier2 -> 10_00_000_000d;
-            case Tier3 -> 10_000_000_000d;
+            case MK0 -> 10_000_000d;
+            case MK1 -> 100_000_000d;
+            case MK2 -> 10_00_000_000d;
+            case MK3 -> 10_000_000_000d;
         };
     }
 

@@ -23,12 +23,15 @@ import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.items.MMUpgrades;
 import matter_manipulator.common.items.ManipulatorTier;
 import matter_manipulator.common.utils.math.Transform;
+import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.context.StackManipulatorContext;
 import matter_manipulator.core.manipulator_resource.ManipulatorResource;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.DataStorage;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.persist.NBTPersist;
+import matter_manipulator.core.util.Flag;
+import matter_manipulator.core.util.FlagSet;
 
 /// The NBT state of a manipulator.
 @SuppressWarnings("unused")
@@ -49,7 +52,7 @@ public class MMState {
     public Transform transform;
 
     public BitSet installedUpgrades = new BitSet();
-    public transient int upgradeProvidedCapabilities;
+    public transient FlagSet upgradeProvidedCapabilities;
 
     public transient ItemMatterManipulator manipulator;
 
@@ -95,7 +98,7 @@ public class MMState {
 
     private void onLoad() {
         for (MMUpgrades upgrade : getInstalledUpgrades()) {
-            upgradeProvidedCapabilities |= upgrade.providesCaps;
+            upgradeProvidedCapabilities.addAll(upgrade.providesCaps);
         }
     }
 
@@ -128,6 +131,18 @@ public class MMState {
         return MMRegistriesInternal.MODES.get(activeMode);
     }
 
+    public boolean setActiveMode(ManipulatorContext context, ResourceLocation modeId) {
+        var mode = MMRegistriesInternal.MODES.get(modeId);
+
+        if (mode != null && mode.isAllowedOnManipulator(context)) {
+            this.activeMode = modeId;
+            this.save.run();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public IDataStorage getActiveModeConfigStorage() {
         if (this.activeMode == null) return null;
 
@@ -151,8 +166,8 @@ public class MMState {
             .collect(Collectors.toList());
     }
 
-    public boolean hasCap(int cap) {
-        return (manipulator.tier.capabilities & cap) == cap || (upgradeProvidedCapabilities & cap) == cap;
+    public boolean hasCapability(Flag flag) {
+        return manipulator.tier.capabilities.contains(flag) || upgradeProvidedCapabilities.contains(flag);
     }
 
     @SuppressWarnings("MethodDoesntCallSuperMethod")

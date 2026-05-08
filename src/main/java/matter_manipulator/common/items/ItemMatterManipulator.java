@@ -46,7 +46,7 @@ import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
-import matter_manipulator.MMMod;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.Tags;
 import matter_manipulator.common.building.BuildContainer;
 import matter_manipulator.common.building.BuildContainer.BuildContainerMetaKey;
@@ -75,7 +75,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
     public final ManipulatorTier tier;
 
     public ItemMatterManipulator(ManipulatorTier tier) {
-        String name = "matter-manipulator-" + tier.tier;
+        String name = "matter-manipulator-" + tier.ordinal();
 
         setCreativeTab(MMCreativeTab.INSTANCE);
         setRegistryName(Tags.MODID, name);
@@ -84,19 +84,6 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
 
         this.tier = tier;
     }
-
-    private static int counter = 0;
-    public static final int CONNECTS_TO_AE = 0b1 << counter++;
-    public static final int CONNECTS_TO_UPLINK = 0b1 << counter++;
-    public static final int ALLOW_REMOVING = 0b1 << counter++;
-    public static final int ALLOW_GEOMETRY = 0b1 << counter++;
-    public static final int ALLOW_CONFIGURING = 0b1 << counter++;
-    public static final int ALLOW_COPYING = 0b1 << counter++;
-    public static final int ALLOW_EXCHANGING = 0b1 << counter++;
-    public static final int ALLOW_MOVING = 0b1 << counter++;
-    public static final int ALLOW_CABLES = 0b1 << counter++;
-
-    public static final int ALL_MODES = ALLOW_GEOMETRY | ALLOW_COPYING | ALLOW_EXCHANGING | ALLOW_MOVING | ALLOW_CABLES;
 
     // #region Energy
 
@@ -138,10 +125,10 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
     @Override
     public IRarity getForgeRarity(ItemStack stack) {
         return switch (tier) {
-            case Tier0 -> EnumRarity.COMMON;
-            case Tier1 -> EnumRarity.UNCOMMON;
-            case Tier2 -> EnumRarity.RARE;
-            case Tier3 -> EnumRarity.EPIC;
+            case MK0 -> EnumRarity.COMMON;
+            case MK1 -> EnumRarity.UNCOMMON;
+            case MK2 -> EnumRarity.RARE;
+            case MK3 -> EnumRarity.EPIC;
         };
     }
 

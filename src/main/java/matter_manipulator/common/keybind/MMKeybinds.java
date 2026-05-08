@@ -9,6 +9,7 @@ import matter_manipulator.common.modes.CopyableMode;
 import matter_manipulator.common.modes.CuttableMode;
 import matter_manipulator.common.modes.PasteableMode;
 import matter_manipulator.common.modes.ResettableMode;
+import matter_manipulator.common.modes.copying.CopyingManipulatorMode;
 import matter_manipulator.core.context.ManipulatorContext;
 import matter_manipulator.core.keybind.AbstractKeybinding;
 
@@ -59,6 +60,10 @@ public class MMKeybinds {
 
         @Override
         public boolean process(ManipulatorContext context) {
+            if (!(context.getState().getActiveMode() instanceof CopyableMode)) {
+                context.getState().setActiveMode(context, CopyingManipulatorMode.MODE_ID);
+            }
+
             if (context.getState()
                 .getActiveMode() instanceof CopyableMode copyable) {
                 return copyable.onCopyPressed(context);

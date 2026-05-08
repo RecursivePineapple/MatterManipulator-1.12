@@ -19,6 +19,7 @@ import matter_manipulator.client.rendering.ModeRenderer;
 import matter_manipulator.client.rendering.modes.GeometryModeRenderer;
 import matter_manipulator.common.building.StandardBuild;
 import matter_manipulator.common.interop.MMRegistriesInternal;
+import matter_manipulator.common.items.ManipulatorFlags;
 import matter_manipulator.common.modes.ResettableMode;
 import matter_manipulator.common.modes.geometry.GeometryConfig.PendingAction;
 import matter_manipulator.common.modes.geometry.GeometryConfig.Shape;
@@ -39,6 +40,11 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     @Override
     public String getLocalizedName() {
         return "Geometry";
+    }
+
+    @Override
+    public boolean isAllowedOnManipulator(ManipulatorContext context) {
+        return context.hasCapability(ManipulatorFlags.ALLOW_GEOMETRY);
     }
 
     @Override
