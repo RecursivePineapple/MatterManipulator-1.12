@@ -75,6 +75,8 @@ public class SlabBlockSpec extends AbstractBlockSpec {
             state.getBlock().quantityDropped(ThreadLocalRandom.current()),
             state.getBlock().damageDropped(state)));;
 
+        modifyResource(resource);
+
         return resource;
     }
 

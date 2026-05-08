@@ -1,6 +1,8 @@
 package matter_manipulator.common.block_spec;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -23,6 +25,7 @@ import matter_manipulator.core.block_spec.BlockSpecLoader;
 import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.context.BlockAnalysisContext;
 import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.persist.DataStorage;
 import matter_manipulator.core.persist.IDataStorage;
@@ -111,7 +114,22 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
 
     @Override
     public Localized getDisplayName() {
-        return getResource().getName();
+        Localized name = getResource().getName();
+
+        List<Localized> details = new ArrayList<>();
+
+        for (var e : interop.object2ObjectEntrySet()) {
+            //noinspection unchecked
+            e.getKey().getDetails(details, e.getValue());
+        }
+
+        if (!details.isEmpty()) {
+            Localized detailsJoined = new Localized(JoiningLocalizer.COMMAS, (Object[]) details.toArray(new Localized[0]));
+
+            name = new Localized("mm.misc.stack-details", name, detailsJoined);
+        }
+
+        return name;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -221,6 +239,13 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
             if (!result.isPresent()) continue;
 
             this.interop.put(interop, result.get());
+        }
+    }
+
+    public void modifyResource(ResourceStack resource) {
+        for (var e : interop.object2ObjectEntrySet()) {
+            //noinspection unchecked
+            e.getKey().modifyResource(resource, e.getValue());
         }
     }
 }

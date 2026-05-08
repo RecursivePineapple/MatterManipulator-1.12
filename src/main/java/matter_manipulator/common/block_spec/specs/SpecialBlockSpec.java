@@ -63,6 +63,8 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
             1,
             state.getBlock().damageDropped(state)));;
 
+        modifyResource(resource);
+
         return resource;
     }
 

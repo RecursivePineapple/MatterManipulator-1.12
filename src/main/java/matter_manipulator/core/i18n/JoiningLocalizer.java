@@ -10,6 +10,7 @@ public class JoiningLocalizer implements Localizer {
 
     public static final JoiningLocalizer NOTHING = new JoiningLocalizer("");
     public static final JoiningLocalizer COLONS = new JoiningLocalizer(": ");
+    public static final JoiningLocalizer COMMAS = new JoiningLocalizer(", ");
 
     public final String separator;
 

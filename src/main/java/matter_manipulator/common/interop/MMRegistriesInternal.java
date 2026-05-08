@@ -120,7 +120,6 @@ public class MMRegistriesInternal {
         INTEROP_MODULES.addSubgraph("tile-config", "after:block-identity");
 
         INTEROP_MODULES.addObject("tile-config/std-inventories", new InventoryInteropModule());
-        // AbstractMachineEntity
     }
 
     static {
@@ -180,6 +179,7 @@ public class MMRegistriesInternal {
     static {
         MMRegistries.registerLocalizer(MatterManipulator.loc("join"), JoiningLocalizer.NOTHING);
         MMRegistries.registerLocalizer(MatterManipulator.loc("join-colons"), JoiningLocalizer.COLONS);
+        MMRegistries.registerLocalizer(MatterManipulator.loc("join-commas"), JoiningLocalizer.COMMAS);
     }
 
     @Nullable

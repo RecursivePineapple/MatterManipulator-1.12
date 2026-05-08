@@ -62,6 +62,7 @@ mm.mode.geometry.shape.cylinder=Cylinder
 # Misc
 mm.misc.itemstack=%s
 mm.misc.fluidstack=%s
+mm.misc.stack-details=%s (%s)
 
 mm.misc.dir.DOWN=Down
 mm.misc.dir.UP=Up
