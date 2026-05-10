@@ -40,27 +40,27 @@ public class GeometryConfig implements GeometryBlockPalette {
 
     @Override
     public BlockSpec corners() {
-        return corners == null ? BlockSpec.AIR : corners;
+        return corners == null ? BlockSpec.air() : corners;
     }
 
     @Override
     public BlockSpec edges() {
-        return edges == null ? BlockSpec.AIR : edges;
+        return edges == null ? BlockSpec.air() : edges;
     }
 
     @Override
     public BlockSpec faces() {
-        return faces == null ? BlockSpec.AIR : faces;
+        return faces == null ? BlockSpec.air() : faces;
     }
 
     @Override
     public BlockSpec volumes() {
-        return volumes == null ? BlockSpec.AIR : volumes;
+        return volumes == null ? BlockSpec.air() : volumes;
     }
 
     public void updateBlock(BlockSelect blockSelect, BlockSpec spec, boolean printChat, EntityPlayer player) {
         if (spec == null) {
-            spec = BlockSpec.AIR;
+            spec = BlockSpec.air();
         }
 
         switch (blockSelect) {
@@ -161,7 +161,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                BlockSpec selected = BlockSpec.AIR;
+                BlockSpec selected = BlockSpec.air();
 
                 var hit = context.getHitResult();
 
@@ -183,7 +183,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                BlockSpec selected = BlockSpec.AIR;
+                BlockSpec selected = BlockSpec.air();
 
                 var hit = context.getHitResult();
 
@@ -205,7 +205,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                BlockSpec selected = BlockSpec.AIR;
+                BlockSpec selected = BlockSpec.air();
 
                 var hit = context.getHitResult();
 
@@ -227,7 +227,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                BlockSpec selected = BlockSpec.AIR;
+                BlockSpec selected = BlockSpec.air();
 
                 var hit = context.getHitResult();
 
@@ -249,7 +249,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
                 boolean forPreview) {
 
-                BlockSpec selected = BlockSpec.AIR;
+                BlockSpec selected = BlockSpec.air();
 
                 var hit = context.getHitResult();
 

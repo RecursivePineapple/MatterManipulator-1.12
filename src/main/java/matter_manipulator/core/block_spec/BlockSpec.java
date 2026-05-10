@@ -22,7 +22,9 @@ import matter_manipulator.core.resources.ResourceStack;
 @NonExtendable
 public interface BlockSpec {
 
-    BlockSpec AIR = AirBlockSpec.INSTANCE;
+    static BlockSpec air() {
+        return AirBlockSpec.INSTANCE;
+    }
 
     BlockSpecLoader getLoader();
 

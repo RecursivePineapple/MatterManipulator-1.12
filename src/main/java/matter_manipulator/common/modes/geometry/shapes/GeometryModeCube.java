@@ -35,7 +35,7 @@ public class GeometryModeCube {
                         case 1 -> palette.edges();
                         case 2 -> palette.faces();
                         case 3 -> palette.volumes();
-                        default -> BlockSpec.AIR;
+                        default -> BlockSpec.air();
                     };
 
                     blocks.add(new PendingBlock(world, x, y, z, spec));

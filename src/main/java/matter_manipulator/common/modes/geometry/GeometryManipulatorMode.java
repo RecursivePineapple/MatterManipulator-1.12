@@ -155,7 +155,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     public Optional<GeometryConfig> onPickBlock(GeometryConfig geometryConfig, ManipulatorContext context) {
         var hit = context.getHitResult();
 
-        BlockSpec selected = BlockSpec.AIR;
+        BlockSpec selected = BlockSpec.air();
 
         if (hit != null) {
             selected = MMRegistriesInternal.getFullBlockSpec(context, hit.getBlockPos());
