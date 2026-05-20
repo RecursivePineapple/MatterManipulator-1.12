@@ -1,0 +1,236 @@
+
+tile.hint_blank.name=标记（空白）
+tile.hint_dot.name=标记（点）
+tile.hint_warning.name=标记（警告）
+tile.hint_x.name=标记（X）
+tile.uplink-controller.name=量子上行链路控制器
+
+item.matter-manipulator-0.name=原型物质操纵器
+item.matter-manipulator-1.name=物质操纵器 MKI
+item.matter-manipulator-2.name=物质操纵器 MKII
+item.matter-manipulator-3.name=物质操纵器 MKIII
+
+item.metaitem.0.name=物质操纵器规划
+item.metaitem.1.name=原型物质操纵器能量核心
+item.metaitem.2.name=原型物质操纵器“计算”核心
+item.metaitem.3.name=原型物质操纵器传送核心
+item.metaitem.4.name=原型物质操纵器框架
+item.metaitem.5.name=原型物质操纵器透镜组件
+item.metaitem.6.name=物质操纵器能量核心 MKI
+item.metaitem.7.name=物质操纵器计算核心 MKI
+item.metaitem.8.name=物质操纵器传送核心 MKI
+item.metaitem.9.name=物质操纵器框架 MKI
+item.metaitem.10.name=物质操纵器透镜组件 MKI
+item.metaitem.11.name=物质操纵器能量核心 MKII
+item.metaitem.12.name=物质操纵器计算核心 MKII
+item.metaitem.13.name=物质操纵器传送核心 MKII
+item.metaitem.14.name=物质操纵器框架 MKII
+item.metaitem.15.name=物质操纵器透镜组件 MKII
+item.metaitem.16.name=物质操纵器能量核心 MKIII
+item.metaitem.17.name=物质操纵器计算核心 MKIII
+item.metaitem.18.name=物质操纵器传送核心 MKIII
+item.metaitem.19.name=物质操纵器框架 MKIII
+item.metaitem.20.name=物质操纵器透镜组件 MKIII
+item.metaitem.21.name=物质操纵器ME下行链路
+item.metaitem.22.name=物质操纵器量子下行链路
+item.metaitem.23.name=空白操纵器升级
+item.metaitem.24.name=操纵器升级：能量通道
+item.metaitem.24.desc=允许物质操纵器 MKIII从量子上行链路上的激光靶仓或多A能源仓抽取能量
+item.metaitem.25.name=操纵器升级：挖掘
+item.metaitem.25.desc=允许原型物质操纵器移除方块
+item.metaitem.26.name=操纵器升级：辅助传送器
+item.metaitem.26.desc=使操纵器的放置速率翻倍
+item.metaitem.27.name=操纵器升级：自适应线束
+item.metaitem.27.desc=操纵器的能量消耗降低50%
+
+mm.upgrade.hint=与下列任意操纵器合成以安装该升级
+
+mm.tooltip.mode=当前模式：%s
+mm.tooltip.energy.rf=%s / %s RF
+mm.tooltip.energy.eu=%s / %s EU - 电压：%s
+mm.tooltip.installed_upgrades=已安装升级：
+
+mm.structure.hatch-info=任意%s机械方块
+mm.structure.hatch-dots=（标记点：%s）
+
+# Modes
+mm.mode.geometry.shape.cube=立方体
+mm.mode.geometry.shape.line=直线
+mm.mode.geometry.shape.sphere=球体
+mm.mode.geometry.shape.cylinder=圆柱体
+
+# Misc
+mm.misc.itemstack=%s
+mm.misc.fluidstack=%s
+mm.misc.stack-details=%s（%s）
+mm.misc.colored=%s%s
+
+mm.misc.dir.DOWN=下
+mm.misc.dir.UP=上
+mm.misc.dir.NORTH=北
+mm.misc.dir.SOUTH=南
+mm.misc.dir.WEST=西
+mm.misc.dir.EAST=东
+mm.misc.dir.unknown=未知
+mm.misc.dir.null=中心
+
+# GUI
+mm.gui.set_mode=设置模式
+mm.gui.set_remove_mode=设置移除模式
+mm.gui.remove_none=不移除方块
+mm.gui.remove_replaceable=移除可替换方块
+mm.gui.remove_all=移除所有方块
+mm.gui.geometry=几何图形
+mm.gui.moving=移动
+mm.gui.copying=复制
+mm.gui.exchanging=交换
+mm.gui.cables=线缆
+mm.gui.select_blocks=选择方块
+mm.gui.set_corners=设置顶点方块
+mm.gui.set_edges=设置棱边方块
+mm.gui.set_faces=设置表面方块
+mm.gui.set_volumes=设置内部方块
+mm.gui.set_all=设置所有方块
+mm.gui.clear_all=清空所有方块
+mm.gui.set_shape=设置形状
+mm.gui.line=直线
+mm.gui.cube=立方体
+mm.gui.sphere=球体
+mm.gui.cylinder=圆柱体
+mm.gui.move_coords=移动坐标
+mm.gui.move_coord_a=移动坐标A
+mm.gui.move_all=移动全部
+mm.gui.move_coord_b=移动坐标B
+mm.gui.move_here=移动到此
+mm.gui.mark_copy=标记复制
+mm.gui.edit_stack=编辑堆叠
+mm.gui.reset=重置
+mm.gui.mark=标记
+mm.gui.planning=规划
+mm.gui.cancel_auto_plans=取消自动规划
+mm.gui.plan_all_auto=规划（全部，自动）
+mm.gui.plan_all_manual=规划（全部，手动）
+mm.gui.clear_manual_plans=清除手动规划
+mm.gui.plan_missing_manual=规划（缺失，手动）
+mm.gui.plan_missing_auto=规划（缺失，自动）
+mm.gui.edit_transform=编辑变换
+mm.gui.mark_cut=标记剪切
+mm.gui.mark_paste=标记粘贴
+mm.gui.edit_replace_whitelist=编辑替换白名单
+mm.gui.clear=清空
+mm.gui.add_block=添加方块
+mm.gui.set_block=设置方块
+mm.gui.set_block_to_replace_with=设置替换所用方块
+mm.gui.set_cable=设置线缆
+
+# InfoMessage
+
+mm.info.error.invalid_block=尝试放置无效方块：%s。
+mm.info.error.out_of_eu=物质操纵器的EU已耗尽。
+mm.info.error.could_not_remove=无法移除方块。
+mm.info.error.unplaceable_block=物质操纵器无法放置该方块：%s
+mm.info.error.could_not_place=无法放置剩余的%s个方块。
+mm.info.finished_placing=方块放置完毕。
+mm.info.warning.could_not_find=找不到以下资源：
+mm.info.warning.missing_resource=  %s x %s
+mm.info.placed_remaining=已放置%s个方块（剩余%s个）
+mm.info.warning=警告[%d, %d, %d%s]：%s
+mm.info.error=错误[%d, %d, %d%s]：%s
+mm.info.error.could_not_move_block=无法移动方块[X=%d, Y=%d, Z=%d]：%s
+mm.info.error.could_not_move_protected_block=无法移动受保护的方块[X=%d, Y=%d, Z=%d]：%s
+mm.info.error.could_not_move_invulnerable_block=无法移动不可破坏的源方块[X=%d, Y=%d, Z=%d]：%s
+mm.info.error.could_not_move_blocked_block=目标位置被阻挡，无法移动源方块[X=%d, Y=%d, Z=%d]：%s
+mm.info.process_move=已移动%s个方块（剩余%s个）
+mm.info.finished_move=方块移动完毕。
+mm.info.warning.protected_area=试图在受保护的区域内破坏/放置方块！
+mm.info.warning.not_find_container_for_fluid=找不到容纳流体的容器（已销毁流体）：
+mm.info.error.could_not_push_items_to_uplink=无法将物品推送至上行链路：
+mm.info.error.could_not_push_fluids_to_uplink=无法将流体推送至上行链路：
+mm.info.error.could_not_request_items_from_uplink=无法从上行链路请求物品：
+mm.info.added=已将%s添加至%s
+mm.info.set=已将%s设置为%s
+mm.info.set_block_to_replace_with=已将替换所用方块设置为：%s
+mm.info.added_block_to_exchange_whitelist=已将方块添加至交换白名单：%s
+mm.info.set_exchange_whitelist_to_only_contain=已将交换白名单设置为仅包含：%s
+mm.info.set_cable=设置线缆为：%s
+mm.info.error.cannot_mark_copy=无法标记数组：复制区域无效
+mm.info.error.cannot_mark_paste=无法标记数组：粘贴坐标无效
+mm.info.new_virtual_me_pattern=已将新的名为“%s”虚拟ME样板推送至上行链路。
+mm.info.error.craft_failed=规划“%s”的合成已失败。
+mm.info.craft_finished=“%s”已完成。
+mm.info.cleared_all_plans_and_pending_jobs=已清除所有规划，并取消了待处理的合成任务。
+mm.info.cleared_your_manual_plans=已清除你的手动规划。
+mm.info.cleared_your_plans_and_craft=已清除你的自动规划，并取消了它们的合成任务。
+mm.info.submitted_job=已为规划“%s”提交合成任务。
+mm.info.error.must_have_copy_region=必须标记复制区域。
+mm.info.error.must_have_paste_region=必须标记粘贴区域才能检测缺失物品。
+mm.info.required_items=所需物品：
+mm.info.not_need_creating_pattern=无需创建样板，因为所有所需物品都已存在。
+mm.info.error.not_connected=操纵器未连接到上行链路：无法创建虚拟样板。
+mm.info.error.must_look_at_block=你必须看向一个方块才能使用该命令。
+mm.info.error.property_not_found=未找到属性。
+mm.info.properties=属性：
+mm.info.intrinsic_properties=固有属性：
+mm.info.none=无
+mm.info.error.error_setting_property=设置属性时出错：%s
+mm.info.error.move_overlapping=无法在剪切区域与粘贴区域重叠时执行移动。
+mm.info.error.build_compile_crash=因崩溃无法确定要放置哪些方块。请查看服务器日志获取更多信息。
+mm.info.error.build_compile_waiting=你的物质操纵器正在确定要放置的方块，可能需要较长时间。
+mm.info.error.build_place_crash=因崩溃无法放置方块。物品可能已丢失。请查看服务器日志获取更多信息。
+mm.info.error.existing_block_missing_spec=你的物质操纵器无法处理现有方块。
+mm.info.geom.all=所有方块
+mm.info.geom.faces=表面
+mm.info.geom.edges=棱边
+mm.info.geom.corners=顶点
+mm.info.geom.volumes=内部
+
+# Chat Messages
+mm.chat.inventory-no-extract=无法从槽位%2$s中提取%1$s
+mm.chat.inventory-no-insert=无法将%s插入到槽位%s
+mm.chat.too-many-items=错误：提取了过多物品（实际获得%s，实际需要%s个%s）
+mm.chat.wrong-slot-count=槽位计数不正确：期望为%s，但实际有%s
+mm.chat.missing-slot-analysis=无效物品栏：物品栏存在槽位%s（其中包含%s），但分析中没有
+mm.chat.missing-slot-inventory=无效物品栏：期望物品栏存在槽位%s（用于%s），但实际没有
+
+# Transform
+mm.transform.info=翻转：%s\n顶面朝向：%s\n正面朝向：%s
+mm.transform.button.rotate_x-=旋转 X-
+mm.transform.button.rotate_x+=旋转 X+
+mm.transform.button.rotate_y-=旋转 Y-
+mm.transform.button.rotate_y+=旋转 Y+
+mm.transform.button.rotate_z-=旋转 Z-
+mm.transform.button.rotate_z+=旋转 Z+
+mm.transform.button.flip_x=翻转 X
+mm.transform.button.flip_y=翻转 Y
+mm.transform.button.flip_z=翻转 Z
+mm.transform.button.reset=重置
+mm.transform.header.copy=复制
+mm.transform.header.copy_a=复制（A）
+mm.transform.header.copy_b=复制（B）
+mm.transform.header.paste=粘贴
+mm.transform.header.stacking=堆叠
+
+# Keybindings
+key.mm=物质操纵器
+key.mm-cut=标记剪切
+key.mm-copy=标记复制
+key.mm-paste=标记粘贴
+key.mm-reset=重置坐标
+
+# Config
+interaction=交互
+rendering=渲染
+debug=调试
+building=建造
+
+# NEI
+mm.recipe.upgrades=操纵器升级
+
+itemGroup.matter-manipulator=物质操纵器
+
+# AE2UEL Compat Chat Messages
+mm+ae2uel.chat.cannot_install_part=无法安装部件：%s（方向：%s）
+mm+ae2uel.chat.cannot_install_cable=无法安装线缆：%s
+
+mm+ae2uel.chat.not_facade=物品不是伪装板：%s
+mm+ae2uel.chat.cannot_install_facade=无法安装伪装板：%s
