@@ -4,14 +4,22 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import crazypants.enderio.base.machine.base.block.BlockMachineExtension;
 import matter_manipulator.common.block_spec.AbstractBlockSpec;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.compat.eio.block_spec.adapters.EIOTopBlockSpecAdapter;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.context.PlacingContext;
+import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
@@ -44,6 +52,11 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
+    public @NotNull Localized getDisplayName() {
+        return new Localized("mm+eio.spec.top");
+    }
+
+    @Override
     public boolean matches(BlockSpec other) {
         if (!(other instanceof EIOTopBlockSpec topSpec)) return false;
 
@@ -56,8 +69,13 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
-    public ApplyResult place(BlockPlacingContext context) {
+    public ApplyResult place(PlacingContext context) {
         return ApplyResult.DidNothing;
+    }
+
+    @Override
+    public void getRequiredResourcesForUpdate(ManipulatorPlacingContext context, boolean skipExisting) {
+
     }
 
     @Override
@@ -73,5 +91,11 @@ public class EIOTopBlockSpec extends AbstractBlockSpec {
     @Override
     public EIOTopBlockSpec sanitized() {
         return this.clone();
+    }
+
+    @Contract(mutates = "this")
+    @Override
+    public @Nullable BlockSpecData exchange(ResourceIdentity stack, ResourceIdentity replacement) {
+        return null;
     }
 }

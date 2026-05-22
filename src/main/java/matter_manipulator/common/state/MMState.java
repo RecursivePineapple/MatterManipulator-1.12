@@ -23,9 +23,10 @@ import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.items.MMUpgrades;
 import matter_manipulator.common.items.ManipulatorTier;
 import matter_manipulator.common.utils.math.Transform;
+import matter_manipulator.core.context.HeldManipulatorContext;
 import matter_manipulator.core.context.ManipulatorContext;
-import matter_manipulator.core.context.StackManipulatorContext;
-import matter_manipulator.core.manipulator_resource.ManipulatorResource;
+import matter_manipulator.core.manipulator_state.ManipulatorState;
+import matter_manipulator.core.manipulator_state.ManipulatorStateLoader;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.DataStorage;
 import matter_manipulator.core.persist.IDataStorage;
@@ -36,6 +37,9 @@ import matter_manipulator.core.util.FlagSet;
 /// The NBT state of a manipulator.
 @SuppressWarnings("unused")
 public class MMState {
+
+    private static final int LASTEST_JSON_VERSION = 0;
+    private static final int LASTEST_DATA_VERSION = 0;
 
     @SerializedName("jv")
     private int jsonVersion = LASTEST_JSON_VERSION;
@@ -52,17 +56,18 @@ public class MMState {
     public Transform transform;
 
     public BitSet installedUpgrades = new BitSet();
-    public transient FlagSet upgradeProvidedCapabilities;
-
-    public transient ItemMatterManipulator manipulator;
 
     public DataStorage resources = new DataStorage();
 
     public DataStorage ioState = new DataStorage();
 
-    public transient Map<ResourceLocation, ManipulatorResource> resourceMap;
+    public transient Map<ResourceLocation, ManipulatorState> resourceMap;
 
     public transient Runnable save;
+
+    public transient FlagSet upgradeProvidedCapabilities;
+
+    public transient ItemMatterManipulator manipulator;
 
     public static MMState load(NBTTagCompound tag) {
         JsonObject obj = (JsonObject) NBTPersist.toJsonObject(tag);
@@ -82,9 +87,6 @@ public class MMState {
     public NBTTagCompound save() {
         return (NBTTagCompound) NBTPersist.toNbt(NBTPersist.GSON.toJsonTree(this));
     }
-
-    private static final int LASTEST_JSON_VERSION = 0;
-    private static final int LASTEST_DATA_VERSION = 0;
 
     private static void migrateJson(JsonObject obj) {
         int version = obj.has("jv") ? obj.get("jv").getAsInt() : LASTEST_JSON_VERSION;
@@ -111,12 +113,12 @@ public class MMState {
         ioState.save = save;
     }
 
-    public Map<ResourceLocation, ManipulatorResource> getResources(StackManipulatorContext context) {
+    public Map<ResourceLocation, ManipulatorState> getResources(ManipulatorContext context) {
         if (resourceMap != null) return this.resourceMap;
 
         this.resourceMap = new Object2ObjectOpenHashMap<>();
 
-        for (var entry : MMRegistriesInternal.RESOURCE_LOADERS.entrySet()) {
+        for (var entry : MMRegistriesInternal.MANIPULATOR_RESOURCE_LOADERS.entrySet()) {
             var resource = entry.getValue().load(context, this.resources);
 
             resource.ifPresent(manipulatorResource -> this.resourceMap.put(entry.getKey(), manipulatorResource));
@@ -125,13 +127,18 @@ public class MMState {
         return this.resourceMap;
     }
 
+    public <L extends ManipulatorStateLoader<S>, S extends ManipulatorState> S getState(ManipulatorContext context, L loader) {
+        //noinspection unchecked
+        return (S) getResources(context).get(loader.getResourceID());
+    }
+
     @SuppressWarnings("rawtypes")
     @Nullable
     public ManipulatorMode getActiveMode() {
         return MMRegistriesInternal.MODES.get(activeMode);
     }
 
-    public boolean setActiveMode(ManipulatorContext context, ResourceLocation modeId) {
+    public boolean setActiveMode(HeldManipulatorContext context, ResourceLocation modeId) {
         var mode = MMRegistriesInternal.MODES.get(modeId);
 
         if (mode != null && mode.isAllowedOnManipulator(context)) {

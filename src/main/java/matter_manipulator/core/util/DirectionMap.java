@@ -86,6 +86,16 @@ public class DirectionMap<T> extends AbstractMap<@Nullable EnumFacing, @NotNull 
         System.arraycopy(out, 0, values, 0, 6);
     }
 
+    public DirectionMap<T> copy(Function<T, T> clone) {
+        DirectionMap<T> out = new DirectionMap<>();
+
+        this.forEach((facing, value) -> {
+            out.put(facing, clone.apply(value));
+        });
+
+        return out;
+    }
+
     public static int index(@Nullable EnumFacing key) {
         if (key == null) return 6;
 

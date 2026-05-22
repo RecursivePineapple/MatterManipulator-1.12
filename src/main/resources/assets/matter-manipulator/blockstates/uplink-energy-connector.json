@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "facing=north": { "model": "matter-manipulator:uplink-energy-connector" },
+    "facing=south": { "model": "matter-manipulator:uplink-energy-connector", "y": 180 },
+    "facing=east": { "model": "matter-manipulator:uplink-energy-connector", "y": 90 },
+    "facing=west": { "model": "matter-manipulator:uplink-energy-connector", "y": 270 },
+    "facing=up": { "model": "matter-manipulator:uplink-energy-connector", "x": 270 },
+    "facing=down": { "model": "matter-manipulator:uplink-energy-connector", "x": 90 }
+  }
+}

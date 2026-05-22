@@ -9,12 +9,12 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import lombok.EqualsAndHashCode;
-import matter_manipulator.client.rendering.MMRenderUtils;
+import matter_manipulator.client.rendering.MMRenderConstants;
 import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.math.VoxelAABB;
 import matter_manipulator.core.color.ImmutableColor;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.PlayerContext;
 
 @EqualsAndHashCode
 public class CopyingConfig {
@@ -71,7 +71,7 @@ public class CopyingConfig {
     public enum PendingAction {
         MARK_COPY_A {
             @Override
-            public Optional<CopyingConfig> process(CopyingConfig config, ManipulatorContext context,
+            public Optional<CopyingConfig> process(CopyingConfig config, PlayerContext context,
                 boolean forPreview) {
                 config.copyA = context.getLookedAtBlock();
                 config.copyB = null;
@@ -87,12 +87,12 @@ public class CopyingConfig {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.BLUE;
+                return MMRenderConstants.BLUE;
             }
         },
         MARK_COPY_B {
             @Override
-            public Optional<CopyingConfig> process(CopyingConfig config, ManipulatorContext context,
+            public Optional<CopyingConfig> process(CopyingConfig config, PlayerContext context,
                 boolean forPreview) {
                 config.copyB = context.getLookedAtBlock();
                 config.paste = null;
@@ -107,12 +107,12 @@ public class CopyingConfig {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.BLUE;
+                return MMRenderConstants.BLUE;
             }
         },
         MARK_PASTE {
             @Override
-            public Optional<CopyingConfig> process(CopyingConfig config, ManipulatorContext context,
+            public Optional<CopyingConfig> process(CopyingConfig config, PlayerContext context,
                 boolean forPreview) {
                 config.paste = context.getLookedAtBlock();
                 config.stack = null;
@@ -126,12 +126,12 @@ public class CopyingConfig {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.ORANGE;
+                return MMRenderConstants.ORANGE;
             }
         },
         MARK_STACK {
             @Override
-            public Optional<CopyingConfig> process(CopyingConfig config, ManipulatorContext context,
+            public Optional<CopyingConfig> process(CopyingConfig config, PlayerContext context,
                 boolean forPreview) {
                 config.stack = config.calculateStack(context.getLookedAtBlock());
 
@@ -144,13 +144,13 @@ public class CopyingConfig {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.GREEN;
+                return MMRenderConstants.GREEN;
             }
         },
         //
         ;
 
-        public Optional<CopyingConfig> process(CopyingConfig config, ManipulatorContext context, boolean forPreview) {
+        public Optional<CopyingConfig> process(CopyingConfig config, PlayerContext context, boolean forPreview) {
             throw new UnsupportedOperationException();
         }
 

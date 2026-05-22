@@ -24,14 +24,14 @@ import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.building.PendingBlockBuildable;
 import matter_manipulator.core.color.ImmutableColor;
 import matter_manipulator.core.color.RGBColor;
-import matter_manipulator.core.context.ManipulatorRenderingContext;
+import matter_manipulator.core.context.RenderingContext;
 import matter_manipulator.core.misc.BuildFeedback;
 
 public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildable>
     implements ModeRenderer<Config, Buildable> {
 
     private static final ImmutableColor WHITE = RGBColor.fromRGB(0xE5F2FF);
-    private static final ImmutableColor INFO = RGBColor.fromRGB(0x3e73ff);
+    private static final ImmutableColor NOTICE = RGBColor.fromRGB(0x3e73ff);
     private static final ImmutableColor WARNING = RGBColor.fromRGB(0xFFAA00);
     private static final ImmutableColor ERROR = RGBColor.fromRGB(0xFF5555);
 
@@ -41,12 +41,12 @@ public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildabl
     public static final Lazy<BlockSpec> HINT_X = new Lazy<>(() -> new SimpleBlockSpec(CommonProxy.HINT_X.getDefaultState()));
 
     @Override
-    public void renderOverlay(ManipulatorRenderingContext context, Config config, Buildable buildable) {
+    public void renderOverlay(RenderingContext context, Config config, Buildable buildable) {
 
     }
 
     @Override
-    public void emitHints(ManipulatorRenderingContext context, Config config, Buildable buildable) {
+    public void emitHints(RenderingContext context, Config config, Buildable buildable) {
         OptionalInt maxRange = context.getMaxRange();
 
         int i = 0;
@@ -91,7 +91,7 @@ public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildabl
                 tint = switch (feedback.severity()) {
                     case ERROR -> ERROR;
                     case WARNING -> WARNING;
-                    case INFO -> INFO;
+                    case NOTICE -> NOTICE;
                 };
             }
 
@@ -131,7 +131,7 @@ public class StandardModeRenderer<Config, Buildable extends PendingBlockBuildabl
                 tint = switch (feedback.severity()) {
                     case ERROR -> ERROR;
                     case WARNING -> WARNING;
-                    case INFO -> INFO;
+                    case NOTICE -> NOTICE;
                 };
             }
 

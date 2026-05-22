@@ -19,7 +19,7 @@ import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 import matter_manipulator.core.util.Coroutine;
 
 public class BlockAnalyzer {
@@ -27,7 +27,7 @@ public class BlockAnalyzer {
     @Desugar
     public record RegionAnalysis(Vector3i deltas, List<PendingBlock> blocks) { }
 
-    public static Coroutine<RegionAnalysis> analyzeRegion(ManipulatorContext context, Location a, Location b) {
+    public static Coroutine<RegionAnalysis> analyzeRegion(HeldManipulatorContext context, Location a, Location b) {
         World world = context.getWorld();
 
         if (!Location.areCompatible(a, b) || !a.isInWorld(world)) {

@@ -2,19 +2,19 @@ package matter_manipulator.client.rendering.modes;
 
 import org.joml.Vector3i;
 
-import matter_manipulator.client.rendering.MMRenderUtils;
+import matter_manipulator.client.rendering.MMRenderConstants;
 import matter_manipulator.client.rendering.StandardModeRenderer;
 import matter_manipulator.common.building.StandardBuild;
 import matter_manipulator.common.modes.geometry.GeometryConfig;
 import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.math.VoxelAABB;
 import matter_manipulator.core.color.ImmutableColor;
-import matter_manipulator.core.context.ManipulatorRenderingContext;
+import matter_manipulator.core.context.RenderingContext;
 
 public class GeometryModeRenderer extends StandardModeRenderer<GeometryConfig, StandardBuild> {
 
     @Override
-    public void renderOverlay(ManipulatorRenderingContext context, GeometryConfig config, StandardBuild buildable) {
+    public void renderOverlay(RenderingContext context, GeometryConfig config, StandardBuild buildable) {
         super.renderOverlay(context, config, buildable);
 
         if (config.action != null) {
@@ -42,6 +42,6 @@ public class GeometryModeRenderer extends StandardModeRenderer<GeometryConfig, S
             box.union(c);
         }
 
-        context.drawBox(box, MMRenderUtils.BLUE);
+        context.drawBox(box, MMRenderConstants.BLUE);
     }
 }

@@ -17,25 +17,22 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.github.bsideup.jabel.Desugar;
 import matter_manipulator.common.utils.DataUtils;
+import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
-import matter_manipulator.common.utils.enums.Flip;
-import matter_manipulator.common.utils.math.Transform;
 
 public class BakedMachineModel implements IBakedModel {
-
-    private static final Matrix4f[] ROTATIONS = new Matrix4f[ExtendedFacing.values().length];
-    private static final Matrix4f[] TRANSFORMS = new Matrix4f[ExtendedFacing.values().length];
 
     public final IBakedModel base;
     public final VertexFormat format;
     private final IUnlistedProperty<ExtendedFacing> facingProp;
 
     private final int posX, posY, posZ, stride;
+    // Int index of the packed normal in the vertex data, or -1 if the format has no normal.
+    private final int normalOffset;
 
     private final UV[] uvs;
 
@@ -95,6 +92,7 @@ public class BakedMachineModel implements IBakedModel {
         stride = format.getIntegerSize();
 
         int offset2 = 0;
+        int normalOffset = -1;
 
         ArrayList<UV> uvs = new ArrayList<>();
 
@@ -109,11 +107,17 @@ public class BakedMachineModel implements IBakedModel {
 
                     uvs.add(new UV(offset2 / 4, len));
                 }
+                case NORMAL -> {
+                    if ((offset2 % 4) == 0 && e.getType() == EnumType.BYTE) {
+                        normalOffset = offset2 / 4;
+                    }
+                }
             }
 
             offset2 += e.getSize();
         }
 
+        this.normalOffset = normalOffset;
         this.uvs = uvs.toArray(new UV[0]);
     }
 
@@ -127,7 +131,7 @@ public class BakedMachineModel implements IBakedModel {
 
         ExtendedFacing facing = extended.getValue(facingProp);
 
-        EnumFacing realSide = facing.getWorldDirectionInverse(side);
+        EnumFacing realSide = toModelSide(facing, side);
 
         List<BakedQuad> quads = base.getQuads(state, realSide, rand);
 
@@ -144,9 +148,16 @@ public class BakedMachineModel implements IBakedModel {
         return DataUtils.mapToList(quads, quad -> transformQuad(quad, side, facing, temp, scratch));
     }
 
-    private BakedQuad transformQuad(BakedQuad src, EnumFacing side, ExtendedFacing facing, Vector3f temp, int[] tempInts) {
-        facing = facing.with(Flip.HORIZONTAL);
+    // Inverse of our vertex transform: given a world-space face direction, returns the model-space
+    // face direction that maps to it. Derived from integerAxisSwap.translate + sign flip to match
+    // the (a=-x, b=-y, c=z) basis used in transformQuad.
+    private static EnumFacing toModelSide(ExtendedFacing facing, EnumFacing worldSide) {
+        if (worldSide == null) return null;
+        Vector3f abc = facing.getIntegerAxisSwap().translate(MathUtils.v(worldSide));
+        return MathUtils.vprime(new Vector3f(-abc.x, -abc.y, abc.z));
+    }
 
+    private BakedQuad transformQuad(BakedQuad src, EnumFacing side, ExtendedFacing facing, Vector3f temp, int[] tempInts) {
         BakedQuad out = new BakedQuad(
             src.getVertexData().clone(),
             src.getTintIndex(),
@@ -157,53 +168,43 @@ public class BakedMachineModel implements IBakedModel {
 
         int[] data = out.getVertexData();
 
-//        if (facing.getFlip().isHorizontallyFlipped()) {
-//            for (UV uv : uvs) {
-//                flipX(data, uv, tempInts);
-//            }
-//        }
-//
-//        if (facing.getFlip().isVerticallyFlipped()) {
-//            for (UV uv : uvs) {
-//                flipY(data, uv, tempInts);
-//            }
-//        }
-
         int offset = 0;
 
-        Matrix4f mat = TRANSFORMS[facing.ordinal()];
-
-        float dx = 0.5f, dy = 0.5f, dz = 0.5f;
-
-        switch (facing.getDirection()) {
-            case DOWN, UP -> {
-                dy = 0;
-            }
-            case NORTH, SOUTH -> {
-                dz = 0;
-            }
-            case WEST, EAST -> {
-                dx = 0;
-            }
-        }
-
         for (int i = 0; i < 4; i++) {
-            temp.x = Float.intBitsToFloat(data[offset + posX]) - dx;
-            temp.y = Float.intBitsToFloat(data[offset + posY]) - dy;
-            temp.z = Float.intBitsToFloat(data[offset + posZ]) - dz;
+            // Center around 0.5, convert to ABC space (NORTH_NORMAL_NONE basis: a=-x, b=-y, c=z),
+            // then inverseTranslate back to world XYZ for the target facing.
+            float cx = Float.intBitsToFloat(data[offset + posX]) - 0.5f;
+            float cy = Float.intBitsToFloat(data[offset + posY]) - 0.5f;
+            float cz = Float.intBitsToFloat(data[offset + posZ]) - 0.5f;
 
-            temp = facing.getIntegerAxisSwap().inverseTranslate(temp);
+            temp = facing.getIntegerAxisSwap().inverseTranslate(new Vector3f(-cx, -cy, cz));
 
-            data[offset + posX] = Float.floatToIntBits(temp.x + dx);
-            data[offset + posY] = Float.floatToIntBits(temp.y + dy);
-            data[offset + posZ] = Float.floatToIntBits(temp.z + dz);
+            data[offset + posX] = Float.floatToIntBits(temp.x + 0.5f);
+            data[offset + posY] = Float.floatToIntBits(temp.y + 0.5f);
+            data[offset + posZ] = Float.floatToIntBits(temp.z + 0.5f);
+
+            if (normalOffset >= 0) {
+                int packed = data[offset + normalOffset];
+                float nx = (byte)(packed & 0xFF) / 127.0f;
+                float ny = (byte)((packed >> 8) & 0xFF) / 127.0f;
+                float nz = (byte)((packed >> 16) & 0xFF) / 127.0f;
+
+                temp = facing.getIntegerAxisSwap().inverseTranslate(new Vector3f(-nx, -ny, nz));
+
+                data[offset + normalOffset] = ((byte)(temp.x * 127) & 0xFF)
+                    | (((byte)(temp.y * 127) & 0xFF) << 8)
+                    | (((byte)(temp.z * 127) & 0xFF) << 16)
+                    | (packed & 0xFF000000);
+            }
 
             offset += stride;
         }
 
-//        if (facing.getFlip().isEitherFlipped()) {
-//            swap(data, stride, 3 * stride, stride);
-//        }
+        // A single flip is a reflection, which reverses winding order.
+        // BOTH is two reflections, so winding is preserved.
+        if (facing.getFlip().isEitherFlipped()) {
+            swap(data, stride, 3 * stride, stride);
+        }
 
         return out;
     }
@@ -241,11 +242,4 @@ public class BakedMachineModel implements IBakedModel {
         return base.getOverrides();
     }
 
-    static {
-        int i = 0;
-
-        for (ExtendedFacing facing : ExtendedFacing.VALUES) {
-            TRANSFORMS[i++] = Transform.fromFacing(facing);
-        }
-    }
 }

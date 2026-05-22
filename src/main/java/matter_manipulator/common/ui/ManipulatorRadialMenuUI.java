@@ -9,7 +9,7 @@ import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
 import matter_manipulator.client.gui.RadialMenu;
 import matter_manipulator.client.gui.RadialMenuBuilder;
-import matter_manipulator.common.context.ManipulatorContextImpl;
+import matter_manipulator.common.context.HeldManipulatorContextImpl;
 import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.state.MMState;
 import matter_manipulator.core.modes.ManipulatorMode;
@@ -32,7 +32,7 @@ public class ManipulatorRadialMenuUI implements IGuiHolder<ManipulatorGuiData> {
         ItemStack heldStack = data.getManipulatorStack();
         MMState initialState = ItemMatterManipulator.getState(heldStack);
 
-        ManipulatorContextImpl context = new ManipulatorContextImpl(data.getWorld(), data.getPlayer(), heldStack, initialState);
+        HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(data.getWorld(), data.getPlayer(), heldStack, initialState);
 
         return new RadialMenuBuilder("menu", syncManager)
             .innerIcon(heldStack)
@@ -54,7 +54,7 @@ public class ManipulatorRadialMenuUI implements IGuiHolder<ManipulatorGuiData> {
     }
 
     @SuppressWarnings("rawtypes")
-    private void addCommonOptions(RadialMenuBuilder builder, ManipulatorContextImpl context) {
+    private void addCommonOptions(RadialMenuBuilder builder, HeldManipulatorContextImpl context) {
         builder
             .branch()
                 .label(IKey.str("Settings"))

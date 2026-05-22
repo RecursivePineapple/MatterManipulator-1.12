@@ -4,6 +4,8 @@ import matter_manipulator.common.structure.coords.Position;
 import matter_manipulator.common.structure.coords.StructureDefinitionCoords;
 import matter_manipulator.common.structure.coords.StructureRelativeCoords;
 import matter_manipulator.common.structure.impl.StructureDefinitionBuilder;
+import matter_manipulator.core.context.StructureContext;
+import matter_manipulator.core.context.StructureInteractContext;
 
 public interface IStructureDefinition<T> {
 
@@ -21,10 +23,10 @@ public interface IStructureDefinition<T> {
     /// Scans a whole part and returns true when all elements match.
     boolean checkPart(StructureContext<T> context);
 
-    void build(StructureContext<T> context);
+    void build(StructureInteractContext<T> context);
 
     /// Emits hints for a part.
-    void emitHints(StructureContext<T> context);
+    void emitHints(StructureInteractContext<T> context);
 
     static <T> StructureDefinitionBuilder<T> builder() {
         return new StructureDefinitionBuilder<>();

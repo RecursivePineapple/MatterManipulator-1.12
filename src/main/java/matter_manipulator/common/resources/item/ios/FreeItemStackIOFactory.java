@@ -20,6 +20,8 @@ import matter_manipulator.core.resources.IteratorUsage;
 
 public class FreeItemStackIOFactory implements ItemStackIO {
 
+    public static final FreeItemStackIOFactory INSTANCE = new FreeItemStackIOFactory();
+
     @Override
     public @NotNull ItemStackIteratorBuilder iterator() {
         return new Builder();

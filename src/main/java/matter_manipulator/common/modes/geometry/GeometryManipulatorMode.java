@@ -10,6 +10,9 @@ import java.util.Optional;
 
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.jetbrains.annotations.Contract;
 
 import com.cleanroommc.modularui.api.drawable.IKey;
@@ -25,7 +28,8 @@ import matter_manipulator.common.modes.geometry.GeometryConfig.PendingAction;
 import matter_manipulator.common.modes.geometry.GeometryConfig.Shape;
 import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.core.block_spec.BlockSpec;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.RenderingContext;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.util.Coroutine;
@@ -43,17 +47,18 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public boolean isAllowedOnManipulator(ManipulatorContext context) {
+    public boolean isAllowedOnManipulator(HeldManipulatorContext context) {
         return context.hasCapability(ManipulatorFlags.ALLOW_GEOMETRY);
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
-    public ModeRenderer<GeometryConfig, StandardBuild> getRenderer(ManipulatorContext context) {
+    public ModeRenderer<GeometryConfig, StandardBuild> getRenderer(RenderingContext context) {
         return new GeometryModeRenderer();
     }
 
     @Override
-    public GeometryConfig getPreviewConfig(GeometryConfig geometryConfig, ManipulatorContext context) {
+    public GeometryConfig getPreviewConfig(GeometryConfig geometryConfig, HeldManipulatorContext context) {
         if (geometryConfig.action != null) {
             Optional<GeometryConfig> result = geometryConfig.action.process(geometryConfig, context, true);
 
@@ -66,7 +71,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public void addTooltipInfo(ManipulatorContext context, List<String> lines) {
+    public void addTooltipInfo(HeldManipulatorContext context, List<String> lines) {
         GeometryConfig config = loadConfig(context.getState().getActiveModeConfigStorage());
 
         addTooltipLine(lines, "Action: ", config.action);
@@ -90,7 +95,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public void addMenuItems(ManipulatorContext context, BranchableRadialMenu menu) {
+    public void addMenuItems(HeldManipulatorContext context, BranchableRadialMenu menu) {
         menu.branch()
             .label(IKey.str("Set Shape"))
             .pipe(shapes -> {
@@ -152,7 +157,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public Optional<GeometryConfig> onPickBlock(GeometryConfig geometryConfig, ManipulatorContext context) {
+    public Optional<GeometryConfig> onPickBlock(GeometryConfig geometryConfig, HeldManipulatorContext context) {
         var hit = context.getHitResult();
 
         BlockSpec selected = BlockSpec.air();
@@ -167,7 +172,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public Optional<GeometryConfig> onRightClick(GeometryConfig geometryConfig, ManipulatorContext context) {
+    public Optional<GeometryConfig> onRightClick(GeometryConfig geometryConfig, HeldManipulatorContext context) {
         if (geometryConfig.action != null) {
             Optional<GeometryConfig> result = geometryConfig.action.process(geometryConfig, context, false);
 
@@ -217,7 +222,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
 
     @Contract(mutates = "param2")
     @Override
-    public Coroutine<StandardBuild> startAnalysis(GeometryConfig config, ManipulatorContext context) {
+    public Coroutine<StandardBuild> startAnalysis(GeometryConfig config, HeldManipulatorContext context) {
         if (!config.shape.canRender(config.a, config.b, config.c)) {
             return ctx -> ctx.stop(new StandardBuild(new ArrayDeque<>()));
         }
@@ -226,7 +231,7 @@ public class GeometryManipulatorMode implements ManipulatorMode<GeometryConfig, 
     }
 
     @Override
-    public boolean onResetPressed(ManipulatorContext context) {
+    public boolean onResetPressed(HeldManipulatorContext context) {
         context.mutateConfig(this, config -> {
             config.action = null;
             config.a = null;

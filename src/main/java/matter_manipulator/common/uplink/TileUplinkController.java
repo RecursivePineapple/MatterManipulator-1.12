@@ -1,13 +1,14 @@
 package matter_manipulator.common.uplink;
 
+import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -18,21 +19,32 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import lombok.Getter;
 import lombok.Setter;
+import matter_manipulator.CommonProxy;
 import matter_manipulator.client.rendering.MMHintRenderer;
+import matter_manipulator.common.block_spec.specs.SimpleBlockSpec;
+import matter_manipulator.common.blocks.BlockUplinkController;
 import matter_manipulator.common.structure.Alignment;
 import matter_manipulator.common.structure.IAlignmentLimits;
 import matter_manipulator.common.structure.IStructureDefinition;
 import matter_manipulator.common.structure.MultiblockController;
-import matter_manipulator.common.structure.MultiblockStructureContext;
+import matter_manipulator.common.structure.MultiblockInteractContext;
+import matter_manipulator.common.structure.StructureElement;
 import matter_manipulator.common.structure.StructureOverlord;
 import matter_manipulator.common.structure.StructureUtils;
 import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
+import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
 import matter_manipulator.common.utils.math.VoxelAABB;
+import matter_manipulator.core.context.StructureContext;
+import matter_manipulator.core.context.StructureInteractContext;
+import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.meta.MetaKey;
+import matter_manipulator.core.resources.ResourceStack;
 
 public class TileUplinkController extends TileEntity implements MultiblockController<TileUplinkController>, ITickable,
-    Alignment {
+    Alignment, Uplink {
 
     private static final String[][] SHAPE = {
         {
@@ -130,12 +142,41 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
 
     private static final IStructureDefinition<TileUplinkController> STRUCTURE = IStructureDefinition.<TileUplinkController>builder()
         .addPart("main", SHAPE)
-        .addElement('A', StructureUtils.block(() -> Blocks.STONE.getDefaultState()))
-        .addElement('B', StructureUtils.block(() -> Blocks.STONE.getDefaultState()))
-        .addElement('C', StructureUtils.block(() -> Blocks.STONE.getDefaultState()))
-        .addElement('D', StructureUtils.block(() -> Blocks.STONE.getDefaultState()))
-        .addElement('E', StructureUtils.block(() -> Blocks.STONE.getDefaultState()))
+        .addElement('A', StructureUtils.chain(new ModuleStructureElement(), StructureUtils.spec(() -> new SimpleBlockSpec(CommonProxy.UPLINK_STRUCTURE_WHITE.getDefaultState()))))
+        .addElement('B', StructureUtils.spec(() -> new SimpleBlockSpec(CommonProxy.UPLINK_SUPPORT_BLACK.getDefaultState())))
+        .addElement('C', StructureUtils.spec(() -> new SimpleBlockSpec(CommonProxy.UPLINK_SUPPORT_WHITE.getDefaultState())))
+        .addElement('D', StructureUtils.spec(() -> new SimpleBlockSpec(CommonProxy.UPLINK_COIL.getDefaultState())))
+        .addElement('E', StructureUtils.spec(() -> new SimpleBlockSpec(CommonProxy.UPLINK_STRUCTURE_BLACK.getDefaultState())))
         .build();
+
+    private static class ModuleStructureElement implements StructureElement<TileUplinkController> {
+
+        @Override
+        public @Nullable <K> K getMetadata(MetaKey<K> key) {
+            return null;
+        }
+
+        @Override
+        public boolean check(StructureContext<? extends TileUplinkController> context, BlockPos pos) {
+            if (context.getWorld().getTileEntity(pos) instanceof TileUplinkModule module) {
+                context.getData().modules.add(module);
+                module.connect(context.getData());
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean build(StructureInteractContext<? extends TileUplinkController> context, BlockPos pos) {
+            return false;
+        }
+
+        @Override
+        public void emitHint(StructureInteractContext<? extends TileUplinkController> context, BlockPos pos) {
+
+        }
+    }
 
     @Setter
     private ExtendedFacing orientation = ExtendedFacing.DEFAULT;
@@ -143,7 +184,11 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     private VoxelAABB aabb;
 
     private boolean structureDirty = true, formed = false;
-    private final HashSet<TileUplinkModule> modules = new HashSet<>();
+    final HashSet<TileUplinkModule> modules = new HashSet<>();
+
+    @Getter
+    @Setter
+    private long address;
 
     @Override
     public void onMachineUpdate(BlockPos pos) {
@@ -168,15 +213,11 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     }
 
     @Override
-    public void validate() {
-        super.validate();
-    }
-
-    @Override
     public void invalidate() {
         super.invalidate();
 
         if (aabb != null && !this.world.isRemote) {
+            UPLINKS.remove(address);
             StructureOverlord.get((WorldServer) this.world).removeController(this);
         }
     }
@@ -188,6 +229,7 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
 
     public void updateBoundingBox() {
         if (aabb != null && !this.world.isRemote) {
+            UPLINKS.remove(address);
             StructureOverlord.get((WorldServer) this.world).removeController(this);
         }
 
@@ -206,8 +248,28 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         this.aabb.origin.set(this.pos.getX(), this.pos.getY(), this.pos.getZ());
 
         if (!this.world.isRemote) {
+            UPLINKS.put(address, new WeakReference<>(this));
             StructureOverlord.get((WorldServer) this.world).addController(this);
         }
+    }
+
+    public void updateState() {
+        UplinkState state;
+
+        if (!formed) {
+            state = UplinkState.off;
+        } else {
+            state = UplinkState.idle;
+
+            for (var module : modules) {
+                if (module.isActive()) {
+                    state = UplinkState.active;
+                    break;
+                }
+            }
+        }
+
+        world.setBlockState(pos, CommonProxy.UPLINK_CONTROLLER.getDefaultState().withProperty(BlockUplinkController.STATE, state));
     }
 
     @Override
@@ -252,7 +314,7 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
 
             modules.clear();
 
-            MultiblockStructureContext<TileUplinkController> context = new MultiblockStructureContext<>(this);
+            MultiblockInteractContext<TileUplinkController> context = new MultiblockInteractContext<>(this);
             context.part = "main";
             formed = STRUCTURE.checkPart(context);
 
@@ -261,25 +323,33 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
                     module.connect(this);
                 }
             }
+
+            updateState();
         }
     }
 
     public void onBuild(EntityPlayer player, ItemStack trigger) {
-        MultiblockStructureContext<TileUplinkController> context = new MultiblockStructureContext<>(this, player, trigger, 10);
+        if (world.isRemote) return;
+
+        MultiblockInteractContext<TileUplinkController> context = new MultiblockInteractContext<>(this, player, trigger, 10);
 
         STRUCTURE.build(context);
+
+        context.onInteractionFinished();
     }
 
     public void emitHints(EntityPlayer player, ItemStack trigger) {
-        MultiblockStructureContext<TileUplinkController> context = new MultiblockStructureContext<>(this, player, trigger, 0);
+        MultiblockInteractContext<TileUplinkController> context = new MultiblockInteractContext<>(this, player, trigger, 0);
 
         MMHintRenderer.INSTANCE.start();
         MMHintRenderer.INSTANCE.setExpiry(Duration.ofSeconds(30));
-        MMHintRenderer.INSTANCE.setDepthTest(false);
+        MMHintRenderer.INSTANCE.setDepthTest(true);
 
         STRUCTURE.emitHints(context);
 
         MMHintRenderer.INSTANCE.finish();
+
+        context.onInteractionFinished();
     }
 
     public void openUI(EntityPlayer player) {
@@ -343,5 +413,34 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     @Override
     public IAlignmentLimits getAlignmentLimits() {
         return (dir, rot, flip) -> !flip.isVerticallyFlipped();
+    }
+
+    @Override
+    public long drainEnergy(long request) {
+        long drained = 0;
+
+        for (var module : modules) {
+            if (module instanceof UplinkPowerProvider power) {
+                long d = power.drainEnergy(request);
+                request -= d;
+                drained += d;
+
+                if (request <= 0) break;
+            }
+        }
+
+        return drained;
+    }
+
+    @Override
+    public void createPlan(EntityPlayer submitter, String name, List<ResourceStack> requirements, boolean autoSubmit) {
+        for (var module : modules) {
+            if (module instanceof UplinkPatternReceiver pattern) {
+                pattern.createPlan(submitter, name, requirements, autoSubmit);
+                return;
+            }
+        }
+
+        MCUtils.sendErrorToPlayer(submitter, new Localized("mm.chat.no-plan-module"));
     }
 }

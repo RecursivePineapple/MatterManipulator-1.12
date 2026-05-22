@@ -1,7 +1,7 @@
 package matter_manipulator.core.inventory_adapter;
 
 import it.unimi.dsi.fastutil.ints.IntList;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.resources.Resource;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.fluid.FluidResource;
@@ -35,7 +35,7 @@ public class EmptyInventoryAdapter<R extends ResourceStack> implements Inventory
     }
 
     @Override
-    public boolean validate(BlockPlacingContext context) {
+    public boolean validate(ManipulatorPlacingContext context) {
         return true;
     }
 

@@ -4,6 +4,8 @@ import net.minecraft.util.math.BlockPos;
 
 import org.jetbrains.annotations.Nullable;
 
+import matter_manipulator.core.context.StructureContext;
+import matter_manipulator.core.context.StructureInteractContext;
 import matter_manipulator.core.meta.MetaKey;
 
 public interface StructureElement<T> {
@@ -15,7 +17,6 @@ public interface StructureElement<T> {
 
     boolean check(StructureContext<? extends T> context, BlockPos pos);
 
-    boolean build(StructureContext<? extends T> context, BlockPos pos);
-
-    void emitHint(StructureContext<? extends T> context, BlockPos pos);
+    boolean build(StructureInteractContext<? extends T> context, BlockPos pos);
+    void emitHint(StructureInteractContext<? extends T> context, BlockPos pos);
 }

@@ -1,6 +1,6 @@
 package matter_manipulator.core.block_spec;
 
-import com.google.gson.JsonElement;
+import matter_manipulator.core.persist.tagged_union.TaggedUnionLoader;
 
 /// Something that can load a block spec from json and vice versa. The external storage format for specs can be thought
 /// of as a tagged union. The format looks something like the following.
@@ -16,13 +16,5 @@ import com.google.gson.JsonElement;
 ///   }
 /// }
 /// ```
-public interface BlockSpecLoader {
-
-    /// A short string that uniquely identifies this loader. Note that this is attached to all block specs that this
-    /// loader is associated with, so please keep it terse.
-    String getKey();
-
-    BlockSpec load(JsonElement element);
-
-    JsonElement save(BlockSpec spec);
+public interface BlockSpecLoader extends TaggedUnionLoader<BlockSpec> {
 }

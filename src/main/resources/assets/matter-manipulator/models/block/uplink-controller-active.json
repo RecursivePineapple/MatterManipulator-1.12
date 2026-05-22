@@ -1,8 +1,8 @@
 {
   "parent": "matter-manipulator:block/uplink-controller-base-on",
   "textures": {
-    "particle": "matter-manipulator:blocks/uplink_casing",
-    "casing": "matter-manipulator:blocks/uplink_casing",
+    "particle": "matter-manipulator:blocks/uplink_casing/structure_white",
+    "casing": "matter-manipulator:blocks/uplink_casing/structure_white",
     "face": "matter-manipulator:blocks/uplink_front_off",
     "face-glow": "matter-manipulator:blocks/uplink_front_active_glow"
   }

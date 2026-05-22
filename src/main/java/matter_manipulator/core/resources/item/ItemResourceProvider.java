@@ -14,14 +14,12 @@ public class ItemResourceProvider implements ResourceProvider<IntItemResourceSta
     private final MetaMap meta = new MetaMap();
     private final ItemStackIO[] extractIOs, insertIOs;
 
-    private static final FreeItemStackIOFactory FREE = new FreeItemStackIOFactory();
-
     public ItemResourceProvider(ItemStackIO[] ios) {
         this.extractIOs = new ItemStackIO[ios.length + 1];
         this.insertIOs = new ItemStackIO[ios.length + 1];
 
-        extractIOs[0] = FREE;
-        insertIOs[0] = FREE;
+        extractIOs[0] = FreeItemStackIOFactory.INSTANCE;
+        insertIOs[0] = FreeItemStackIOFactory.INSTANCE;
 
         System.arraycopy(ios, 0, insertIOs, 1, ios.length);
 

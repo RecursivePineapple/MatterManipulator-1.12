@@ -8,19 +8,21 @@ import java.util.Set;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 
+
 import appeng.tile.AEBaseTile;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.InteropModule;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.interop.InteropModule;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.persist.IDataStorage;
+import matter_manipulator.core.resources.ResourceIdentity;
 
 public class AEMachineInteropModule implements InteropModule<MachineData> {
 
     @Override
-    public Optional<MachineData> analyze(BlockAnalysisContext context) {
+    public Optional<MachineData> analyze(AnalysisContext context) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof AEBaseTile ae)) return Optional.empty();
@@ -29,7 +31,7 @@ public class AEMachineInteropModule implements InteropModule<MachineData> {
     }
 
     @Override
-    public Set<ApplyResult> apply(BlockPlacingContext context, MachineData analysis) {
+    public Set<ApplyResult> apply(ManipulatorPlacingContext context, MachineData analysis) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof AEBaseTile ae)) return EnumSet.of(ApplyResult.NotApplicable);
@@ -42,7 +44,7 @@ public class AEMachineInteropModule implements InteropModule<MachineData> {
     }
 
     @Override
-    public Set<ApplyResult> getRequiredItemsForExistingBlock(BlockPlacingContext context, MachineData analysis) {
+    public Set<ApplyResult> getRequiredResourcesForExistingBlock(ManipulatorPlacingContext context, MachineData analysis) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof AEBaseTile ae)) return EnumSet.of(ApplyResult.NotApplicable);
@@ -55,7 +57,7 @@ public class AEMachineInteropModule implements InteropModule<MachineData> {
     }
 
     @Override
-    public Set<ApplyResult> getRequiredItemsForNewBlock(BlockPlacingContext context, MachineData analysis) {
+    public Set<ApplyResult> getRequiredResourcesForNewBlock(ManipulatorPlacingContext context, MachineData analysis) {
         analysis.getRequiredItemsForNewBlock(context);
 
         return Collections.emptySet();
@@ -87,5 +89,16 @@ public class AEMachineInteropModule implements InteropModule<MachineData> {
             analysis.config(),
             analysis.priority(),
             analysis.omniDirectional());
+    }
+
+    @Override
+    public void exchangeResource(MachineData analysis, ResourceIdentity stack, ResourceIdentity replacement) {
+        analysis.upgrades().exchangeResource(stack, replacement);
+        analysis.config().exchangeResource(stack, replacement);
+    }
+
+    @Override
+    public MachineData cloneAnalysis(MachineData machineData) {
+        return machineData.clone();
     }
 }

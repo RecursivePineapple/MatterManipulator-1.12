@@ -2,30 +2,32 @@ package matter_manipulator.common.structure;
 
 import java.util.function.Supplier;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 
+import org.jetbrains.annotations.Nullable;
+
 import matter_manipulator.common.utils.data.Lazy;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.context.StructureContext;
+import matter_manipulator.core.context.StructureInteractContext;
 import matter_manipulator.core.meta.MetaKey;
 
 public class StructureUtils {
 
-    @SuppressWarnings("Convert2MethodRef")
-    private static final StructureElement<?> AIR = block(() -> Blocks.AIR.getDefaultState());
+    private static final StructureElement<?> AIR = spec(BlockSpec::air);
 
-    public interface BlockStateSupplier extends Supplier<IBlockState> {
+    public interface BlockSpecSupplier extends Supplier<BlockSpec> {
 
     }
 
-    public static <T> StructureElement<T> block(BlockStateSupplier supplier) {
-        return lazy(() -> new BlockStateStructureElement<>(supplier.get()));
+    public static <T> StructureElement<T> spec(BlockSpecSupplier supplier) {
+        return lazy(() -> new BlockSpecStructureElement<>(supplier.get()));
     }
 
     public static <T> StructureElement<T> lazy(Supplier<StructureElement<T>> next) {
@@ -44,12 +46,12 @@ public class StructureUtils {
             }
 
             @Override
-            public boolean build(StructureContext<? extends T> context, BlockPos pos) {
+            public boolean build(StructureInteractContext<? extends T> context, BlockPos pos) {
                 return element.get().build(context, pos);
             }
 
             @Override
-            public void emitHint(StructureContext<? extends T> context, BlockPos pos) {
+            public void emitHint(StructureInteractContext<? extends T> context, BlockPos pos) {
                 element.get().emitHint(context, pos);
             }
         };
@@ -58,6 +60,46 @@ public class StructureUtils {
     public static <T> StructureElement<T> air() {
         //noinspection unchecked
         return (StructureElement<T>) AIR;
+    }
+
+    @SafeVarargs
+    public static <T> StructureElement<T> chain(StructureElement<T>... elements) {
+        return new StructureElement<>() {
+
+            @Override
+            public @Nullable <K> K getMetadata(MetaKey<K> key) {
+                for (var e : elements) {
+                    var meta = e.getMetadata(key);
+
+                    if (meta != null) return meta;
+                }
+
+                return null;
+            }
+
+            @Override
+            public boolean check(StructureContext<? extends T> context, BlockPos pos) {
+                for (var e : elements) {
+                    if (e.check(context, pos)) return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean build(StructureInteractContext<? extends T> context, BlockPos pos) {
+                for (var e : elements) {
+                    if (e.build(context, pos)) return true;
+                }
+
+                return false;
+            }
+
+            @Override
+            public void emitHint(StructureInteractContext<? extends T> context, BlockPos pos) {
+                elements[0].emitHint(context, pos);
+            }
+        };
     }
 
     public static boolean wrench(EntityPlayer player, World world, BlockPos pos) {

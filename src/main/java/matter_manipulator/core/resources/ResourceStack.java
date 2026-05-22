@@ -3,6 +3,8 @@ package matter_manipulator.core.resources;
 import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.persist.tagged_union.TaggedUnionLoader;
+import matter_manipulator.core.persist.tagged_union.TaggedUnionVariant;
 
 /// A resource. This should be implemented on the stack class itself. For existing classes, this interface should be
 /// implemented on a wrapper class.
@@ -13,10 +15,15 @@ import matter_manipulator.core.i18n.Localized;
 /// `hasTrait(ResourceTrait.IntAmount)` or `hasTrait(ResourceTrait.LongAmount)` is undefined behaviour and may cause
 /// exceptions to be thrown. The trait system exists so that consumers of the API do not have to infer how the stack
 /// behaves by inspecting its super classes.
-public interface ResourceStack {
+public interface ResourceStack extends TaggedUnionVariant<ResourceStack> {
 
     /// Checks if this stack behaves a certain way.
     boolean hasTrait(ResourceTrait trait);
+
+    @Override
+    default TaggedUnionLoader<ResourceStack> getLoader() {
+        return getResource();
+    }
 
     /// Gets the [Resource] for this stack.
     Resource<?> getResource();
@@ -36,6 +43,18 @@ public interface ResourceStack {
 
     default ResourceStack copy() {
         return multipliedCopy(1);
+    }
+
+    default IntResourceStack asInt() {
+        if (!hasTrait(ResourceTrait.IntAmount)) return null;
+
+        return (IntResourceStack) this;
+    }
+
+    default LongResourceStack asLong() {
+        if (!hasTrait(ResourceTrait.LongAmount)) return null;
+
+        return (LongResourceStack) this;
     }
 
     default ResourceStack multipliedCopy(int mult) {

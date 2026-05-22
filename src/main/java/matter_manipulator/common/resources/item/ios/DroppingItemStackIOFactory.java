@@ -11,7 +11,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.items.ItemCluster;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.PlayerContext;
 import matter_manipulator.core.item.ImmutableItemStack;
 import matter_manipulator.core.item.ItemStackIO;
 import matter_manipulator.core.item.ItemStackIteratorBuilder;
@@ -21,11 +21,15 @@ import matter_manipulator.core.resources.ResourceIOFactory;
 
 public class DroppingItemStackIOFactory implements ResourceIOFactory<ItemStackIO> {
 
-    @Override
-    public Optional<ItemStackIO> getIO(ManipulatorContext context, IDataStorage storage) {
-        EntityPlayer player = context.getRealPlayer();
+    public static final DroppingItemStackIOFactory INSTANCE = new DroppingItemStackIOFactory();
 
-        return Optional.of(new ItemStackIO() {
+    @Override
+    public Optional<ItemStackIO> getIO(PlayerContext context, IDataStorage storage) {
+        return Optional.of(createIO(context.getRealPlayer()));
+    }
+
+    public @NotNull ItemStackIO createIO(EntityPlayer player) {
+        return new ItemStackIO() {
 
             @Override
             public int store(ImmutableItemStack stack) {
@@ -77,6 +81,6 @@ public class DroppingItemStackIOFactory implements ResourceIOFactory<ItemStackIO
             public ItemStackIteratorBuilder iterator() {
                 return ItemStackIteratorBuilder.EMPTY;
             }
-        });
+        };
     }
 }

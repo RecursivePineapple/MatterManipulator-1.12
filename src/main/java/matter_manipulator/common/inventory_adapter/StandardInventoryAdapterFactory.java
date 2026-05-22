@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.ints.IntIterators;
 import it.unimi.dsi.fastutil.ints.IntList;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
 import matter_manipulator.core.resources.Resource;
@@ -37,7 +37,7 @@ public class StandardInventoryAdapterFactory implements InventoryAdapterFactory<
         }
 
         @Override
-        public boolean validate(BlockPlacingContext context) {
+        public boolean validate(ManipulatorPlacingContext context) {
             return true;
         }
 

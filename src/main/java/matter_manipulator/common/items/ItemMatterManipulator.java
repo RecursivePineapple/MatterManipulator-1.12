@@ -50,7 +50,7 @@ import matter_manipulator.MatterManipulator;
 import matter_manipulator.Tags;
 import matter_manipulator.common.building.BuildContainer;
 import matter_manipulator.common.building.BuildContainer.BuildContainerMetaKey;
-import matter_manipulator.common.context.ManipulatorContextImpl;
+import matter_manipulator.common.context.HeldManipulatorContextImpl;
 import matter_manipulator.common.context.StackManipulatorContextImpl;
 import matter_manipulator.common.networking.MMAction;
 import matter_manipulator.common.state.MMState;
@@ -60,7 +60,7 @@ import matter_manipulator.common.ui.ManipulatorUIFactory;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.i18n.Localized;
-import matter_manipulator.core.manipulator_resource.EnergyManipulatorResource;
+import matter_manipulator.core.manipulator_state.EnergyManipulatorState;
 import matter_manipulator.core.meta.MetadataContainer;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.IDataStorage;
@@ -103,7 +103,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
         double stored = 0;
 
         for (var e : state.getResources(context).values()) {
-            if (e instanceof EnergyManipulatorResource energy) {
+            if (e instanceof EnergyManipulatorState energy) {
                 stored += energy.getStored();
                 capacity += energy.getCapacity();
             }
@@ -173,7 +173,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
     ) {
         MMState state = getState(itemStack);
 
-        ManipulatorContextImpl context = new ManipulatorContextImpl(worldIn, Minecraft.getMinecraft().player, itemStack, state);
+        HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(worldIn, Minecraft.getMinecraft().player, itemStack, state);
 
         if (!GuiScreen.isShiftKeyDown()) {
             desc.add("Hold shift for more information.");
@@ -223,7 +223,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
 
         MMState state = getState(held);
 
-        ManipulatorContextImpl context = new ManipulatorContextImpl(world, player, held, state);
+        HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(world, player, held, state);
 
         @SuppressWarnings("rawtypes")
         ManipulatorMode mode = state.getActiveMode();
@@ -264,7 +264,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
 
         MMState state = getState(held);
 
-        ManipulatorContextImpl context = new ManipulatorContextImpl(player.world, player, held, state);
+        HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(player.world, player, held, state);
 
         ManipulatorMode mode = state.getActiveMode();
 
@@ -329,7 +329,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
             if (mode != null) {
                 Object config = mode.loadConfig(state.getActiveModeConfigStorage());
 
-                ManipulatorContextImpl context = new ManipulatorContextImpl(player.getEntityWorld(), player, stack, state);
+                HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(player.getEntityWorld(), player, stack, state);
 
                 @SuppressWarnings("unchecked")
                 Coroutine<Buildable> analysis = mode.startAnalysis(config, context);

@@ -20,6 +20,7 @@ import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.ResourceIdentity.IntResourceIdentity;
 import matter_manipulator.core.resources.ResourceIdentity.LongResourceIdentity;
 import matter_manipulator.core.resources.ResourceIdentityTrait;
+import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemResourceIdentity;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
@@ -48,6 +49,13 @@ public final class ItemId implements ItemResourceIdentity, IntResourceIdentity, 
     @Override
     public Localized getName() {
         return new Localized("mm.misc.itemstack", toStack(1));
+    }
+
+    @Override
+    public boolean isSameType(ResourceStack stack) {
+        if (!(stack instanceof ItemStackLike itemStack)) return false;
+
+        return matches(itemStack);
     }
 
     @Override
@@ -261,7 +269,7 @@ public final class ItemId implements ItemResourceIdentity, IntResourceIdentity, 
         if (obj instanceof Item item) return item;
         if (obj instanceof ItemStack stack) return stack.getItem();
         // Includes ImmutableItemStack and ItemId
-        if (obj instanceof ImmutableItemMeta im) return im.getItem();
+        if (obj instanceof ItemStackLike im) return im.getItem();
 
         throw new IllegalArgumentException("Cannot extract item from object: " + obj);
     }
@@ -270,7 +278,7 @@ public final class ItemId implements ItemResourceIdentity, IntResourceIdentity, 
         if (obj == null) return 0;
         if (obj instanceof ItemStack stack) return ItemUtils.getStackMeta(stack);
         // Includes ImmutableItemStack and ItemId
-        if (obj instanceof ImmutableItemMeta im) return im.getItemMeta();
+        if (obj instanceof ItemStackLike im) return im.getItemMeta();
 
         throw new IllegalArgumentException("Cannot extract item metadata from object: " + obj);
     }
@@ -279,7 +287,7 @@ public final class ItemId implements ItemResourceIdentity, IntResourceIdentity, 
         if (obj == null) return null;
         if (obj instanceof ItemStack stack) return stack.getTagCompound();
         // Includes ItemId
-        if (obj instanceof ImmutableItemStack stack) return stack.getTag();
+        if (obj instanceof ItemStackLike stack) return stack.getTag();
 
         throw new IllegalArgumentException("Cannot extract item metadata from object: " + obj);
     }
@@ -335,7 +343,7 @@ public final class ItemId implements ItemResourceIdentity, IntResourceIdentity, 
             if (a == null || b == null) return false;
 
             if (getGenericItem(a) != getGenericItem(b)) return false;
-            if (getGenericMeta(a) == getGenericMeta(b)) return false;
+            if (getGenericMeta(a) != getGenericMeta(b)) return false;
             return Objects.equals(getGenericTag(a), getGenericTag(b));
         }
     };

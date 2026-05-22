@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.Contract;
 import org.joml.Vector3i;
@@ -35,13 +37,16 @@ import matter_manipulator.core.analysis.BlockAnalyzer;
 import matter_manipulator.core.analysis.BlockAnalyzer.RegionAnalysis;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.RenderingContext;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.IDataStorage;
+import matter_manipulator.core.planning.BuildPlan;
 import matter_manipulator.core.util.Coroutine;
+import matter_manipulator.core.util.CoroutineExecutor;
 
-public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, StandardBuild>, ResettableMode,
-    CopyableMode, PasteableMode {
+public class CopyingManipulatorMode
+    implements ManipulatorMode<CopyingConfig, StandardBuild>, ResettableMode, CopyableMode, PasteableMode {
 
     public static final ResourceLocation MODE_ID = MatterManipulator.loc("copying");
 
@@ -55,18 +60,19 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
         return "Copying";
     }
 
+    @SideOnly(Side.CLIENT)
     @Override
-    public ModeRenderer<CopyingConfig, StandardBuild> getRenderer(ManipulatorContext context) {
+    public ModeRenderer<CopyingConfig, StandardBuild> getRenderer(RenderingContext context) {
         return new CopyingModeRenderer();
     }
 
     @Override
-    public boolean isAllowedOnManipulator(ManipulatorContext context) {
+    public boolean isAllowedOnManipulator(HeldManipulatorContext context) {
         return context.hasCapability(ManipulatorFlags.ALLOW_COPYING);
     }
 
     @Override
-    public CopyingConfig getPreviewConfig(CopyingConfig config, ManipulatorContext context) {
+    public CopyingConfig getPreviewConfig(CopyingConfig config, HeldManipulatorContext context) {
         if (config.action != null) {
             Optional<CopyingConfig> result = config.action.process(config, context, true);
 
@@ -79,9 +85,8 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
     }
 
     @Override
-    public void addTooltipInfo(ManipulatorContext context, List<String> lines) {
-        CopyingConfig config = loadConfig(context.getState()
-            .getActiveModeConfigStorage());
+    public void addTooltipInfo(HeldManipulatorContext context, List<String> lines) {
+        CopyingConfig config = loadConfig(context.getState().getActiveModeConfigStorage());
 
         addTooltipLine(lines, "Action: ", config.action);
 
@@ -108,7 +113,7 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
     }
 
     @Override
-    public void addMenuItems(ManipulatorContext context, BranchableRadialMenu menu) {
+    public void addMenuItems(HeldManipulatorContext context, BranchableRadialMenu menu) {
         // spotless:off
         menu.branch()
             .label(IKey.str("Mark Coord"))
@@ -136,16 +141,54 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
                     });
                 })
             .done();
+
+        menu.branch()
+                .label(IKey.lang("mm.gui.planning"))
+                .option()
+                    .label(IKey.lang("mm.gui.clear_plans"))
+                    .onClicked(() -> {
+                    })
+                .done()
+                .option()
+                    .label(IKey.lang("mm.gui.plan_all_auto"))
+                    .onClicked(() -> {
+                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                    })
+                .done()
+                .option()
+                    .label(IKey.lang("mm.gui.plan_all_manual"))
+                    .onClicked(() -> {
+                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                    })
+                .done()
+                .option()
+                    .label(IKey.lang("mm.gui.clear_manual_plans"))
+                    .onClicked(() -> {
+                    })
+                .done()
+                .option()
+                    .label(IKey.lang("mm.gui.plan_missing_manual"))
+                    .onClicked(() -> {
+                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                    })
+                .done()
+                .option()
+                    .label(IKey.lang("mm.gui.plan_missing_auto"))
+                    .onClicked(() -> {
+                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                    })
+                .done()
+            .done();
         // spotless:on
     }
 
     @Override
-    public Optional<CopyingConfig> onPickBlock(CopyingConfig config, ManipulatorContext context) {
+    public Optional<CopyingConfig> onPickBlock(CopyingConfig config, HeldManipulatorContext context) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<CopyingConfig> onRightClick(CopyingConfig config, ManipulatorContext context) {
+    public Optional<CopyingConfig> onRightClick(CopyingConfig config, HeldManipulatorContext context) {
         if (config.action != null) {
             Optional<CopyingConfig> result = config.action.process(config, context, false);
 
@@ -170,14 +213,12 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
 
     @Override
     public CopyingConfig loadConfig(IDataStorage storage) {
-        return storage.getSandbox(getModeID())
-            .load(CopyingConfig.class);
+        return storage.getSandbox(getModeID()).load(CopyingConfig.class);
     }
 
     @Override
     public void saveConfig(IDataStorage storage, CopyingConfig config) {
-        storage.getSandbox(getModeID())
-            .save(config);
+        storage.getSandbox(getModeID()).save(config);
     }
 
     @Override
@@ -197,7 +238,7 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
 
     @Contract(mutates = "param2")
     @Override
-    public Coroutine<StandardBuild> startAnalysis(CopyingConfig config, ManipulatorContext context) {
+    public Coroutine<StandardBuild> startAnalysis(CopyingConfig config, HeldManipulatorContext context) {
         final Location copyA = config.copyA;
         final Location copyB = config.copyB;
         final Location paste = config.paste;
@@ -282,31 +323,37 @@ public class CopyingManipulatorMode implements ManipulatorMode<CopyingConfig, St
     }
 
     @Override
-    public boolean onCopyPressed(ManipulatorContext context) {
-        context.mutateConfig(this, config -> {
-            config.action = PendingAction.MARK_COPY_A;
-        });
+    public boolean onCopyPressed(HeldManipulatorContext context) {
+        context.mutateConfig(
+            this, config -> {
+                config.action = PendingAction.MARK_COPY_A;
+            }
+        );
 
         return true;
     }
 
     @Override
-    public boolean onPastePressed(ManipulatorContext context) {
-        context.mutateConfig(this, config -> {
-            config.action = PendingAction.MARK_PASTE;
-        });
+    public boolean onPastePressed(HeldManipulatorContext context) {
+        context.mutateConfig(
+            this, config -> {
+                config.action = PendingAction.MARK_PASTE;
+            }
+        );
 
         return true;
     }
 
     @Override
-    public boolean onResetPressed(ManipulatorContext context) {
-        context.mutateConfig(this, config -> {
-            config.action = null;
-            config.copyA = null;
-            config.copyB = null;
-            config.paste = null;
-        });
+    public boolean onResetPressed(HeldManipulatorContext context) {
+        context.mutateConfig(
+            this, config -> {
+                config.action = null;
+                config.copyA = null;
+                config.copyB = null;
+                config.paste = null;
+            }
+        );
 
         return true;
     }

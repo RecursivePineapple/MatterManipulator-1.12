@@ -1,32 +1,69 @@
 package matter_manipulator.core.context;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import java.util.OptionalInt;
+import java.util.function.Consumer;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.item.ItemStack;
 
-import matter_manipulator.common.utils.MathUtils;
-import matter_manipulator.common.utils.math.Location;
+import matter_manipulator.common.items.ItemMatterManipulator;
+import matter_manipulator.common.items.MMUpgrades;
+import matter_manipulator.common.items.ManipulatorTier;
+import matter_manipulator.common.state.MMState;
+import matter_manipulator.core.modes.ManipulatorMode;
+import matter_manipulator.core.settings.ManipulatorSetting;
+import matter_manipulator.core.util.Flag;
 
-public interface ManipulatorContext extends StackManipulatorContext {
+public interface ManipulatorContext {
 
-    World getWorld();
+    ItemStack getManipulator();
 
-    EntityPlayer getRealPlayer();
+    MMState getState();
 
-    @Nullable
-    default RayTraceResult getHitResult() {
-        return MathUtils.getHitResult(getRealPlayer());
+    default ManipulatorTier getTier() {
+        return ((ItemMatterManipulator) getManipulator().getItem()).tier;
     }
 
-    @NotNull
-    default Location getLookedAtBlock() {
-        return new Location(getWorld(), MathUtils.getLookedAtBlock(getRealPlayer()));
+    default int getPlaceSpeed() {
+        int speed = getTier().placeSpeed;
+
+        if (hasUpgrade(MMUpgrades.Speed)) {
+            speed *= 2;
+        }
+
+        return speed;
     }
 
-    default boolean isRemote() {
-        return getWorld().isRemote;
+    default OptionalInt getMaxRange() {
+        return getTier().maxRange;
+    }
+
+    default boolean hasUpgrade(MMUpgrades upgrade) {
+        return getState().hasUpgrade(upgrade);
+    }
+
+    default boolean hasCapability(Flag flag) {
+        return getState().hasCapability(flag);
+    }
+
+    default <T> T getSettingValue(ManipulatorSetting<T> setting) {
+        return setting.load(getState().settings);
+    }
+
+    default <T> void setSettingValue(ManipulatorSetting<T> setting, T value) {
+        setting.save(getState().settings, value);
+    }
+
+    default void saveState() {
+        ItemMatterManipulator.setState(getManipulator(), getState());
+    }
+
+    default <T, M extends ManipulatorMode<T, ?>> T mutateConfig(M mode, Consumer<T> fn) {
+        T config = mode.loadConfig(this.getState().getActiveModeConfigStorage());
+
+        fn.accept(config);
+
+        mode.saveConfig(this.getState().getActiveModeConfigStorage(), config);
+
+        return config;
     }
 }

@@ -1,0 +1,103 @@
+package matter_manipulator.core.interop;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import net.minecraft.nbt.NBTTagCompound;
+
+import org.jetbrains.annotations.Contract;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import matter_manipulator.common.utils.math.Transform;
+import matter_manipulator.core.block_spec.ApplyResult;
+import matter_manipulator.core.block_spec.BlockSpec;
+import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.persist.IDataStorage;
+import matter_manipulator.core.persist.StateSandbox;
+import matter_manipulator.core.resources.ResourceIdentity;
+import matter_manipulator.core.resources.ResourceStack;
+
+/// A module that allows a matter manipulator to interact with a block or tile entity. This may do anything so long as
+/// it only affects the target coordinates. This object should not contain any state - the analysis result (see
+/// [AnalysisResult]) should contain all required information for this module's operation. <p /> This module is used as
+/// follows: <br />
+/// 1. A manipulator starts analyzing a block in the world. <br />
+/// 2. It loops over all registered [InteropModule] objects and calls [#analyze(AnalysisContext)]. <br />
+/// 3. The analysis results are stored in a `Map<IInteropModule<AnalysisResult>, AnalysisResult>` within a [BlockSpec].
+/// <p /> From here, the [BlockSpec] can either be saved, applied to a block, or discarded entirely. <p /> When saving,
+/// this is the data flow: <br />
+/// 1. An [BlockSpec] loops over its stored analysis results and calls [#save(IDataStorage , Object)]. <br />
+/// 2. Each interop module retrieves a sandboxed state storage via one of the [IDataStorage#getSandbox(String, String)]
+/// overloads and writes its data to a [JsonElement], which is persisted by calling
+/// [StateSandbox#setValue(JsonElement)]. [StateSandbox#save(Object)] compacts the two operations into one call if the
+/// exact format doesn't matter. <br />
+/// 3. The [BlockSpec] saves its own state into a [JsonObject] via a [BlockSpecLoader], which is then converted to a
+/// [NBTTagCompound]. <p /> When loading, this is the data flow: <br />
+/// 1. An [BlockSpec] is loaded from a [NBTTagCompound]. In the process, the state sandbox is loaded and the [BlockSpec]
+/// loops over all analysis results (which are identified by their name, see [MMRegistries#interop()]) and loads their
+/// results via [#load(IDataStorage)]. <br />
+/// 2. Each [InteropModule] loads its sandbox and deserializes its state into its object, which is stored in a
+/// `Map<IInteropModule<AnalysisResult>, AnalysisResult>` within the [BlockSpec]. <br />
+/// 3. As before, the [BlockSpec] can either be saved again, applied to a block, or discarded entirely.
+///
+/// @param <AnalysisResult> The analysis result.
+/// @see BlockSpec
+/// @see StateSandbox
+/// @see IDataStorage
+/// @see MMRegistries#interop()
+public interface InteropModule<AnalysisResult> {
+
+    /// Analyzes a block in the world and returns this interop module's analysis result. Returns [Optional#empty()] if
+    /// this module cannot analyze or affect the requested block.
+    ///
+    /// @see AnalysisContext#getPos()
+    @Contract(pure = true)
+    Optional<AnalysisResult> analyze(AnalysisContext context);
+
+    /// Applies an analysis result that was previously retrieved from [#analyze(AnalysisContext)] or
+    /// [#load(IDataStorage)].
+    Set<ApplyResult> apply(ManipulatorPlacingContext context, AnalysisResult analysis);
+
+    /// Gets the resources required to update an existing block. Resources should be extracted from the context, but not
+    /// placed in the world.
+    Set<ApplyResult> getRequiredResourcesForExistingBlock(ManipulatorPlacingContext context, AnalysisResult analysis);
+
+    /// Gets the resources required to create a block from scratch. This should ignore any existing blocks at the
+    /// location. Resources should be extracted from the context, but not placed in the world.
+    Set<ApplyResult> getRequiredResourcesForNewBlock(ManipulatorPlacingContext context, AnalysisResult analysis);
+
+    @Contract(mutates = "param1")
+    void save(IDataStorage storage, AnalysisResult analysis);
+
+    Optional<AnalysisResult> load(IDataStorage storage);
+
+    /// Modifies the resource stack as necessary. This is usually used to add NBT fields to items.
+    @Contract(mutates = "param1")
+    default void modifyResource(ResourceStack resource, AnalysisResult analysis) {
+
+    }
+
+    /// Gets any user-relevant details that describe the analysis. This is usually used to differentiate similarly-named
+    /// but distinct item stacks (for blocks that store NBT when broken).
+    @Contract(mutates = "param1")
+    default void getDetails(List<Localized> text, AnalysisResult analysis) {
+
+    }
+
+    /// Transforms the result according to the given [Transform].
+    @Contract(mutates = "param1")
+    AnalysisResult transform(AnalysisResult analysis, Transform transform);
+
+    /// Swaps one stack for another within the analysis. Does nothing if the analysis does not contain the given stack.
+    /// May also do nothing if the replacement is invalid, either because `replacement` is air or because its contents
+    /// cannot take the place of the existing stack.
+    @Contract(mutates = "param1")
+    void exchangeResource(AnalysisResult analysis, ResourceIdentity stack, ResourceIdentity replacement);
+
+    AnalysisResult cloneAnalysis(AnalysisResult analysisResult);
+}

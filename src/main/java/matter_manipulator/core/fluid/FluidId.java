@@ -21,6 +21,7 @@ import matter_manipulator.core.item.ImmutableItemMeta;
 import matter_manipulator.core.resources.ResourceIdentity.IntResourceIdentity;
 import matter_manipulator.core.resources.ResourceIdentity.LongResourceIdentity;
 import matter_manipulator.core.resources.ResourceIdentityTrait;
+import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.fluid.FluidResourceIdentity;
 import matter_manipulator.core.resources.fluid.FluidStackWrapper;
 
@@ -56,6 +57,13 @@ public record FluidId(Fluid fluid, NBTTagCompound tag) implements FluidResourceI
     @Override
     public Localized getName() {
         return new Localized("mm.misc.fluidstack", toStack(1));
+    }
+
+    @Override
+    public boolean isSameType(ResourceStack stack) {
+        if (!(stack instanceof FluidStackLike fluidStack)) return false;
+
+        return matches(fluidStack);
     }
 
     public static FluidId create(NBTTagCompound tag) {

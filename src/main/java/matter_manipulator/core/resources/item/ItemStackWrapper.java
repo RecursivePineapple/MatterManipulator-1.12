@@ -86,4 +86,14 @@ public class ItemStackWrapper implements IntItemResourceStack {
     public NBTTagCompound getCapTag() {
         return ItemUtils.getCapTag(stack);
     }
+
+    @Override
+    public int hashCode() {
+        return ItemId.GENERIC_ITEM_META_NBT_STRATEGY.hashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return ItemId.GENERIC_ITEM_META_NBT_STRATEGY.equals(this, obj);
+    }
 }

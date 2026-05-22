@@ -3,12 +3,24 @@ tile.hint_blank.name=Hint (Blank)
 tile.hint_dot.name=Hint (Dot)
 tile.hint_warning.name=Hint (Warning)
 tile.hint_x.name=Hint (X)
+
+tile.uplink-structure-black.name=Uplink Singularity Interface
+tile.uplink-structure-white.name=Uplink Casing
+tile.uplink-support-black.name=Reinforced Uplink Structure
+tile.uplink-support-white.name=Uplink Structure
+tile.uplink-coil.name=Uplink Singularity Generator Coil
+
 tile.uplink-controller.name=Quantum Uplink Controller
+tile.uplink-energy-connector.name=Quantum Uplink Energy Connector
+tile.uplink-ae-connector.name=Quantum Uplink ME Connector
 
 item.matter-manipulator-0.name=Prototype Matter Manipulator
 item.matter-manipulator-1.name=Matter Manipulator MKI
 item.matter-manipulator-2.name=Matter Manipulator MKII
 item.matter-manipulator-3.name=Matter Manipulator MKIII
+
+item.mm-wrench.name=Wrench
+item.hologram-projector.name=Hologram Projector
 
 item.metaitem.0.name=Matter Manipulator Plan
 item.metaitem.1.name=Prototype Matter Manipulator Power Core
@@ -107,7 +119,7 @@ mm.gui.edit_stack=Edit Stack
 mm.gui.reset=Reset
 mm.gui.mark=Mark
 mm.gui.planning=Planning
-mm.gui.cancel_auto_plans=Cancel Auto Plans
+mm.gui.clear_plans=Clear Plans
 mm.gui.plan_all_auto=Plan (All, Auto)
 mm.gui.plan_all_manual=Plan (All, Manual)
 mm.gui.clear_manual_plans=Clear Manual Plans
@@ -183,6 +195,10 @@ mm.info.geom.faces=faces
 mm.info.geom.edges=edges
 mm.info.geom.corners=corners
 mm.info.geom.volumes=volumes
+mm.info.exch.replacing=Replacing %s with %s
+mm.info.exch.replace=Replace %s with %s
+mm.info.exch.no-block-pick=Block pick only works in simple exchange mode
+mm.info.invalid_ae_stack=Invalid resource for AE: %s - it will be excluded from the plan
 
 # Chat Messages
 mm.chat.inventory-no-extract=Cannot extract %s from slot %s
@@ -191,6 +207,16 @@ mm.chat.too-many-items=Bug: Too many items were extracted (got %s, wanted %s of 
 mm.chat.wrong-slot-count=Incorrect slot counts: expected %s but had %s
 mm.chat.missing-slot-analysis=Invalid inventory: inventory has slot %s (contains %s) but analysis did not
 mm.chat.missing-slot-inventory=Invalid inventory: expected inventory to have slot %s (for %s) but it did not
+mm.chat.feedback.warn=Warning at %s: %s
+mm.chat.feedback.error=Error at %s: %s
+mm.chat.feedback.notice=Notice at %s: %s
+mm.structure.occupied=Location was occupied by another block
+mm.chat.no-plan-module=Uplink does not contain a planning module
+mm.chat.not-plannable=Current mode does not support planning
+mm.chat.plan-header=Build requires the following resource:
+mm.chat.plan-header.plural=Build requires the following resources:
+mm.chat.plan-header.empty=Build does not require any resources
+mm.chat.plan-entry=- %s: %s
 
 # Transform
 mm.transform.info=Flip: %s\nUp: %s\nForward: %s
@@ -228,9 +254,16 @@ mm.recipe.upgrades=Manipulator Upgrades
 
 itemGroup.matter-manipulator=Matter Manipulator
 
-# AE2UEL Compat Chat Messages
+# AE2UEL Compat
+
+## Chat Messages
 mm+ae2uel.chat.cannot_install_part=Cannot install part %s on side %s
 mm+ae2uel.chat.cannot_install_cable=Cannot install cable %s
 
 mm+ae2uel.chat.not_facade=Item is not facade: %s
 mm+ae2uel.chat.cannot_install_facade=Cannot install facade: %s
+
+# EIO Compat
+
+## Specs
+mm+eio.spec.top=Ender IO Multiblock Machine Top

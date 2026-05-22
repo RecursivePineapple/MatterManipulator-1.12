@@ -6,6 +6,8 @@ import java.util.EnumSet;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
+import org.jetbrains.annotations.Contract;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -18,20 +20,21 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
+import matter_manipulator.core.item.ItemStackLike;
 import matter_manipulator.core.persist.NBTPersist;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 import matter_manipulator.core.resources.item.ItemResource;
-import matter_manipulator.core.resources.item.ItemResourceProvider;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
-public class InventoryAnalysis {
+public class InventoryAnalysis implements Cloneable {
 
     public Int2ObjectOpenHashMap<ItemStack> slots = new Int2ObjectOpenHashMap<>();
 
-    public EnumSet<ApplyResult> apply(BlockPlacingContext context, InventoryAdapter<IntItemResourceStack> target, ApplyMode applyMode) {
+    public EnumSet<ApplyResult> apply(ManipulatorPlacingContext context, InventoryAdapter<IntItemResourceStack> target, ApplyMode applyMode) {
         EnumSet<ApplyResult> result = EnumSet.noneOf(ApplyResult.class);
 
         validateInventory(context, target, result);
@@ -42,7 +45,7 @@ public class InventoryAnalysis {
 
         IntIterator iter = target.getSlots().iterator();
 
-        ItemResourceProvider provider = context.resource(ItemResource.ITEMS);
+        var provider = context.resource(ItemResource.ITEMS);
 
         while (iter.hasNext()) {
             int i = iter.nextInt();
@@ -106,7 +109,14 @@ public class InventoryAnalysis {
         return result;
     }
 
-    private void validateInventory(BlockPlacingContext context,
+    public void getRequiredItemsForNewBlock(ManipulatorPlacingContext context) {
+        this.slots.forEach((slot, item) -> {
+            context.items().extract(new ItemStackWrapper(item));
+        });
+    }
+
+    private void validateInventory(
+        ManipulatorPlacingContext context,
         InventoryAdapter<IntItemResourceStack> target, EnumSet<ApplyResult> result) {
         if (this.slots.size() != target.getSlots().size()) {
             result.add(ApplyResult.NotApplicable);
@@ -156,6 +166,34 @@ public class InventoryAnalysis {
                 this.slots.put(i, NBTPersist.GSON.fromJson(e.getValue(), ItemStack.class));
             } catch (NumberFormatException ex) {
                 throw new JsonParseException("Invalid slot index: " + e.getKey(), ex);
+            }
+        });
+    }
+
+    @Override
+    public InventoryAnalysis clone() {
+        try {
+            InventoryAnalysis copy = (InventoryAnalysis) super.clone();
+            copy.slots = new Int2ObjectOpenHashMap<>(this.slots);
+            copy.slots.int2ObjectEntrySet().fastForEach(e -> e.setValue(e.getValue().copy()));
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
+    /// Swaps one stack for another within this inventory analysis.
+    /// Does nothing if this analysis does not contain the given stack.
+    @Contract(mutates = "this")
+    public void exchangeResource(ResourceIdentity stack, ResourceIdentity replacement) {
+        if (!(stack instanceof ItemStackLike stackItem)) return;
+        if (!(replacement instanceof ItemStackLike replacementItem)) return;
+
+        this.slots.int2ObjectEntrySet().forEach(e -> {
+            if (stackItem.matches(e.getValue())) {
+                int amount = e.getValue().getCount();
+
+                e.setValue(replacementItem.toStack(amount));
             }
         });
     }

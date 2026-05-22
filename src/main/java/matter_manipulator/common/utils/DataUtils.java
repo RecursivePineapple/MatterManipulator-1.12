@@ -316,4 +316,11 @@ public class DataUtils {
 
         return out;
     }
+
+    public static <T> List<T> concat(List<T> first, List<T> second) {
+        ArrayList<T> out = new ArrayList<>(first.size() + second.size());
+        out.addAll(first);
+        out.addAll(second);
+        return out;
+    }
 }

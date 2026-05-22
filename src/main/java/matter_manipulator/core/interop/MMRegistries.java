@@ -10,7 +10,6 @@ import matter_manipulator.common.utils.deps.IDependencyGraph;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.block_spec.InteropModule;
 import matter_manipulator.core.fluid.FluidStackIO;
 import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
@@ -18,7 +17,7 @@ import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
 import matter_manipulator.core.item.ImmutableItemStack;
 import matter_manipulator.core.item.ItemStackIO;
 import matter_manipulator.core.keybind.ManipulatorKeybind;
-import matter_manipulator.core.manipulator_resource.ManipulatorResourceLoader;
+import matter_manipulator.core.manipulator_state.ManipulatorStateLoader;
 import matter_manipulator.core.modes.ManipulatorMode;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.resources.Resource;
@@ -66,7 +65,7 @@ public class MMRegistries {
 
     /// A [BlockSpecLoader] is used to transparently load or save [BlockSpec] implementations from or to json.
     public static void registerSpecLoader(BlockSpecLoader loader) {
-        MMRegistriesInternal.LOADERS.put(loader.getKey(), loader);
+        MMRegistriesInternal.SPEC_LOADERS.put(loader.getKey(), loader);
     }
 
     /// ItemStackIOFactories are used to create [ItemStackIO]s. They have full access to any piece of state on
@@ -95,6 +94,7 @@ public class MMRegistries {
 
     public static <Provider extends ResourceProvider<?>> void registerResourceType(Resource<Provider> resource, ResourceProviderFactory<Provider> factory) {
         MMRegistriesInternal.RESOURCES.put(resource, factory);
+        MMRegistriesInternal.RESOURCE_LOADERS.put(resource.getKey(), resource);
         //noinspection unchecked
         MMRegistriesInternal.RESOURCE_ARRAY = MMRegistriesInternal.RESOURCES.entrySet()
             .stream()
@@ -102,12 +102,12 @@ public class MMRegistries {
             .toArray(Pair[]::new);
     }
 
-    public static void registerManipulatorResourceLoader(ManipulatorResourceLoader loader) {
-        MMRegistriesInternal.RESOURCE_LOADERS.put(loader.getResourceID(), loader);
+    public static void registerManipulatorStateLoader(ManipulatorStateLoader loader) {
+        MMRegistriesInternal.MANIPULATOR_RESOURCE_LOADERS.put(loader.getResourceID(), loader);
     }
 
     public static IDependencyGraph<BlockStateMutator> stateMutators() {
-        return MMRegistriesInternal.BLOCK_STATE_TRANSFORMERS;
+        return MMRegistriesInternal.BLOCK_STATE_MUTATORS;
     }
 
     public static void registerKeybind(ManipulatorKeybind keybind) {

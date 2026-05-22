@@ -1,6 +1,7 @@
 package matter_manipulator.common.block_spec.specs;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.minecraft.block.properties.IProperty;
@@ -14,12 +15,14 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 import lombok.EqualsAndHashCode;
 import matter_manipulator.common.block_spec.AbstractBlockSpec;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.common.block_spec.adapters.SpecialBlockSpecAdapter;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
 /// A [BlockSpec] that places a block, along with some interop state. The block must be backed 1:1 by a standard
@@ -85,6 +88,22 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
+    public BlockSpecData exchange(ResourceIdentity stack, ResourceIdentity replacement) {
+        super.exchangeInterop(stack, replacement);
+
+        if (!Objects.equals(this.getResource().getIdentity(), stack)) return null;
+
+        var repl = replacement.asInt();
+        if (repl == null) return null;
+
+        return BlockSpecData.builder()
+            .stack(repl.createStackInt(this.getResource().getAmountInt()))
+            .state(this.getBlockState())
+            .interopData(this.interop)
+            .build();
+    }
+
+    @Override
     public SpecialBlockSpec clone() {
         return (SpecialBlockSpec) super.clone();
     }
@@ -108,7 +127,7 @@ public class SpecialBlockSpec extends AbstractBlockSpec {
 
         MutableObject<IBlockState> state = new MutableObject<>(base);
 
-        MMRegistriesInternal.transformBlock(state, getBlockState(), EnumSet.noneOf(ApplyResult.class));
+        MMRegistriesInternal.mutateBlock(state, getBlockState(), EnumSet.noneOf(ApplyResult.class));
 
         SpecialBlockSpec copy = this.clone();
 

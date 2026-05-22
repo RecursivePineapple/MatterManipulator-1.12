@@ -1,6 +1,6 @@
 {
   "variants": {
-    "state=off": { "model": "matter-manipulator:uplink-controller-active#machine" },
+    "state=off": { "model": "matter-manipulator:uplink-controller-off#machine" },
     "state=idle": { "model": "matter-manipulator:uplink-controller-idle#machine" },
     "state=active": { "model": "matter-manipulator:uplink-controller-active#machine" }
   }

@@ -16,11 +16,11 @@ import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import matter_manipulator.common.context.ManipulatorContextImpl;
+import matter_manipulator.common.context.HeldManipulatorContextImpl;
 import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.networking.MMAction;
 import matter_manipulator.common.state.MMState;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 import matter_manipulator.core.interop.MMRegistries;
 
 public abstract class AbstractKeybinding implements ManipulatorKeybind {
@@ -74,13 +74,13 @@ public abstract class AbstractKeybinding implements ManipulatorKeybind {
 
         MMState state = ItemMatterManipulator.getState(held);
 
-        ManipulatorContextImpl context = new ManipulatorContextImpl(player.world, player, held, state);
+        HeldManipulatorContextImpl context = new HeldManipulatorContextImpl(player.world, player, held, state);
 
         return process(context);
     }
 
     @Override
-    public abstract boolean process(ManipulatorContext context);
+    public abstract boolean process(HeldManipulatorContext context);
 
     @SideOnly(Side.CLIENT)
     protected static class ClientDelegate {

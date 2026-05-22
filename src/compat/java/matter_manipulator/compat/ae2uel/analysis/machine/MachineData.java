@@ -23,12 +23,12 @@ import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.core.analysis.ApplyMode;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
 @Desugar
 public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data, AEColor color, String customName,
-    InventoryAnalysis upgrades, InventoryAnalysis config, int priority, boolean omniDirectional) {
+    InventoryAnalysis upgrades, InventoryAnalysis config, int priority, boolean omniDirectional) implements Cloneable {
 
     public static MachineData fromMachine(AEBaseTile tile) {
         EnumFacing up = tile.getUp();
@@ -51,7 +51,7 @@ public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data
 
         AEColor color = tile instanceof IColorableTile colorable ? colorable.getColor() : null;
 
-        String customName = tile.getCustomInventoryName();
+        String customName = tile.hasCustomInventoryName() ? tile.getCustomInventoryName() : null;
 
         InventoryAnalysis upgrade = null, config = null;
 
@@ -80,7 +80,7 @@ public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data
         TileInterface.class,
         "omniDirectional");
 
-    public void apply(BlockPlacingContext context, TileEntity tile, EnumSet<ApplyResult> result) {
+    public void apply(ManipulatorPlacingContext context, TileEntity tile, EnumSet<ApplyResult> result) {
         if (tile instanceof AEBaseTile ae) {
             if (this.forward != null && this.up != null) {
                 ae.setOrientation(this.forward, this.up);
@@ -96,7 +96,7 @@ public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data
         }
 
         if (tile instanceof ICustomNameObject c) {
-            if (this.customName != null) c.setCustomName(this.customName);
+            c.setCustomName(this.customName);
         }
 
         if (tile instanceof IConfigurableObject configurable && configurable.getConfigManager() != null) {
@@ -124,7 +124,9 @@ public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data
         }
     }
 
-    public void getRequiredItemsForExistingBlock(BlockPlacingContext context, TileEntity tile, EnumSet<ApplyResult> result) {
+    public void getRequiredItemsForExistingBlock(
+        ManipulatorPlacingContext context, TileEntity tile,
+        EnumSet<ApplyResult> result) {
         if (tile instanceof ISegmentedInventory inv) {
             IItemHandler upgradeInv = inv.getInventoryByName("upgrades");
             if (upgradeInv != null && this.upgrades != null) {
@@ -136,11 +138,23 @@ public record MachineData(EnumFacing up, EnumFacing forward, NBTTagCompound data
         }
     }
 
-    public void getRequiredItemsForNewBlock(BlockPlacingContext context) {
+    public void getRequiredItemsForNewBlock(ManipulatorPlacingContext context) {
         if (this.upgrades != null) {
-            this.upgrades.slots.forEach((slot, item) -> {
-                context.items().extract(new ItemStackWrapper(item));
-            });
+            this.upgrades.getRequiredItemsForNewBlock(context);
         }
+    }
+
+    @Override
+    public MachineData clone() {
+        return new MachineData(
+            up,
+            forward,
+            data.copy(),
+            color,
+            customName,
+            upgrades.clone(),
+            config.clone(),
+            priority,
+            omniDirectional);
     }
 }

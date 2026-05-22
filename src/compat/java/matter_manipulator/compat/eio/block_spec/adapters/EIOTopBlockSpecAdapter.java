@@ -2,17 +2,19 @@ package matter_manipulator.compat.eio.block_spec.adapters;
 
 import net.minecraft.block.state.IBlockState;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import crazypants.enderio.base.machine.base.block.BlockMachineExtension;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.compat.eio.block_spec.specs.EIOTopBlockSpec;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.TargetedManipulatorContext;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.TargetedContext;
 import matter_manipulator.core.persist.NBTPersist;
 
 public class EIOTopBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoader {
@@ -22,7 +24,7 @@ public class EIOTopBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoad
     private EIOTopBlockSpecAdapter() { }
 
     @Override
-    public @Nullable EIOTopBlockSpec getSpecPartial(TargetedManipulatorContext context) {
+    public @Nullable EIOTopBlockSpec getSpecPartial(TargetedContext context) {
         IBlockState state = context.getBlockState();
 
         if (!(state.getBlock() instanceof BlockMachineExtension)) return null;
@@ -31,18 +33,23 @@ public class EIOTopBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoad
     }
 
     @Override
-    public @Nullable EIOTopBlockSpec getSpecFull(BlockAnalysisContext context) {
+    public @Nullable EIOTopBlockSpec getSpecFull(AnalysisContext context) {
         return getSpecPartial(context);
     }
 
     @Override
-    public String getKey() {
+    public @Nullable BlockSpec reconstructSpec(BlockSpecData data) {
+        return null;
+    }
+
+    @Override
+    public @NotNull String getKey() {
         return "eio:top";
     }
 
     @Override
-    public EIOTopBlockSpec load(JsonElement element) {
-        if (!(element instanceof JsonObject obj)) return null;
+    public @NotNull BlockSpec load(@NotNull JsonElement element) {
+        if (!(element instanceof JsonObject obj)) return BlockSpec.air();
 
         IBlockState state = NBTPersist.GSON.fromJson(obj.get("state"), IBlockState.class);
 
@@ -50,7 +57,7 @@ public class EIOTopBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoad
     }
 
     @Override
-    public JsonElement save(BlockSpec spec2) {
+    public @NotNull JsonElement save(@NotNull BlockSpec spec2) {
         EIOTopBlockSpec spec = (EIOTopBlockSpec) spec2;
 
         JsonObject obj = new JsonObject();

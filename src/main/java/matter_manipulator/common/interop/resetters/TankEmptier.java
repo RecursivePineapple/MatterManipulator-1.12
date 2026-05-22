@@ -10,7 +10,7 @@ import net.minecraft.util.EnumFacing;
 import org.jetbrains.annotations.NotNull;
 
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.context.TargetedManipulatorContext;
+import matter_manipulator.core.context.PlacingContext;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.resources.ResourceStack;
@@ -19,7 +19,7 @@ import matter_manipulator.core.resources.fluid.FluidResourceStack;
 public class TankEmptier implements BlockResetter {
 
     @Override
-    public @NotNull List<ResourceStack> resetBlock(@NotNull TargetedManipulatorContext context) {
+    public @NotNull List<ResourceStack> resetBlock(@NotNull PlacingContext context) {
         TileEntity te = context.getTileEntity();
 
         if (te == null) return Collections.emptyList();
@@ -53,5 +53,12 @@ public class TankEmptier implements BlockResetter {
 
             out.add(extracted);
         }
+    }
+
+    @Override
+    public @NotNull List<ResourceStack> resetBlockSimulated(@NotNull PlacingContext context) {
+        // Tanks are skipped entirely because things like multiblock tanks are too problematic to implement cleanly.
+
+        return Collections.emptyList();
     }
 }

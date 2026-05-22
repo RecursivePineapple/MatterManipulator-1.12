@@ -25,6 +25,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.analysis.InventoryInteropModule;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.common.block_spec.adapters.AirBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.RedstoneBlockSpecAdapter;
 import matter_manipulator.common.block_spec.adapters.SimpleBlockSpecAdapter;
@@ -38,6 +39,7 @@ import matter_manipulator.common.interop.state_mutators.PropertyCopyStateMutator
 import matter_manipulator.common.inventory_adapter.ItemHandlerInventoryAdapterFactory;
 import matter_manipulator.common.inventory_adapter.StandardInventoryAdapterFactory;
 import matter_manipulator.common.modes.copying.CopyingManipulatorMode;
+import matter_manipulator.common.modes.exchanging.ExchangeManipulatorMode;
 import matter_manipulator.common.modes.geometry.GeometryManipulatorMode;
 import matter_manipulator.common.resources.item.ios.DroppingItemStackIOFactory;
 import matter_manipulator.common.resources.item.ios.PlayerInventoryItemStackIOFactory;
@@ -46,27 +48,32 @@ import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.block_spec.InteropModule;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.ManipulatorContext;
-import matter_manipulator.core.context.TargetedManipulatorContext;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.TargetedContext;
 import matter_manipulator.core.fluid.FluidStackIO;
 import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.i18n.Localizer;
 import matter_manipulator.core.interop.BlockResetter;
 import matter_manipulator.core.interop.BlockStateMutator;
+import matter_manipulator.core.interop.InteropModule;
 import matter_manipulator.core.interop.MMRegistries;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
 import matter_manipulator.core.item.ImmutableItemStack;
 import matter_manipulator.core.item.ItemStackIO;
 import matter_manipulator.core.keybind.ManipulatorKeybind;
-import matter_manipulator.core.manipulator_resource.ManipulatorResourceLoader;
-import matter_manipulator.core.manipulator_resource.RFEnergyResourceLoader;
+import matter_manipulator.core.manipulator_state.ManipulatorStateLoader;
+import matter_manipulator.core.manipulator_state.RFEnergyStateLoader;
+import matter_manipulator.core.manipulator_state.UplinkStateLoader;
 import matter_manipulator.core.modes.ManipulatorMode;
+import matter_manipulator.core.persist.tagged_union.TaggedUnionLoader;
 import matter_manipulator.core.resources.Resource;
 import matter_manipulator.core.resources.ResourceIOFactory;
 import matter_manipulator.core.resources.ResourceProviderFactory;
+import matter_manipulator.core.resources.ResourceStack;
+import matter_manipulator.core.resources.fluid.FluidResource;
+import matter_manipulator.core.resources.fluid.FluidResourceProviderFactory;
 import matter_manipulator.core.resources.fluid.FluidResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 import matter_manipulator.core.resources.item.ItemResource;
@@ -87,10 +94,11 @@ public class MMRegistriesInternal {
     public static final Map<ResourceLocation, ManipulatorMode<?, ?>> MODES = new Object2ObjectOpenHashMap<>();
     public static final Map<ResourceLocation, ManipulatorSetting<?>> SETTINGS = new Object2ObjectOpenHashMap<>();
     public static final Map<Resource, ResourceProviderFactory> RESOURCES = new Object2ObjectOpenHashMap<>();
-    public static final Object2ObjectMap<String, BlockSpecLoader> LOADERS = new Object2ObjectOpenHashMap<>();
+    public static final Object2ObjectMap<String, BlockSpecLoader> SPEC_LOADERS = new Object2ObjectOpenHashMap<>();
     public static Pair<Resource, ResourceProviderFactory>[] RESOURCE_ARRAY = new Pair[0];
-    public static final Map<ResourceLocation, ManipulatorResourceLoader<?>> RESOURCE_LOADERS = new Object2ObjectOpenHashMap<>();
-    public static final DependencyGraph<BlockStateMutator> BLOCK_STATE_TRANSFORMERS = new DependencyGraph<>(new BlockStateMutator[0]);
+    public static final Object2ObjectMap<String, TaggedUnionLoader<ResourceStack>> RESOURCE_LOADERS = new Object2ObjectOpenHashMap<>();
+    public static final Map<ResourceLocation, ManipulatorStateLoader<?>> MANIPULATOR_RESOURCE_LOADERS = new Object2ObjectOpenHashMap<>();
+    public static final DependencyGraph<BlockStateMutator> BLOCK_STATE_MUTATORS = new DependencyGraph<>(new BlockStateMutator[0]);
     public static final Map<ResourceLocation, ManipulatorKeybind> KEYBINDS = new HashMap<>();
     public static final BiMap<ResourceLocation, Localizer> LOCALIZERS = HashBiMap.create();
     public static ImmutableItemStack[] FREE_ITEMS = new ImmutableItemStack[0];
@@ -145,6 +153,7 @@ public class MMRegistriesInternal {
 
     static {
         MMRegistries.registerResourceType(ItemResource.ITEMS, ItemResourceProviderFactory.INSTANCE);
+        MMRegistries.registerResourceType(FluidResource.FLUIDS, FluidResourceProviderFactory.INSTANCE);
     }
 
     static {
@@ -157,17 +166,19 @@ public class MMRegistriesInternal {
         // Anything that interacts with the world directly (like items on the ground)
         ITEM_IO_FACTORIES.addSubgraph("world", "after:player");
 
-        ITEM_IO_FACTORIES.addObject("player/player-inv", new PlayerInventoryItemStackIOFactory());
-        ITEM_IO_FACTORIES.addObject("world/dump-on-ground", new DroppingItemStackIOFactory());
+        ITEM_IO_FACTORIES.addObject("player/player-inv", PlayerInventoryItemStackIOFactory.INSTANCE);
+        ITEM_IO_FACTORIES.addObject("world/dump-on-ground", DroppingItemStackIOFactory.INSTANCE);
     }
 
     static {
         MMRegistries.registerManipulatorMode(new GeometryManipulatorMode());
         MMRegistries.registerManipulatorMode(new CopyingManipulatorMode());
+        MMRegistries.registerManipulatorMode(new ExchangeManipulatorMode());
     }
 
     static {
-        MMRegistries.registerManipulatorResourceLoader(new RFEnergyResourceLoader());
+        MMRegistries.registerManipulatorStateLoader(new RFEnergyStateLoader());
+        MMRegistries.registerManipulatorStateLoader(new UplinkStateLoader());
     }
 
     static {
@@ -205,7 +216,7 @@ public class MMRegistriesInternal {
     }
 
     @Nullable
-    public static BlockSpec getPartialBlockSpec(TargetedManipulatorContext context) {
+    public static BlockSpec getPartialBlockSpec(TargetedContext context) {
         for (var extractor : SPEC_EXTRACTORS.sorted()) {
             BlockSpec spec = extractor.getSpecPartial(context);
 
@@ -216,7 +227,7 @@ public class MMRegistriesInternal {
     }
 
     @Nullable
-    public static BlockSpec getFullBlockSpec(BlockAnalysisContext context) {
+    public static BlockSpec getFullBlockSpec(AnalysisContext context) {
         for (var extractor : SPEC_EXTRACTORS.sorted()) {
             BlockSpec spec = extractor.getSpecFull(context);
 
@@ -226,15 +237,25 @@ public class MMRegistriesInternal {
         return null;
     }
 
-    public static BlockSpec getFullBlockSpec(ManipulatorContext context, BlockPos pos) {
+    public static BlockSpec getFullBlockSpec(HeldManipulatorContext context, BlockPos pos) {
         AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
         analysisContext.setPos(pos);
         return getFullBlockSpec(analysisContext);
     }
 
-    public static void transformBlock(MutableObject<IBlockState> state, IBlockState target, EnumSet<ApplyResult> result) {
-        for (var transformer : BLOCK_STATE_TRANSFORMERS.sorted()) {
-            result.add(transformer.transform(state, target));
+    public static BlockSpec reconstructSpec(BlockSpecData data) {
+        for (var extractor : SPEC_EXTRACTORS.sorted()) {
+            BlockSpec spec = extractor.reconstructSpec(data);
+
+            if (spec != null) return spec;
+        }
+
+        return null;
+    }
+
+    public static void mutateBlock(MutableObject<IBlockState> state, IBlockState target, EnumSet<ApplyResult> result) {
+        for (var mutator : BLOCK_STATE_MUTATORS.sorted()) {
+            result.add(mutator.transform(state, target));
 
             if (result.contains(ApplyResult.Error)) break;
         }

@@ -2,15 +2,18 @@ package matter_manipulator.common.block_spec.adapters;
 
 import net.minecraft.init.Blocks;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.common.block_spec.specs.RedstoneBlockSpec;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecExtractor;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.TargetedManipulatorContext;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.TargetedContext;
 
 public class RedstoneBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLoader {
 
@@ -19,27 +22,32 @@ public class RedstoneBlockSpecAdapter implements BlockSpecExtractor, BlockSpecLo
     private RedstoneBlockSpecAdapter() { }
 
     @Override
-    public @Nullable BlockSpec getSpecPartial(TargetedManipulatorContext context) {
+    public @Nullable BlockSpec getSpecPartial(TargetedContext context) {
         return context.getBlockState().getBlock() == Blocks.REDSTONE_WIRE ? RedstoneBlockSpec.INSTANCE : null;
     }
 
     @Override
-    public @Nullable BlockSpec getSpecFull(BlockAnalysisContext context) {
+    public @Nullable BlockSpec getSpecFull(AnalysisContext context) {
         return getSpecPartial(context);
     }
 
     @Override
-    public String getKey() {
+    public @Nullable BlockSpec reconstructSpec(BlockSpecData data) {
+        return data.stack.isSameType(RedstoneBlockSpec.INSTANCE.getResource()) ? RedstoneBlockSpec.INSTANCE : null;
+    }
+
+    @Override
+    public @NotNull String getKey() {
         return "core:redstone";
     }
 
     @Override
-    public BlockSpec load(JsonElement element) {
-        return null;
+    public @NotNull BlockSpec load(@NotNull JsonElement element) {
+        return RedstoneBlockSpec.INSTANCE;
     }
 
     @Override
-    public JsonElement save(BlockSpec spec) {
-        return null;
+    public @NotNull JsonElement save(@NotNull BlockSpec variant) {
+        return JsonNull.INSTANCE;
     }
 }

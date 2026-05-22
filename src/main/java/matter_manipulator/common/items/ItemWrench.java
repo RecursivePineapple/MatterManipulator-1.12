@@ -24,7 +24,7 @@ import mcp.MethodsReturnNonnullByDefault;
 public class ItemWrench extends Item {
 
     public ItemWrench() {
-        setTranslationKey("wrench");
+        setTranslationKey("mm-wrench");
         setRegistryName(Tags.MODID, "wrench");
     }
 

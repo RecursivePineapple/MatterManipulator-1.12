@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3i;
 
 import lombok.EqualsAndHashCode;
-import matter_manipulator.client.rendering.MMRenderUtils;
+import matter_manipulator.client.rendering.MMRenderConstants;
 import matter_manipulator.common.building.StandardBuild;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.modes.geometry.shapes.GeometryBlockPalette;
@@ -25,7 +25,8 @@ import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.color.ImmutableColor;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.PlayerContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.util.Coroutine;
 
@@ -100,7 +101,7 @@ public class GeometryConfig implements GeometryBlockPalette {
     public enum PendingAction {
         MARK_A {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
                 config.a = context.getLookedAtBlock();
 
@@ -113,12 +114,12 @@ public class GeometryConfig implements GeometryBlockPalette {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.BLUE;
+                return MMRenderConstants.BLUE;
             }
         },
         MARK_B {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
                 config.b = context.getLookedAtBlock();
 
@@ -135,12 +136,12 @@ public class GeometryConfig implements GeometryBlockPalette {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.BLUE;
+                return MMRenderConstants.BLUE;
             }
         },
         MARK_C {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
                 config.c = context.getLookedAtBlock();
 
@@ -153,12 +154,12 @@ public class GeometryConfig implements GeometryBlockPalette {
 
             @Override
             public ImmutableColor getRulerColor() {
-                return MMRenderUtils.BLUE;
+                return MMRenderConstants.BLUE;
             }
         },
         SET_ALL {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
 
                 BlockSpec selected = BlockSpec.air();
@@ -180,7 +181,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         SET_FACES {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
 
                 BlockSpec selected = BlockSpec.air();
@@ -202,7 +203,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         SET_EDGES {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
 
                 BlockSpec selected = BlockSpec.air();
@@ -224,7 +225,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         SET_CORNERS {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
 
                 BlockSpec selected = BlockSpec.air();
@@ -246,7 +247,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         SET_VOLUMES {
             @Override
-            public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context,
+            public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context,
                 boolean forPreview) {
 
                 BlockSpec selected = BlockSpec.air();
@@ -269,7 +270,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         //
         ;
 
-        public Optional<GeometryConfig> process(GeometryConfig config, ManipulatorContext context, boolean forPreview) {
+        public Optional<GeometryConfig> process(GeometryConfig config, HeldManipulatorContext context, boolean forPreview) {
             throw new UnsupportedOperationException();
         }
 
@@ -291,7 +292,7 @@ public class GeometryConfig implements GeometryBlockPalette {
     public enum Shape {
         CUBE {
             @Override
-            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
+            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, PlayerContext context) {
                 return ctx -> {
                     Vector3i min = new Vector3i(config.a).min(config.b);
                     Vector3i max = new Vector3i(config.a).max(config.b);
@@ -306,7 +307,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         LINE {
             @Override
-            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
+            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, PlayerContext context) {
                 return ctx -> {
                     Vector3i a = config.a;
                     Vector3i b = config.b;
@@ -321,7 +322,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         SPHERE {
             @Override
-            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
+            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, PlayerContext context) {
                 return ctx -> {
                     Vector3i min = new Vector3i(config.a).min(config.b);
                     Vector3i max = new Vector3i(config.a).max(config.b);
@@ -336,7 +337,7 @@ public class GeometryConfig implements GeometryBlockPalette {
         },
         CYLINDER {
             @Override
-            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
+            public Coroutine<StandardBuild> getBlocks(GeometryConfig config, PlayerContext context) {
                 return ctx -> {
                     XSTR rng = new XSTR(config.hashCode());
 
@@ -374,7 +375,7 @@ public class GeometryConfig implements GeometryBlockPalette {
             return false;
         }
 
-        public Coroutine<StandardBuild> getBlocks(GeometryConfig config, ManipulatorContext context) {
+        public Coroutine<StandardBuild> getBlocks(GeometryConfig config, PlayerContext context) {
             throw new UnsupportedOperationException();
         }
 

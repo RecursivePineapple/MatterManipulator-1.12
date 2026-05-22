@@ -1,7 +1,5 @@
 package matter_manipulator.core.resources;
 
-import matter_manipulator.core.item.ItemStackIO;
-
 /// This is a minimal interface for resource I/O. Implementations are free to add extra methods to
 /// subclasses/subinterfaces for more granular or optimized operations.
 /// All operations performed on this interface or subclasses/subinterfaces must immediately affect the world to avoid
@@ -28,8 +26,7 @@ public interface ResourceProvider<R extends ResourceStack> {
     R insert(R stack);
 
     /// Extracts a stack atomically. If the stack does not match the request, it is reinserted. Note that this may cause
-    /// items to be moved between storages, but that should only occur when an [ItemStackIO] has a bug and does not
-    /// extract items properly.
+    /// items to be moved between storages, but that should only occur when [#canExtract(ResourceStack)] misbehaves.
     default R tryExtract(R request) {
         if (!canExtract(request)) return null;
 

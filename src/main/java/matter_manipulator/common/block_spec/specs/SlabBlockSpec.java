@@ -1,6 +1,7 @@
 package matter_manipulator.common.block_spec.specs;
 
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 import net.minecraft.block.Block;
@@ -16,12 +17,14 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 import lombok.EqualsAndHashCode;
 import matter_manipulator.common.block_spec.AbstractBlockSpec;
+import matter_manipulator.common.block_spec.BlockSpecData;
 import matter_manipulator.common.block_spec.adapters.SlabBlockSpecAdapter;
 import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 import matter_manipulator.mixin.mixins.minecraft.AccessorItemSlab;
@@ -97,6 +100,22 @@ public class SlabBlockSpec extends AbstractBlockSpec {
     }
 
     @Override
+    public BlockSpecData exchange(ResourceIdentity stack, ResourceIdentity replacement) {
+        super.exchangeInterop(stack, replacement);
+
+        if (!Objects.equals(this.getResource().getIdentity(), stack)) return null;
+
+        var repl = replacement.asInt();
+        if (repl == null) return null;
+
+        return BlockSpecData.builder()
+            .stack(repl.createStackInt(this.getResource().getAmountInt()))
+            .state(this.getBlockState())
+            .interopData(this.interop)
+            .build();
+    }
+
+    @Override
     public SlabBlockSpec clone() {
         return (SlabBlockSpec) super.clone();
     }
@@ -117,7 +136,7 @@ public class SlabBlockSpec extends AbstractBlockSpec {
 
         MutableObject<IBlockState> state = new MutableObject<>(base);
 
-        MMRegistriesInternal.transformBlock(state, getBlockState(), EnumSet.noneOf(ApplyResult.class));
+        MMRegistriesInternal.mutateBlock(state, getBlockState(), EnumSet.noneOf(ApplyResult.class));
 
         SlabBlockSpec copy = clone();
 

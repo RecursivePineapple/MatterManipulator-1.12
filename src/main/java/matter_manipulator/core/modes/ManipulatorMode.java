@@ -14,7 +14,8 @@ import matter_manipulator.client.gui.BranchableRadialMenu;
 import matter_manipulator.client.rendering.ModeRenderer;
 import matter_manipulator.common.networking.MMPacketBuffer;
 import matter_manipulator.core.building.Buildable;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.RenderingContext;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.util.Coroutine;
 
@@ -28,16 +29,16 @@ public interface ManipulatorMode<TConfig, TBuildable extends Buildable> {
 
     @Contract(pure = true)
     @SideOnly(Side.CLIENT)
-    ModeRenderer<TConfig, TBuildable> getRenderer(ManipulatorContext context);
+    ModeRenderer<TConfig, TBuildable> getRenderer(RenderingContext context);
 
     /// Checks if the given manipulator is allowed to use this mode.
-    boolean isAllowedOnManipulator(ManipulatorContext context);
+    boolean isAllowedOnManipulator(HeldManipulatorContext context);
 
-    void addTooltipInfo(ManipulatorContext context, List<String> lines);
+    void addTooltipInfo(HeldManipulatorContext context, List<String> lines);
 
-    void addMenuItems(ManipulatorContext context, BranchableRadialMenu menu);
+    void addMenuItems(HeldManipulatorContext context, BranchableRadialMenu menu);
 
-    default void addModeSelect(ManipulatorContext context, BranchableRadialMenu menu) {
+    default void addModeSelect(HeldManipulatorContext context, BranchableRadialMenu menu) {
         menu.option()
             .label(IKey.str(getLocalizedName()))
             .onClicked(() -> {
@@ -48,17 +49,17 @@ public interface ManipulatorMode<TConfig, TBuildable extends Buildable> {
     }
 
     @Contract(pure = true)
-    default TConfig getPreviewConfig(TConfig config, ManipulatorContext context) {
+    default TConfig getPreviewConfig(TConfig config, HeldManipulatorContext context) {
         return config;
     }
 
     @Contract(mutates = "param2")
-    Optional<TConfig> onPickBlock(TConfig config, ManipulatorContext context);
+    Optional<TConfig> onPickBlock(TConfig config, HeldManipulatorContext context);
 
     @Contract(mutates = "param2")
-    Optional<TConfig> onRightClick(TConfig config, ManipulatorContext context);
+    Optional<TConfig> onRightClick(TConfig config, HeldManipulatorContext context);
 
-    default boolean handleRickClick(ManipulatorContext context) {
+    default boolean handleRickClick(HeldManipulatorContext context) {
         IDataStorage storage = context.getState().getActiveModeConfigStorage();
 
         TConfig config = this.loadConfig(storage);
@@ -79,7 +80,7 @@ public interface ManipulatorMode<TConfig, TBuildable extends Buildable> {
     /// Creates a coroutine which will produce a [TBuildable] once finished. This method should just create the objects,
     /// no analysis should be done until the coroutine is executed.
     @Contract(mutates = "param2")
-    Coroutine<TBuildable> startAnalysis(TConfig config, ManipulatorContext context);
+    Coroutine<TBuildable> startAnalysis(TConfig config, HeldManipulatorContext context);
 
     TConfig loadConfig(IDataStorage storage);
     void saveConfig(IDataStorage storage, TConfig config);

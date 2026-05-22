@@ -7,7 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.RegistryEvent.Register;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -15,10 +14,13 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.cleanroommc.modularui.factory.GuiManager;
 import matter_manipulator.common.blocks.BlockHint;
+import matter_manipulator.common.blocks.BlockUplinkCasing;
 import matter_manipulator.common.blocks.BlockUplinkController;
+import matter_manipulator.common.blocks.BlockUplinkEnergyConnector;
 import matter_manipulator.common.items.ItemCluster;
 import matter_manipulator.common.items.ItemHologramProjector;
 import matter_manipulator.common.items.ItemMatterManipulator;
@@ -31,6 +33,8 @@ import matter_manipulator.common.keybind.MMKeybinds;
 import matter_manipulator.common.networking.MMNetwork;
 import matter_manipulator.common.ui.ManipulatorUIFactory;
 import matter_manipulator.common.uplink.TileUplinkController;
+import matter_manipulator.common.uplink.TileUplinkEnergyConnector;
+import matter_manipulator.core.tooltip.MMTooltipManager;
 
 public class CommonProxy {
 
@@ -40,6 +44,14 @@ public class CommonProxy {
     public static final BlockHint HINT_DOT = new BlockHint("hint_dot");
     public static final BlockHint HINT_WARNING = new BlockHint("hint_warning");
     public static final BlockHint HINT_X = new BlockHint("hint_x");
+
+    public static final BlockUplinkCasing UPLINK_STRUCTURE_WHITE = new BlockUplinkCasing("uplink-structure-white", false);
+    public static final BlockUplinkCasing UPLINK_STRUCTURE_BLACK = new BlockUplinkCasing("uplink-structure-black", false);
+    public static final BlockUplinkCasing UPLINK_COIL = new BlockUplinkCasing("uplink-coil", true);
+    public static final BlockUplinkCasing UPLINK_SUPPORT_BLACK = new BlockUplinkCasing("uplink-support-black", false);
+    public static final BlockUplinkCasing UPLINK_SUPPORT_WHITE = new BlockUplinkCasing("uplink-support-white", false);
+
+    public static final BlockUplinkEnergyConnector UPLINK_ENERGY_CONNECTOR = new BlockUplinkEnergyConnector();
 
     public static final ItemHologramProjector HOLOGRAM_PROJECTOR = new ItemHologramProjector();
     public static final ItemWrench WRENCH = new ItemWrench();
@@ -56,7 +68,8 @@ public class CommonProxy {
 
         try {
             Class.forName("matter_manipulator.compat.InteropLoader").getMethod("preInit").invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+            ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -64,7 +77,8 @@ public class CommonProxy {
     public void init(FMLInitializationEvent event) {
         try {
             Class.forName("matter_manipulator.compat.InteropLoader").getMethod("init").invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+            ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -72,7 +86,8 @@ public class CommonProxy {
     public void postInit(FMLPostInitializationEvent event) {
         try {
             Class.forName("matter_manipulator.compat.InteropLoader").getMethod("postInit").invoke(null);
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+            ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
     }
@@ -133,7 +148,17 @@ public class CommonProxy {
         registerBlock(HINT_WARNING);
         registerBlock(HINT_X);
         registerBlock(UPLINK_CONTROLLER);
-        TileEntity.register(Tags.MODID + ":uplink", TileUplinkController.class);
+        registerBlock(UPLINK_STRUCTURE_WHITE);
+        registerBlock(UPLINK_STRUCTURE_BLACK);
+        registerBlock(UPLINK_COIL);
+        registerBlock(UPLINK_SUPPORT_BLACK);
+        registerBlock(UPLINK_SUPPORT_WHITE);
+        registerBlock(UPLINK_ENERGY_CONNECTOR);
+
+        MMTooltipManager.addTooltip(UPLINK_ENERGY_CONNECTOR, MMTooltipManager.markdown("energy-connector"));
+
+        GameRegistry.registerTileEntity(TileUplinkController.class, MatterManipulator.loc("uplink"));
+        GameRegistry.registerTileEntity(TileUplinkEnergyConnector.class, MatterManipulator.loc("uplink-energy-connector"));
     }
 
     public void registerRecipes(Register<IRecipe> event) {

@@ -1,11 +1,12 @@
 package matter_manipulator.common.structure.impl;
 
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
+
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import matter_manipulator.common.structure.IStructureDefinition;
 import matter_manipulator.common.structure.StructureElement;
-import matter_manipulator.common.structure.StructureContext;
 import matter_manipulator.common.structure.StructureWalker;
 import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
 import matter_manipulator.common.structure.coords.Position;
@@ -13,6 +14,8 @@ import matter_manipulator.common.structure.coords.StructureDefinitionCoords;
 import matter_manipulator.common.structure.coords.StructureRelativeCoords;
 import matter_manipulator.common.structure.coords.WorldCoords;
 import matter_manipulator.common.utils.MathUtils;
+import matter_manipulator.core.context.StructureContext;
+import matter_manipulator.core.context.StructureInteractContext;
 
 public class StructureDefinition<T> implements IStructureDefinition<T> {
 
@@ -107,18 +110,20 @@ public class StructureDefinition<T> implements IStructureDefinition<T> {
     }
 
     @Override
-    public void build(StructureContext<T> context) {
+    public void build(StructureInteractContext<T> context) {
+        var blockPos = new MutableBlockPos();
+
         iterate(context, ($, pos, element) -> {
-            if (!context.consumePlaceQuota()) return false;
+            context.setPos(blockPos.setPos(pos.x, pos.y, pos.z));
 
             element.build(context, pos.toBlockPos());
 
-            return true;
+            return context.hasPlaceQuota();
         });
     }
 
     @Override
-    public void emitHints(StructureContext<T> context) {
+    public void emitHints(StructureInteractContext<T> context) {
         iterate(context, ($, pos, element) -> {
             element.emitHint(context, pos.toBlockPos());
 

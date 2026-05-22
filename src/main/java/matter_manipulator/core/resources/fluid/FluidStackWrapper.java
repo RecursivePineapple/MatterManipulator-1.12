@@ -47,6 +47,11 @@ public class FluidStackWrapper implements IntFluidResourceStack {
     }
 
     @Override
+    public FluidStackWrapper copy() {
+        return new FluidStackWrapper(FluidUtils.copyWithAmount(this.stack, this.stack.amount));
+    }
+
+    @Override
     public FluidStackWrapper emptyCopy() {
         return new FluidStackWrapper(FluidUtils.copyWithAmount(this.stack, 0));
     }

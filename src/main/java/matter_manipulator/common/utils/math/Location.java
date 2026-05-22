@@ -46,6 +46,10 @@ public class Location extends Vector3i {
         this(world, v.x, v.y, v.z);
     }
 
+    public Location(@Nonnull World world, BlockPos p) {
+        this(world, p.getX(), p.getY(), p.getZ());
+    }
+
     @Override
     public String toString() {
         return String.format("X=%,d Y=%,d Z=%,d", x, y, z);

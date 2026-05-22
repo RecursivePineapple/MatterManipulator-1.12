@@ -35,6 +35,7 @@ public enum MMUpgrades {
         this.id = id.ID;
         this.bit = bit;
         this.providesCaps = providesCaps;
+        id.container.set(getStack());
     }
 
     public ItemStack getStack() {

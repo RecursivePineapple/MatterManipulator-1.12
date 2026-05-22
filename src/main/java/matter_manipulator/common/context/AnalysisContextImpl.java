@@ -7,10 +7,10 @@ import net.minecraft.world.World;
 
 import lombok.Setter;
 import matter_manipulator.common.state.MMState;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 
-public class AnalysisContextImpl extends ManipulatorContextImpl implements BlockAnalysisContext {
+public class AnalysisContextImpl extends HeldManipulatorContextImpl implements AnalysisContext {
 
     @Setter
     public BlockPos pos;
@@ -19,7 +19,7 @@ public class AnalysisContextImpl extends ManipulatorContextImpl implements Block
         super(world, player, manipulator, state);
     }
 
-    public AnalysisContextImpl(ManipulatorContext base) {
+    public AnalysisContextImpl(HeldManipulatorContext base) {
         this(base.getWorld(), base.getRealPlayer(), base.getManipulator(), base.getState());
     }
 

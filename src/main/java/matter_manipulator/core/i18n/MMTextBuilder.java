@@ -2,6 +2,7 @@ package matter_manipulator.core.i18n;
 
 import java.util.ArrayList;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,10 @@ public class MMTextBuilder {
     public MMTextBuilder addName(String name) {
         add(NAME, name);
         return this;
+    }
+
+    public MMTextBuilder addCoord(BlockPos pos) {
+        return addCoord(pos.getX(), pos.getY(), pos.getZ());
     }
 
     public MMTextBuilder addCoord(int x, int y, int z) {

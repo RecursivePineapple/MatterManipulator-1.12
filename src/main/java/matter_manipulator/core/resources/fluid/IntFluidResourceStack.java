@@ -7,5 +7,8 @@ public interface IntFluidResourceStack extends FluidResourceStack, IntResourceSt
     IntFluidResourceStack EMPTY = new FluidStackWrapper(null);
 
     @Override
+    IntFluidResourceStack copy();
+
+    @Override
     IntFluidResourceStack emptyCopy();
 }

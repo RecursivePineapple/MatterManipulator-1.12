@@ -25,11 +25,16 @@ import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.building.PendingBlock;
 import matter_manipulator.core.building.PendingBlockBuildable;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.building.Plannable;
+import matter_manipulator.core.context.HeldManipulatorContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.context.PlanningContextImpl;
 import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.planning.BuildPlan;
 import matter_manipulator.core.resources.ResourceStack;
+import matter_manipulator.core.util.Coroutine;
 
-public class StandardBuild implements PendingBlockBuildable {
+public class StandardBuild implements PendingBlockBuildable, Plannable {
 
     public final ArrayDeque<PendingBlock> pendingBlocks;
     private final ObjectOpenHashSet<BlockPos> visited = new ObjectOpenHashSet<>();
@@ -45,7 +50,7 @@ public class StandardBuild implements PendingBlockBuildable {
     }
 
     @Override
-    public void onBuildTick(BlockPlacingContext placingContext) {
+    public void onBuildTick(ManipulatorPlacingContext placingContext) {
         int placeSpeed = placingContext.getPlaceSpeed();
 
         Integer lastChunkX = null, lastChunkZ = null;
@@ -127,29 +132,6 @@ public class StandardBuild implements PendingBlockBuildable {
 //                case ALL -> true;
 //            };
 
-            boolean canPlace = existing.getBlockState().getBlockHardness(world, pos) >= 0;
-
-            // We don't want to remove these even though they'll never be placed because we want to see how many blocks
-            // couldn't be placed
-            if (!canPlace) {
-                pendingBlocks.addLast(pendingBlocks.removeFirst());
-                shuffleCount++;
-
-                if (shuffleCount > pendingBlocks.size()) {
-                    break;
-                } else {
-                    continue;
-                }
-            }
-
-            // if there's an existing block then skip it if we can't remove it
-            if (!world.isAirBlock(pos)) {
-                if (!placingContext.hasCapability(ManipulatorFlags.ALLOW_REMOVING)) {
-                    pendingBlocks.removeFirst();
-                    continue;
-                }
-            }
-
             if (!visited.add(pos)) {
                 MatterManipulator.LOG.warn("Tried to place block twice! {}", pendingBlock);
                 pendingBlocks.removeFirst();
@@ -162,12 +144,14 @@ public class StandardBuild implements PendingBlockBuildable {
 
             // If there's already a block at this location, we need to remove it if it's different
             if (!pendingBlock.spec.matches(existing)) {
-                if (!pendingBlock.spec.canPlaceAt(proxiedWorld, pos)) {
+                boolean canRemove = isRemovable(placingContext, existing, pendingBlock, proxiedWorld);
+
+                // We don't want to remove these even though they'll never be placed because we want to see how many blocks
+                // couldn't be placed
+                if (!canRemove) {
                     pendingBlocks.addLast(pendingBlocks.removeFirst());
-                    visited.remove(pos);
                     shuffleCount++;
 
-                    // if we've shuffled every block, then we'll never be able to place any of them
                     if (shuffleCount > pendingBlocks.size()) {
                         break;
                     } else {
@@ -192,7 +176,8 @@ public class StandardBuild implements PendingBlockBuildable {
             if (world.isAirBlock(pos)) {
                 result.add(pendingBlock.spec.place(placingContext));
 
-                if (filter == null && (result.contains(ApplyResult.DidSomething) || result.contains(ApplyResult.Wrenched))) {
+                if (filter == null && (result.contains(ApplyResult.DidSomething)
+                    || result.contains(ApplyResult.Wrenched))) {
                     filter = pendingResource.copy();
                 }
             }
@@ -200,7 +185,7 @@ public class StandardBuild implements PendingBlockBuildable {
             if (!ApplyResult.hasFailure(result)) {
                 MutableObject<IBlockState> state = new MutableObject<>(world.getBlockState(pos));
 
-                MMRegistriesInternal.transformBlock(state, pendingState, result);
+                MMRegistriesInternal.mutateBlock(state, pendingState, result);
 
                 if (!ApplyResult.hasFailure(result)) {
                     world.setBlockState(pos, state.getValue());
@@ -215,6 +200,7 @@ public class StandardBuild implements PendingBlockBuildable {
 
             if (result.contains(ApplyResult.DidSomething)) {
                 placingContext.playSound(SoundEvents.ENTITY_ENDERMEN_TELEPORT);
+                quota--;
             }
 
             if (result.contains(ApplyResult.Retry)) {
@@ -222,7 +208,6 @@ public class StandardBuild implements PendingBlockBuildable {
             }
 
             pendingBlocks.remove();
-            quota--;
         }
 
         for (PendingBlock pendingBlock : retry) {
@@ -241,8 +226,28 @@ public class StandardBuild implements PendingBlockBuildable {
         }
     }
 
+    private static boolean isRemovable(
+        ManipulatorPlacingContext placingContext, BlockSpec existing, PendingBlock pendingBlock, ProxiedWorld proxiedWorld
+    ) {
+        World world = placingContext.getWorld();
+        BlockPos pos = placingContext.getPos();
+
+        if (existing.getBlockState().getBlockHardness(world, pos) < 0) {
+            return false;
+        }
+
+        // if there's an existing block then skip it if we can't remove it
+        if (!world.isAirBlock(pos)) {
+            if (!placingContext.hasCapability(ManipulatorFlags.ALLOW_REMOVING)) {
+                return false;
+            }
+        }
+
+        return pendingBlock.spec.canPlaceAt(proxiedWorld, pos);
+    }
+
     @Override
-    public void onStop(BlockPlacingContext context) {
+    public void onStop(ManipulatorPlacingContext context) {
 
     }
 
@@ -258,5 +263,70 @@ public class StandardBuild implements PendingBlockBuildable {
     public void decode(MMPacketBuffer buffer) {
         pendingBlocks.clear();
         pendingBlocks.addAll(buffer.readList(PendingBlock::decodeNew));
+    }
+
+    @Override
+    public Coroutine<BuildPlan> createPlan(HeldManipulatorContext context, boolean skipExisting) {
+        PlanningContextImpl placingContext = new PlanningContextImpl(context);
+        AnalysisContextImpl analysisContext = new AnalysisContextImpl(context);
+
+        World world = context.getWorld();
+        ProxiedWorld proxiedWorld = new ProxiedWorld(world);
+
+        return Coroutine.forEach(
+            this.pendingBlocks, pendingBlock -> {
+
+                BlockPos pos = pendingBlock.toPos();
+                IBlockState pendingState = pendingBlock.getBlockState();
+                BlockSpec spec = pendingBlock.spec;
+
+                placingContext.setTarget(pos, spec);
+
+                if (!spec.isValid()) {
+                    placingContext.error(new Localized("mm.info.error.unplaceable_block", pendingState.toString()));
+                    return;
+                }
+
+                if (world.isOutsideBuildHeight(pos)) {
+                    return;
+                }
+
+                if (spec.isAir() && world.isAirBlock(pos)) {
+                    return;
+                }
+
+                analysisContext.setPos(pos);
+                BlockSpec existing = MMRegistriesInternal.getPartialBlockSpec(analysisContext);
+
+                if (existing == null) {
+                    placingContext.error(new Localized("mm.info.error.existing_block_missing_spec"));
+                    return;
+                }
+
+                boolean newBlock = false;
+
+                // If there's already a block at this location, we need to remove it if it's different
+                if (!spec.matches(existing)) {
+                    boolean canRemove = isRemovable(placingContext, existing, pendingBlock, proxiedWorld);
+
+                    if (!canRemove) {
+                        return;
+                    }
+
+                    placingContext.removeBlock();
+
+                    var stack = spec.getResource();
+
+                    if (!stack.isEmpty()) {
+                        //noinspection unchecked
+                        placingContext.resource(stack.getResource()).extract(stack);
+                    }
+
+                    newBlock = true;
+                }
+
+                spec.getRequiredResourcesForUpdate(placingContext, skipExisting || newBlock);
+            }, () -> new BuildPlan(placingContext.getNetStacks())
+        );
     }
 }

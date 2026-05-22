@@ -54,6 +54,8 @@ dependencies {
 
     api("com.cleanroommc:modularui:3.1.5") { transitive = false }
 
+    runtimeOnlyNonPublishable(rfg.deobf("curse.maven:jei-integration-265917:2951731"))
+
     compileOnly("com.google.auto.value:auto-value-annotations:1.10.1") { transitive = false }
     annotationProcessor("com.google.auto.value:auto-value:1.10.1")
 

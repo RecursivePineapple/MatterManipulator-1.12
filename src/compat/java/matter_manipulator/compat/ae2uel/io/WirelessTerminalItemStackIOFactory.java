@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import net.minecraft.entity.player.EntityPlayer;
 
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.PlayerContext;
 import matter_manipulator.core.item.ItemStackIO;
 import matter_manipulator.core.persist.IDataStorage;
 import matter_manipulator.core.resources.ResourceIOFactory;
@@ -12,7 +12,7 @@ import matter_manipulator.core.resources.ResourceIOFactory;
 public class WirelessTerminalItemStackIOFactory implements ResourceIOFactory<ItemStackIO> {
 
     @Override
-    public Optional<ItemStackIO> getIO(ManipulatorContext context, IDataStorage storage) {
+    public Optional<ItemStackIO> getIO(PlayerContext context, IDataStorage storage) {
         EntityPlayer player = context.getRealPlayer();
 
         WirelessTerminalState wirelessTerminalState = WirelessTerminalState.getWirelessTerminal(player);

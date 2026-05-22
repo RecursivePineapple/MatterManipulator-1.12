@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 
 public interface ManipulatorKeybind {
 
@@ -17,5 +17,5 @@ public interface ManipulatorKeybind {
     @SideOnly(Side.CLIENT)
     void onPressed();
 
-    boolean process(ManipulatorContext context);
+    boolean process(HeldManipulatorContext context);
 }

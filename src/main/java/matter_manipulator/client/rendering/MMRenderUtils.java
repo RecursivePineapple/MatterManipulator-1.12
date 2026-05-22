@@ -17,6 +17,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
@@ -25,15 +28,9 @@ import org.lwjgl.opengl.GL11;
 import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.Arrays;
 import matter_manipulator.MatterManipulator;
-import matter_manipulator.core.color.ImmutableColor;
-import matter_manipulator.core.color.RGBColor;
 
+@SideOnly(Side.CLIENT)
 public class MMRenderUtils {
-
-    public static final ImmutableColor WHITE = new RGBColor(255, 255, 255, 100);
-    public static final ImmutableColor BLUE = new RGBColor(38, 153, 192, 100);
-    public static final ImmutableColor ORANGE = new RGBColor(192, 128, 38, 100);
-    public static final ImmutableColor GREEN = new RGBColor(102, 192, 38, 100);
 
     private static Vector3d getVecForDir(EnumFacing dir) {
         return new Vector3d(dir.getXOffset(), dir.getYOffset(), dir.getZOffset());

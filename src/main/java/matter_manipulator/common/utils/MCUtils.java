@@ -6,15 +6,24 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import matter_manipulator.core.i18n.Localized;
@@ -97,16 +106,18 @@ public class MCUtils {
     }
 
     private static DecimalFormat getDecimalFormat() {
-        return decimalFormatters.computeIfAbsent(Locale.getDefault(Locale.Category.FORMAT), locale -> {
-            DecimalFormat numberFormat = new DecimalFormat(); // uses the necessary locale inside anyway
-            numberFormat.setGroupingUsed(true);
-            numberFormat.setMaximumFractionDigits(2);
-            numberFormat.setRoundingMode(RoundingMode.HALF_UP);
-            DecimalFormatSymbols decimalFormatSymbols = numberFormat.getDecimalFormatSymbols();
-            decimalFormatSymbols.setGroupingSeparator(','); // Use sensible separator for best clarity.
-            numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-            return numberFormat;
-        });
+        return decimalFormatters.computeIfAbsent(
+            Locale.getDefault(Locale.Category.FORMAT), locale -> {
+                DecimalFormat numberFormat = new DecimalFormat(); // uses the necessary locale inside anyway
+                numberFormat.setGroupingUsed(true);
+                numberFormat.setMaximumFractionDigits(2);
+                numberFormat.setRoundingMode(RoundingMode.HALF_UP);
+                DecimalFormatSymbols decimalFormatSymbols = numberFormat.getDecimalFormatSymbols();
+                decimalFormatSymbols.setGroupingSeparator(','); // Use sensible separator for best clarity.
+                numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
+                return numberFormat;
+            }
+        );
     }
 
     public static String formatNumbers(BigInteger aNumber) {
@@ -126,7 +137,8 @@ public class MCUtils {
     }
 
     public static Localized getDirectionDisplayName(EnumFacing dir, boolean nullIsUnknown) {
-        if (dir == null) return nullIsUnknown ? new Localized("mm.misc.dir.unknown") : new Localized("mm.misc.dir.null");
+        if (dir == null)
+            return nullIsUnknown ? new Localized("mm.misc.dir.unknown") : new Localized("mm.misc.dir.null");
 
         return new Localized("mm.misc.dir." + dir.name());
     }
@@ -185,27 +197,23 @@ public class MCUtils {
                 if (code >= '0' && code <= '9' || code >= 'a' && code <= 'f') {
                     // Colours, use as-is and erase the previous format
                     currentFormat = "" + FORMAT_ESCAPE + code;
-                    out.append(FORMAT_ESCAPE)
-                        .append(code);
+                    out.append(FORMAT_ESCAPE).append(code);
                 } else if (code >= 'k' && code <= 'o') {
                     // Styles, use as-is and append to the colour style (note: this may act up with repeated style
                     // codes, but it shouldn't break anything).
                     currentFormat = currentFormat + FORMAT_ESCAPE + code;
-                    out.append(FORMAT_ESCAPE)
-                        .append(code);
+                    out.append(FORMAT_ESCAPE).append(code);
                 } else if (code == 'r') {
                     // Reset, use as-is and clear the format
                     currentFormat = "";
-                    out.append(FORMAT_ESCAPE)
-                        .append(code);
+                    out.append(FORMAT_ESCAPE).append(code);
                 } else if (code == 's') {
                     // Push, save the current format and don't emit to the output buffer
                     stack.push(currentFormat);
                 } else if (code == 't') {
                     if (stack.isEmpty()) {
                         // No format in the stack, start it
-                        out.append(FORMAT_ESCAPE)
-                            .append('r');
+                        out.append(FORMAT_ESCAPE).append('r');
                     } else {
                         // Pop, restore the top format and don't emit to the output buffer
                         currentFormat = stack.pop();
@@ -219,5 +227,44 @@ public class MCUtils {
         }
 
         return out.toString();
+    }
+
+    public static List<NBTTagCompound> getCompoundTagList(NBTTagCompound parent, String tag) {
+        //noinspection unchecked,rawtypes
+        return (List) parent.getTagList(tag, NBT.TAG_COMPOUND).tagList;
+    }
+
+    public static EntityPlayer getPlayerById(World world, UUID playerId) {
+        if (world.getMinecraftServer() != null) {
+            for (EntityPlayer player : world.getMinecraftServer().getPlayerList().getPlayers()) {
+                if (player.getGameProfile().getId().equals(playerId)) return player;
+            }
+        }
+
+        return null;
+    }
+
+    public static Stream<ItemStack> streamInventory(IInventory inv) {
+        return IntStream.range(0, inv.getSizeInventory()).mapToObj(inv::getStackInSlot);
+    }
+
+    /// Returns true when on the server thread.
+    public static boolean isServerThread() {
+        return FMLCommonHandler.instance().getEffectiveSide().isServer();
+    }
+
+    /// Returns true when on the client thread.
+    public static boolean isClientThread() {
+        return FMLCommonHandler.instance().getEffectiveSide().isClient();
+    }
+
+    /// Returns true when the current process is a client.
+    public static boolean isClientProc() {
+        return FMLCommonHandler.instance().getSide().isClient();
+    }
+
+    /// Returns true when the current process is a dedicated server.
+    public static boolean isServerProc() {
+        return FMLCommonHandler.instance().getSide().isServer();
     }
 }

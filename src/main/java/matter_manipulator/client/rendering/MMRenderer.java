@@ -30,7 +30,7 @@ import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.common.utils.math.VoxelAABB;
 import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.color.ImmutableColor;
-import matter_manipulator.core.context.ManipulatorRenderingContext;
+import matter_manipulator.core.context.RenderingContext;
 import matter_manipulator.core.misc.BuildFeedback;
 import matter_manipulator.core.modes.ManipulatorMode;
 
@@ -185,7 +185,7 @@ public class MMRenderer {
         }
     }
 
-    private static class RenderContextImpl implements ManipulatorRenderingContext {
+    private static class RenderContextImpl implements RenderingContext {
 
         public ItemStack manipulator;
         public MMState state;

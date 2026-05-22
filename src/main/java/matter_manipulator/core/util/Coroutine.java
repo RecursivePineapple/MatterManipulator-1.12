@@ -1,5 +1,6 @@
 package matter_manipulator.core.util;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -14,8 +15,8 @@ public interface Coroutine<T> {
 
     /// This is called repeatedly each tick until [CoroutineExecutionContext#stop(Object)] is called, or the method
     /// throws an error. The implementation should periodically call [CoroutineExecutionContext#shouldYield()]. When
-    /// this method returns true, the implementation should return from this method to yield execution back to another
-    /// task or the client/server thread.
+    /// `shouldYield` returns true, the coroutine should return, to yield execution back to another task or the
+    /// client/server thread.
     void run(CoroutineExecutionContext<T> ctx);
 
     /// Runs this coroutine to completion and returns the value, if any. Does not capture errors. Blocks the current
@@ -94,5 +95,21 @@ public interface Coroutine<T> {
 
     static <T> Coroutine<T> finishedDeferred(Supplier<T> value) {
         return ctx -> ctx.stop(value.get());
+    }
+
+    static <T, R> Coroutine<R> forEach(Iterable<T> iterable, Consumer<T> fn, Supplier<R> finisher) {
+        var iter = iterable.iterator();
+
+        return ctx -> {
+            int i = 0;
+
+            while (iter.hasNext()) {
+                if (i++ % 10 == 9) return;
+
+                fn.accept(iter.next());
+            }
+
+            ctx.stop(finisher.get());
+        };
     }
 }

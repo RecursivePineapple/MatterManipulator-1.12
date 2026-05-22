@@ -9,24 +9,30 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 
+
 import appeng.api.parts.IFacadePart;
 import appeng.api.parts.IPart;
+import appeng.api.parts.IPartItem;
 import appeng.api.util.AEPartLocation;
+import appeng.facade.IFacadeItem;
 import appeng.tile.networking.TileCableBus;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.core.analysis.ApplyMode;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.block_spec.InteropModule;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.interop.InteropModule;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.item.ItemStackLike;
+import matter_manipulator.core.persist.DataStorage;
 import matter_manipulator.core.persist.IDataStorage;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
 public class AECableBusInteropModule implements InteropModule<AECableAnalysisResult> {
 
     @Override
-    public Optional<AECableAnalysisResult> analyze(BlockAnalysisContext context) {
+    public Optional<AECableAnalysisResult> analyze(AnalysisContext context) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof TileCableBus cableBus)) return Optional.empty();
@@ -54,7 +60,7 @@ public class AECableBusInteropModule implements InteropModule<AECableAnalysisRes
     }
 
     @Override
-    public Set<ApplyResult> apply(BlockPlacingContext context, AECableAnalysisResult analysis) {
+    public Set<ApplyResult> apply(ManipulatorPlacingContext context, AECableAnalysisResult analysis) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof TileCableBus cableBus)) return Collections.emptySet();
@@ -94,7 +100,7 @@ public class AECableBusInteropModule implements InteropModule<AECableAnalysisRes
     }
 
     @Override
-    public Set<ApplyResult> getRequiredItemsForExistingBlock(BlockPlacingContext context, AECableAnalysisResult analysis) {
+    public Set<ApplyResult> getRequiredResourcesForExistingBlock(ManipulatorPlacingContext context, AECableAnalysisResult analysis) {
         TileEntity tile = context.getTileEntity();
 
         if (!(tile instanceof TileCableBus cableBus)) return Collections.emptySet();
@@ -133,7 +139,7 @@ public class AECableBusInteropModule implements InteropModule<AECableAnalysisRes
     }
 
     @Override
-    public Set<ApplyResult> getRequiredItemsForNewBlock(BlockPlacingContext context, AECableAnalysisResult analysis) {
+    public Set<ApplyResult> getRequiredResourcesForNewBlock(ManipulatorPlacingContext context, AECableAnalysisResult analysis) {
         EnumSet<ApplyResult> results = EnumSet.noneOf(ApplyResult.class);
 
         for (var e : analysis.parts.fastEntrySet()) {
@@ -168,5 +174,56 @@ public class AECableBusInteropModule implements InteropModule<AECableAnalysisRes
         analysis.parts.transform((EnumFacing dir) -> transform.apply(dir));
         analysis.facades.transform((EnumFacing dir) -> transform.apply(dir));
         return analysis;
+    }
+
+    @Override
+    public void exchangeResource(AECableAnalysisResult analysis, ResourceIdentity stack, ResourceIdentity replacement) {
+        if (!(stack instanceof ItemStackLike stackItem)) return;
+        if (!(replacement instanceof ItemStackLike replacementItem)) return;
+
+        if (stackItem.getItem() instanceof IFacadeItem) {
+            if (replacementItem.getItem() instanceof IFacadeItem) {
+                analysis.facades.fastEntrySet().forEach(e -> {
+                    FacadeData data = e.getValue();
+
+                    if (stackItem.matches(data.getFacadeStack())) {
+                        e.setValue(new FacadeData(replacementItem.toStack(data.getFacadeStack().getCount())));
+                    }
+                });
+            }
+        }
+
+        if (stackItem.getItem() instanceof IPartItem<?>) {
+            if (replacementItem.getItem() instanceof IPartItem) {
+                analysis.parts.fastEntrySet().forEach(e -> {
+                    PartData data = e.getValue();
+
+                    if (stackItem.matches(data.getPartStack())) {
+                        data = data.clone();
+
+                        data.partStack = replacementItem.toStack(data.getPartStack().getCount());
+
+                        e.setValue(data);
+                    }
+                });
+            }
+        }
+
+        analysis.parts.fastEntrySet().forEach(e -> {
+            PartData data = e.getValue();
+
+            if (data.upgrades != null) {
+                data.upgrades.exchangeResource(stack, replacement);
+            }
+
+            if (data.config != null) {
+                data.config.exchangeResource(stack, replacement);
+            }
+        });
+    }
+
+    @Override
+    public AECableAnalysisResult cloneAnalysis(AECableAnalysisResult result) {
+        return result.clone();
     }
 }

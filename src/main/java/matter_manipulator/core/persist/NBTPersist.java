@@ -40,9 +40,9 @@ import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
+import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.analysis.InventoryAnalysis.InventoryAnalysisJsonAdapter;
-import matter_manipulator.core.persist.adapters.BlockSpecJsonAdapter;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.persist.adapters.BitSetJsonAdapter;
 import matter_manipulator.core.persist.adapters.BlockStateJsonAdapter;
@@ -53,6 +53,8 @@ import matter_manipulator.core.persist.adapters.ItemStackJsonAdapter;
 import matter_manipulator.core.persist.adapters.NBTJsonAdapter;
 import matter_manipulator.core.persist.adapters.ResourceLocationJsonAdapter;
 import matter_manipulator.core.persist.adapters.StaticEnumJsonAdapter;
+import matter_manipulator.core.persist.tagged_union.TaggedUnionJsonAdapter;
+import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.util.DirectionMap;
 
 public class NBTPersist {
@@ -65,10 +67,11 @@ public class NBTPersist {
         .registerTypeAdapter(DataStorage.class, new DataStorageJsonAdapter())
         .registerTypeAdapter(ItemStack.class, new ItemStackJsonAdapter())
         .registerTypeAdapter(FluidStack.class, new FluidStackJsonAdapter())
-        .registerTypeAdapter(BlockSpec.class, new BlockSpecJsonAdapter())
+        .registerTypeAdapter(BlockSpec.class, new TaggedUnionJsonAdapter<>("spec", MMRegistriesInternal.SPEC_LOADERS))
         .registerTypeAdapter(IBlockState.class, new BlockStateJsonAdapter())
         .registerTypeAdapter(InventoryAnalysis.class, new InventoryAnalysisJsonAdapter())
         .registerTypeAdapter(DirectionMap.class, new DirectionMapJsonAdapter())
+        .registerTypeAdapter(ResourceStack.class, new TaggedUnionJsonAdapter<>("resource stack", MMRegistriesInternal.RESOURCE_LOADERS))
         .create();
 
     /**

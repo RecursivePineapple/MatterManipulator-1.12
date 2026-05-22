@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
 import matter_manipulator.common.interop.MMRegistriesInternal;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 import matter_manipulator.core.item.ItemStackIO;
 import matter_manipulator.core.persist.DataStorage;
+import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceProviderFactory;
 
-public class ItemResourceProviderFactory implements ResourceProviderFactory<ItemResourceProvider> {
+public class ItemResourceProviderFactory implements ResourceProviderFactory<ResourceProvider<IntItemResourceStack>> {
 
     public static final ItemResourceProviderFactory INSTANCE = new ItemResourceProviderFactory();
 
@@ -22,7 +24,7 @@ public class ItemResourceProviderFactory implements ResourceProviderFactory<Item
     }
 
     @Override
-    public ItemResourceProvider createProvider(ManipulatorContext context) {
+    public ResourceProvider<IntItemResourceStack> createProvider(HeldManipulatorContext context) {
         List<ItemStackIO> ios = new ArrayList<>();
 
         DataStorage storage = context.getState().ioState;
@@ -34,5 +36,10 @@ public class ItemResourceProviderFactory implements ResourceProviderFactory<Item
         }
 
         return new ItemResourceProvider(ios.toArray(new ItemStackIO[0]));
+    }
+
+    @Override
+    public ResourceProvider<IntItemResourceStack> createSimulatedProvider(HeldManipulatorContext context) {
+        return new SimulatedItemResourceProvider();
     }
 }

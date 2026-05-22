@@ -3,9 +3,9 @@ package matter_manipulator.common.context;
 import net.minecraft.item.ItemStack;
 
 import matter_manipulator.common.state.MMState;
-import matter_manipulator.core.context.StackManipulatorContext;
+import matter_manipulator.core.context.ManipulatorContext;
 
-public class StackManipulatorContextImpl implements StackManipulatorContext {
+public class StackManipulatorContextImpl implements ManipulatorContext {
 
     public ItemStack manipulator;
     public MMState state;

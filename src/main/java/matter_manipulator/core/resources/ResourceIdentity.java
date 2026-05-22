@@ -15,6 +15,20 @@ public interface ResourceIdentity {
 
     Localized getName();
 
+    boolean isSameType(ResourceStack stack);
+
+    default IntResourceIdentity asInt() {
+        if (!hasTrait(ResourceIdentityTrait.IntAmount)) return null;
+
+        return (IntResourceIdentity) this;
+    }
+
+    default LongResourceIdentity asLong() {
+        if (!hasTrait(ResourceIdentityTrait.LongAmount)) return null;
+
+        return (LongResourceIdentity) this;
+    }
+
     /// The stack has an integer amount field.
     interface IntResourceIdentity extends ResourceIdentity {
         ResourceStack createStackInt(int amount);

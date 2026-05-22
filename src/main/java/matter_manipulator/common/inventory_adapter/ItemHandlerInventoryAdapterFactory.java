@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import com.github.bsideup.jabel.Desugar;
 import it.unimi.dsi.fastutil.ints.IntIterators;
 import it.unimi.dsi.fastutil.ints.IntList;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.inventory_adapter.InventoryAdapter;
 import matter_manipulator.core.inventory_adapter.InventoryAdapterFactory;
 import matter_manipulator.core.resources.Resource;
@@ -40,7 +40,7 @@ public class ItemHandlerInventoryAdapterFactory implements InventoryAdapterFacto
         }
 
         @Override
-        public boolean validate(BlockPlacingContext context) {
+        public boolean validate(ManipulatorPlacingContext context) {
             return true;
         }
 
@@ -57,13 +57,7 @@ public class ItemHandlerInventoryAdapterFactory implements InventoryAdapterFacto
 
         @Override
         public boolean canInsert(int slot, IntItemResourceStack stack) {
-            var stack2 = stack.toStack();
-
-            if (!handler.isItemValid(slot, stack2)) return false;
-
-            int rejected = handler.insertItem(slot, stack2, true).getCount();
-
-            return rejected == 0 || rejected != stack.getAmountInt();
+            return handler.isItemValid(slot, stack.toStackFast(stack.getAmountInt()));
         }
 
         @Override

@@ -24,13 +24,13 @@ import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.items.MMUpgrades;
 import matter_manipulator.common.state.MMState;
 import matter_manipulator.core.block_spec.BlockSpec;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.i18n.MMTextBuilder;
 import matter_manipulator.core.interop.BlockResetter;
-import matter_manipulator.core.manipulator_resource.EnergyManipulatorResource;
-import matter_manipulator.core.manipulator_resource.ManipulatorResource;
+import matter_manipulator.core.manipulator_state.EnergyManipulatorState;
+import matter_manipulator.core.manipulator_state.ManipulatorState;
 import matter_manipulator.core.misc.BuildFeedback;
 import matter_manipulator.core.misc.FeedbackSeverity;
 import matter_manipulator.core.resources.Resource;
@@ -39,10 +39,9 @@ import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceProviderFactory;
 import matter_manipulator.core.resources.ResourceStack;
 
-public class BuildingContextImpl extends ManipulatorContextImpl implements BlockPlacingContext {
+public class BuildingContextImpl extends HeldManipulatorContextImpl implements ManipulatorPlacingContext {
 
-    @SuppressWarnings("rawtypes")
-    private final Map<Resource<?>, ResourceProvider> cachedProviders = new Object2ObjectArrayMap<>();
+    @SuppressWarnings("rawtypes") private final Map<Resource<?>, ResourceProvider> cachedProviders = new Object2ObjectArrayMap<>();
 
     public BlockPos pos;
     public BlockSpec spec;
@@ -125,8 +124,8 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
             cost *= 0.5;
         }
 
-        for (ManipulatorResource res : state.getResources(this).values()) {
-            if (res instanceof EnergyManipulatorResource energy) {
+        for (ManipulatorState res : state.getResources(this).values()) {
+            if (res instanceof EnergyManipulatorState energy) {
                 cost -= energy.extract(cost);
 
                 if (cost <= 0.001) return true;
@@ -153,8 +152,8 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
             cost *= 0.5;
         }
 
-        for (ManipulatorResource res : state.getResources(this).values()) {
-            if (res instanceof EnergyManipulatorResource energy) {
+        for (ManipulatorState res : state.getResources(this).values()) {
+            if (res instanceof EnergyManipulatorState energy) {
                 cost -= energy.extract(cost);
 
                 if (cost <= 0.001) return true;
@@ -220,11 +219,6 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
         this.extractionFailures.addTo(stack.getIdentity(), ResourceStack.getStackAmount(stack));
     }
 
-    @Override
-    public boolean isSimulation() {
-        return false;
-    }
-
     public void onBuildTickFinished() {
         pendingSounds.forEach((pair, info) -> {
             int avgX = (int) (info.sumX / info.eventCount);
@@ -238,14 +232,33 @@ public class BuildingContextImpl extends ManipulatorContextImpl implements Block
 
         pendingSounds.clear();
 
+        feedback.forEach(feedback -> {
+            String key = null;
+            TextFormatting color = null;
+
+            switch (feedback.severity()) {
+                case ERROR -> {
+                    key = "mm.chat.feedback.error";
+                    color = TextFormatting.RED;
+                }
+                case WARNING -> {
+                    key = "mm.chat.feedback.warn";
+                    color = TextFormatting.YELLOW;
+                }
+                case NOTICE -> {
+                    key = "mm.chat.feedback.notice";
+                    color = TextFormatting.BLUE;
+                }
+            }
+
+            new MMTextBuilder(key).setBase(color).addCoord(feedback.pos()).addLocalized(feedback.message()).toLocalized().sendChat(getRealPlayer());
+        });
+
+        feedback.clear();
+
         extractionFailures.object2LongEntrySet().fastForEach(e -> {
             new Localized("mm.info.warning.could_not_find").setBase(TextFormatting.GRAY).sendChat(getRealPlayer());
-            new MMTextBuilder("mm.info.warning.missing_resource")
-                .setBase(TextFormatting.GRAY)
-                .addLocalized(e.getKey().getName())
-                .addNumber(e.getLongValue())
-                .toLocalized()
-                .sendChat(getRealPlayer());
+            new MMTextBuilder("mm.info.warning.missing_resource").setBase(TextFormatting.GRAY).addLocalized(e.getKey().getName()).addNumber(e.getLongValue()).toLocalized().sendChat(getRealPlayer());
         });
 
         extractionFailures.clear();

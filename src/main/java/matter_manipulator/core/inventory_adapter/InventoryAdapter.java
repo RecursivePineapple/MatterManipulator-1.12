@@ -1,7 +1,7 @@
 package matter_manipulator.core.inventory_adapter;
 
 import it.unimi.dsi.fastutil.ints.IntList;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.resources.Resource;
 import matter_manipulator.core.resources.ResourceStack;
 
@@ -12,7 +12,7 @@ public interface InventoryAdapter<R extends ResourceStack> {
 
     Resource<?> getResource();
 
-    boolean validate(BlockPlacingContext context);
+    boolean validate(ManipulatorPlacingContext context);
 
     IntList getSlots();
 

@@ -1,9 +1,7 @@
 package matter_manipulator.common.block_spec;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
@@ -15,23 +13,20 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
-import matter_manipulator.common.interop.MMRegistriesInternal;
 import matter_manipulator.common.utils.math.Transform;
 import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.block_spec.InteropModule;
-import matter_manipulator.core.context.BlockAnalysisContext;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.AnalysisContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.context.PlacingContext;
 import matter_manipulator.core.i18n.JoiningLocalizer;
 import matter_manipulator.core.i18n.Localized;
-import matter_manipulator.core.persist.DataStorage;
-import matter_manipulator.core.persist.IDataStorage;
-import matter_manipulator.core.persist.NBTPersist;
+import matter_manipulator.core.interop.InteropMap;
+import matter_manipulator.core.resources.ResourceIdentity;
 import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
@@ -39,8 +34,7 @@ import matter_manipulator.core.resources.item.IntItemResourceStack;
 @EqualsAndHashCode
 public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
 
-    @SuppressWarnings("rawtypes")
-    public final Object2ObjectOpenHashMap<InteropModule, Object> interop = new Object2ObjectOpenHashMap<>(0);
+    public InteropMap interop = new InteropMap();
 
     @Override
     public abstract BlockSpecLoader getLoader();
@@ -62,11 +56,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
         AbstractBlockSpec copy = (AbstractBlockSpec) super.clone();
 
         copy.resetResource();
-
-        this.interop.forEach((module, analysis) -> {
-            //noinspection unchecked
-            copy.interop.put(module, module.cloneAnalysis(analysis));
-        });
+        copy.interop = copy.interop.clone();
 
         return copy;
     }
@@ -79,8 +69,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
     @Override
     @OverridingMethodsMustInvokeSuper
     public void transform(Transform transform) {
-        //noinspection unchecked
-        this.interop.replaceAll((module, state) -> module.transform(state, transform));
+        this.interop.transform(transform);
     }
 
     @Override
@@ -126,12 +115,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
             name = stack.getName();
         }
 
-        List<Localized> details = new ArrayList<>();
-
-        for (var e : interop.object2ObjectEntrySet()) {
-            //noinspection unchecked
-            e.getKey().getDetails(details, e.getValue());
-        }
+        List<Localized> details = this.interop.getDetails();
 
         if (!details.isEmpty()) {
             Localized detailsJoined = new Localized(JoiningLocalizer.COMMAS, (Object[]) details.toArray(new Localized[0]));
@@ -144,7 +128,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public ApplyResult place(BlockPlacingContext context) {
+    public ApplyResult place(PlacingContext context) {
         ResourceStack stack = this.getResource();
 
         ResourceProvider resource = context.resource(stack.getResource());
@@ -166,7 +150,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
         switch (result) {
             case DidNothing, NotApplicable, Retry, Error -> {
                 if (!stack.isEmpty()) {
-                    // For whatever reason the adapter couldn't place the block, so we have to reinsert it.
+                    // For whatever reason we couldn't place the block, so we have to reinsert it.
                     resource.insert(extracted);
                 }
             }
@@ -178,7 +162,7 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
         return result;
     }
 
-    protected ApplyResult doPlace(BlockPlacingContext context, ResourceStack extracted) {
+    protected ApplyResult doPlace(PlacingContext context, ResourceStack extracted) {
         var world = context.getWorld();
         var pos = context.getPos();
 
@@ -202,54 +186,25 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
     }
 
     @Override
-    public EnumSet<ApplyResult> update(BlockPlacingContext context) {
-        EnumSet<ApplyResult> result = EnumSet.noneOf(ApplyResult.class);
+    public EnumSet<ApplyResult> update(ManipulatorPlacingContext context) {
+        return this.interop.apply(context);
+    }
 
-        for (var e : interop.object2ObjectEntrySet()) {
-            //noinspection unchecked
-            result.addAll(e.getKey().apply(context, e.getValue()));
-        }
-
-        return result;
+    @Override
+    public void getRequiredResourcesForUpdate(ManipulatorPlacingContext context, boolean skipExisting) {
+        this.interop.getRequiredResources(context, skipExisting);
     }
 
     public void saveInterop(JsonObject specRoot) {
-        DataStorage storage = new DataStorage();
-
-        for (var e : this.interop.object2ObjectEntrySet()) {
-            //noinspection unchecked
-            e.getKey().save(storage, e.getValue());
-        }
-
-        if (storage.state.size() > 0) {
-            specRoot.add("interop", NBTPersist.GSON.toJsonTree(storage, IDataStorage.class));
-        }
+        this.interop.saveInterop(specRoot);
     }
 
     public void loadInterop(JsonObject specRoot) {
-        if (specRoot.has("interop")) {
-            DataStorage storage = NBTPersist.GSON.fromJson(specRoot.get("interop"), DataStorage.class);
-
-            //noinspection rawtypes
-            for (InteropModule interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
-                @SuppressWarnings("rawtypes")
-                Optional result = interop.load(storage);
-
-                if (result.isPresent()) {
-                    this.interop.put(interop, result.get());
-                }
-            }
-        }
+        this.interop.loadInterop(specRoot);
     }
 
-    public void analyze(BlockAnalysisContext context) {
-        for (InteropModule<?> interop : MMRegistriesInternal.INTEROP_MODULES.sorted()) {
-            var result = interop.analyze(context);
-
-            if (!result.isPresent()) continue;
-
-            this.interop.put(interop, result.get());
-        }
+    public void analyze(AnalysisContext context) {
+        this.interop.analyze(context);
     }
 
     public void modifyResource(ResourceStack resource) {
@@ -257,5 +212,9 @@ public abstract class AbstractBlockSpec implements BlockSpec, Cloneable {
             //noinspection unchecked
             e.getKey().modifyResource(resource, e.getValue());
         }
+    }
+
+    public void exchangeInterop(ResourceIdentity stack, ResourceIdentity replacement) {
+        this.interop.exchange(stack, replacement);
     }
 }

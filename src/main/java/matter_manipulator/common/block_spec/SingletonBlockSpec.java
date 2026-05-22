@@ -15,8 +15,13 @@ import matter_manipulator.common.utils.world.ProxiedWorld;
 import matter_manipulator.core.block_spec.ApplyResult;
 import matter_manipulator.core.block_spec.BlockSpec;
 import matter_manipulator.core.block_spec.BlockSpecLoader;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
+import matter_manipulator.core.context.PlacingContext;
 import matter_manipulator.core.i18n.Localized;
+import matter_manipulator.core.resources.ResourceIdentity;
+import matter_manipulator.core.resources.ResourceIdentity.IntResourceIdentity;
+import matter_manipulator.core.resources.ResourceIdentity.LongResourceIdentity;
+import matter_manipulator.core.resources.ResourceIdentityTrait;
 import matter_manipulator.core.resources.ResourceProvider;
 import matter_manipulator.core.resources.ResourceStack;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
@@ -53,13 +58,40 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
     }
 
     @Override
+    public BlockSpecData exchange(ResourceIdentity stack, ResourceIdentity replacement) {
+        ResourceStack ours = getResource();
+
+        if (!stack.isSameType(ours)) return null;
+
+        long ourAmount = ResourceStack.getStackAmount(ours);
+
+        if (ourAmount == 0) {
+            ourAmount = 1;
+        }
+
+        ResourceStack replStack;
+
+        if (ourAmount <= Integer.MAX_VALUE && replacement.hasTrait(ResourceIdentityTrait.IntAmount)) {
+            replStack = ((IntResourceIdentity) replacement).createStackInt((int) ourAmount);
+        } else if (replacement.hasTrait(ResourceIdentityTrait.LongAmount)) {
+            replStack = ((LongResourceIdentity) replacement).createStackLong(ourAmount);
+        } else {
+            return null;
+        }
+
+        return BlockSpecData.builder()
+            .stack(replStack)
+            .state(this.getBlockState())
+            .build();
+    }
+
+    @Override
     public boolean canPlaceAt(ProxiedWorld world, BlockPos pos) {
         IBlockState state = getBlockState();
 
         world.overrides.clear();
         world.setBlockToAir(pos);
-        if (!state.getBlock()
-            .canPlaceBlockAt(world, pos)) {
+        if (!state.getBlock().canPlaceBlockAt(world, pos)) {
             return false;
         }
 
@@ -68,8 +100,7 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
         world.overrides.clear();
         world.setBlockState(pos, state);
         //noinspection deprecation
-        state.getBlock()
-            .neighborChanged(state, world, pos, Blocks.AIR, pos.add(0, 1, 0));
+        state.getBlock().neighborChanged(state, world, pos, Blocks.AIR, pos.add(0, 1, 0));
 
         return world.getBlockState(pos) == state;
     }
@@ -86,7 +117,7 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public ApplyResult place(BlockPlacingContext context) {
+    public ApplyResult place(PlacingContext context) {
         ResourceStack stack = this.getResource();
 
         ResourceProvider resource = context.resource(stack.getResource());
@@ -120,7 +151,7 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
         return result;
     }
 
-    protected ApplyResult doPlace(BlockPlacingContext context, ResourceStack extracted) {
+    protected ApplyResult doPlace(PlacingContext context, ResourceStack extracted) {
         var world = context.getWorld();
         var pos = context.getPos();
 
@@ -132,19 +163,18 @@ public abstract class SingletonBlockSpec implements BlockSpec, Cloneable {
 
         var placed = world.getBlockState(pos);
 
-        placed.getBlock()
-            .onBlockPlacedBy(
-                world,
-                pos,
-                placed,
-                context.getRealPlayer(),
-                extracted instanceof IntItemResourceStack item ? item.toStack() : ItemStack.EMPTY);
+        placed.getBlock().onBlockPlacedBy(world, pos, placed, context.getRealPlayer(), extracted instanceof IntItemResourceStack item ? item.toStack() : ItemStack.EMPTY);
 
         return ApplyResult.DidSomething;
     }
 
     @Override
-    public EnumSet<ApplyResult> update(BlockPlacingContext context) {
+    public EnumSet<ApplyResult> update(ManipulatorPlacingContext context) {
         return EnumSet.noneOf(ApplyResult.class);
+    }
+
+    @Override
+    public void getRequiredResourcesForUpdate(ManipulatorPlacingContext context, boolean skipExisting) {
+
     }
 }

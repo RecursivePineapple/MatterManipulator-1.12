@@ -10,7 +10,7 @@ import matter_manipulator.common.modes.CuttableMode;
 import matter_manipulator.common.modes.PasteableMode;
 import matter_manipulator.common.modes.ResettableMode;
 import matter_manipulator.common.modes.copying.CopyingManipulatorMode;
-import matter_manipulator.core.context.ManipulatorContext;
+import matter_manipulator.core.context.HeldManipulatorContext;
 import matter_manipulator.core.keybind.AbstractKeybinding;
 
 public class MMKeybinds {
@@ -23,7 +23,7 @@ public class MMKeybinds {
         Keyboard.KEY_Z) {
 
         @Override
-        public boolean process(ManipulatorContext context) {
+        public boolean process(HeldManipulatorContext context) {
             if (context.getState()
                 .getActiveMode() instanceof ResettableMode resettable) {
                 return resettable.onResetPressed(context);
@@ -41,7 +41,7 @@ public class MMKeybinds {
         Keyboard.KEY_X) {
 
         @Override
-        public boolean process(ManipulatorContext context) {
+        public boolean process(HeldManipulatorContext context) {
             if (context.getState()
                 .getActiveMode() instanceof CuttableMode cuttable) {
                 return cuttable.onCutPressed(context);
@@ -59,7 +59,7 @@ public class MMKeybinds {
         Keyboard.KEY_C) {
 
         @Override
-        public boolean process(ManipulatorContext context) {
+        public boolean process(HeldManipulatorContext context) {
             if (!(context.getState().getActiveMode() instanceof CopyableMode)) {
                 context.getState().setActiveMode(context, CopyingManipulatorMode.MODE_ID);
             }
@@ -81,7 +81,7 @@ public class MMKeybinds {
         Keyboard.KEY_V) {
 
         @Override
-        public boolean process(ManipulatorContext context) {
+        public boolean process(HeldManipulatorContext context) {
             if (context.getState()
                 .getActiveMode() instanceof PasteableMode pasteable) {
                 return pasteable.onPastePressed(context);

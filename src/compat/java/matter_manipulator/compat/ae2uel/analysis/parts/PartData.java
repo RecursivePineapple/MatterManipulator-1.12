@@ -10,6 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import appeng.api.implementations.tiles.ISegmentedInventory;
 import appeng.api.parts.IPart;
 import appeng.api.parts.PartItemStack;
@@ -21,7 +24,11 @@ import appeng.me.GridAccessException;
 import appeng.me.cache.P2PCache;
 import appeng.parts.p2p.PartP2PTunnel;
 import appeng.tile.networking.TileCableBus;
-import com.github.bsideup.jabel.Desugar;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.inventory_adapter.ItemHandlerInventoryAdapterFactory.ItemHandlerInventoryAdapter;
 import matter_manipulator.common.utils.DataUtils;
@@ -29,14 +36,30 @@ import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.core.analysis.ApplyMode;
 import matter_manipulator.core.analysis.InventoryAnalysis;
 import matter_manipulator.core.block_spec.ApplyResult;
-import matter_manipulator.core.context.BlockPlacingContext;
+import matter_manipulator.core.context.ManipulatorPlacingContext;
 import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.resources.item.IntItemResourceStack;
 import matter_manipulator.core.resources.item.ItemStackWrapper;
 
-@Desugar
-public record PartData(ItemStack partStack, NBTTagCompound data, String customName, InventoryAnalysis upgrades,
-    InventoryAnalysis config, boolean isP2POutput, short p2pFreq, int priority) {
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@ToString
+public class PartData implements Cloneable {
+    @NotNull
+    public ItemStack partStack;
+    @Nullable
+    public NBTTagCompound data;
+    @Nullable
+    public String customName;
+    @Nullable
+    public InventoryAnalysis upgrades;
+    @Nullable
+    public InventoryAnalysis config;
+    public boolean isP2POutput;
+    public short p2pFreq;
+    public int priority;
 
     public static PartData fromPart(IPart part) {
         ItemStack stack = part.getItemStack(PartItemStack.BREAK);
@@ -88,7 +111,8 @@ public record PartData(ItemStack partStack, NBTTagCompound data, String customNa
         MethodType.methodType(void.class, boolean.class),
         "setOutput");
 
-    public void apply(BlockPlacingContext context, TileCableBus cableBus, AEPartLocation location,
+    public void apply(
+        ManipulatorPlacingContext context, TileCableBus cableBus, AEPartLocation location,
         EnumSet<ApplyResult> result) {
         IPart part = cableBus.getPart(location);
 
@@ -166,7 +190,7 @@ public record PartData(ItemStack partStack, NBTTagCompound data, String customNa
         }
     }
 
-    public void getRequiredItemsForExistingBlock(BlockPlacingContext context, TileCableBus cableBus, AEPartLocation location, EnumSet<ApplyResult> result) {
+    public void getRequiredItemsForExistingBlock(ManipulatorPlacingContext context, TileCableBus cableBus, AEPartLocation location, EnumSet<ApplyResult> result) {
         IPart part = cableBus.getPart(location);
 
         if (part != null) {
@@ -200,19 +224,18 @@ public record PartData(ItemStack partStack, NBTTagCompound data, String customNa
         }
     }
 
-    public void getRequiredItemsForNewBlock(BlockPlacingContext context) {
+    public void getRequiredItemsForNewBlock(ManipulatorPlacingContext context) {
         ItemStackWrapper toExtract = new ItemStackWrapper(partStack.copy());
 
         context.items().extract(toExtract);
 
         if (this.upgrades != null) {
-            this.upgrades.slots.forEach((slot, item) -> {
-                context.items().extract(new ItemStackWrapper(item));
-            });
+            this.upgrades.getRequiredItemsForNewBlock(context);
         }
     }
 
-    public static void removePart(BlockPlacingContext context, TileCableBus cableBus, AEPartLocation location,
+    public static void removePart(
+        ManipulatorPlacingContext context, TileCableBus cableBus, AEPartLocation location,
         EnumSet<ApplyResult> result, ApplyMode applyMode) {
         IPart part = cableBus.getPart(location);
 
@@ -254,7 +277,8 @@ public record PartData(ItemStack partStack, NBTTagCompound data, String customNa
         }
     }
 
-    public static void installPart(BlockPlacingContext context, TileCableBus cableBus, AEPartLocation location,
+    public static void installPart(
+        ManipulatorPlacingContext context, TileCableBus cableBus, AEPartLocation location,
         EnumSet<ApplyResult> result, ItemStack partStack, ApplyMode applyMode) {
         if (!cableBus.canAddPart(partStack, location)) {
             if (location != AEPartLocation.INTERNAL) {
@@ -303,6 +327,22 @@ public record PartData(ItemStack partStack, NBTTagCompound data, String customNa
 
                 result.add(ApplyResult.Error);
             }
+        }
+    }
+
+    @Override
+    public PartData clone() {
+        try {
+            PartData copy = (PartData) super.clone();
+
+            copy.partStack = copy.partStack.copy();
+            copy.data = copy.data == null ? null : copy.data.copy();
+            copy.upgrades = copy.upgrades.clone();
+            copy.config = copy.config.clone();
+
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
         }
     }
 }
