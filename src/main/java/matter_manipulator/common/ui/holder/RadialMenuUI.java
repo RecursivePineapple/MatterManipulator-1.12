@@ -1,4 +1,4 @@
-package matter_manipulator.common.ui;
+package matter_manipulator.common.ui.holder;
 
 import net.minecraft.item.ItemStack;
 
@@ -12,12 +12,13 @@ import matter_manipulator.client.gui.RadialMenuBuilder;
 import matter_manipulator.common.context.HeldManipulatorContextImpl;
 import matter_manipulator.common.items.ItemMatterManipulator;
 import matter_manipulator.common.state.MMState;
+import matter_manipulator.common.ui.factory.RadialMenuUIFactory.RadialMenuGuiData;
 import matter_manipulator.core.modes.ManipulatorMode;
 
-public class ManipulatorRadialMenuUI implements IGuiHolder<ManipulatorGuiData> {
+public class RadialMenuUI implements IGuiHolder<RadialMenuGuiData> {
 
     @Override
-    public ModularPanel buildUI(ManipulatorGuiData data, PanelSyncManager syncManager, UISettings settings) {
+    public ModularPanel buildUI(RadialMenuGuiData data, PanelSyncManager syncManager, UISettings settings) {
         ModularPanel panel = new ModularPanel("ManipulatorRadialMenu");
 
         panel.fullScreenInvisible();
@@ -28,7 +29,7 @@ public class ManipulatorRadialMenuUI implements IGuiHolder<ManipulatorGuiData> {
     }
 
     // spotless:off
-    private RadialMenu createMenu(ManipulatorGuiData data, PanelSyncManager syncManager, UISettings settings) {
+    private RadialMenu createMenu(RadialMenuGuiData data, PanelSyncManager syncManager, UISettings settings) {
         ItemStack heldStack = data.getManipulatorStack();
         MMState initialState = ItemMatterManipulator.getState(heldStack);
 
@@ -80,4 +81,5 @@ public class ManipulatorRadialMenuUI implements IGuiHolder<ManipulatorGuiData> {
                 })
             .done();
     }
+    // spotless:on
 }

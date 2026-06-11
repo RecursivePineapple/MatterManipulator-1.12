@@ -113,7 +113,7 @@ public class MMState {
         ioState.save = save;
     }
 
-    public Map<ResourceLocation, ManipulatorState> getResources(ManipulatorContext context) {
+    public Map<ResourceLocation, ManipulatorState> getStates(ManipulatorContext context) {
         if (resourceMap != null) return this.resourceMap;
 
         this.resourceMap = new Object2ObjectOpenHashMap<>();
@@ -129,7 +129,7 @@ public class MMState {
 
     public <L extends ManipulatorStateLoader<S>, S extends ManipulatorState> S getState(ManipulatorContext context, L loader) {
         //noinspection unchecked
-        return (S) getResources(context).get(loader.getResourceID());
+        return (S) getStates(context).get(loader.getResourceID());
     }
 
     @SuppressWarnings("rawtypes")

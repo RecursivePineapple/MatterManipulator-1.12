@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-import com.cleanroommc.modularui.factory.GuiManager;
 import matter_manipulator.common.blocks.BlockHint;
 import matter_manipulator.common.blocks.BlockUplinkCasing;
 import matter_manipulator.common.blocks.BlockUplinkController;
@@ -31,7 +30,10 @@ import matter_manipulator.common.items.ManipulatorTier;
 import matter_manipulator.common.items.RecipeInstallUpgrade;
 import matter_manipulator.common.keybind.MMKeybinds;
 import matter_manipulator.common.networking.MMNetwork;
-import matter_manipulator.common.ui.ManipulatorUIFactory;
+import matter_manipulator.common.ui.MMGuiTheme;
+import matter_manipulator.common.ui.factory.PlanEditUIFactory;
+import matter_manipulator.common.ui.factory.RadialMenuUIFactory;
+import matter_manipulator.common.ui.factory.UplinkUIFactory;
 import matter_manipulator.common.uplink.TileUplinkController;
 import matter_manipulator.common.uplink.TileUplinkEnergyConnector;
 import matter_manipulator.core.tooltip.MMTooltipManager;
@@ -63,8 +65,11 @@ public class CommonProxy {
 
         GlobalMMConfig.init();
         MMNetwork.init();
-        GuiManager.registerFactory(ManipulatorUIFactory.INSTANCE);
+        RadialMenuUIFactory.INSTANCE.register();
+        PlanEditUIFactory.INSTANCE.register();
+        UplinkUIFactory.INSTANCE.register();
         MMKeybinds.init();
+        MMGuiTheme.registerThemes();
 
         try {
             Class.forName("matter_manipulator.compat.InteropLoader").getMethod("preInit").invoke(null);

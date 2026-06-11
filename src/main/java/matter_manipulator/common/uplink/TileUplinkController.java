@@ -3,21 +3,25 @@ package matter_manipulator.common.uplink;
 import java.lang.ref.WeakReference;
 import java.time.Duration;
 import java.util.HashSet;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,14 +38,12 @@ import matter_manipulator.common.structure.StructureElement;
 import matter_manipulator.common.structure.StructureOverlord;
 import matter_manipulator.common.structure.StructureUtils;
 import matter_manipulator.common.structure.coords.ControllerRelativeCoords;
-import matter_manipulator.common.utils.MCUtils;
+import matter_manipulator.common.ui.factory.UplinkUIFactory;
 import matter_manipulator.common.utils.enums.ExtendedFacing;
 import matter_manipulator.common.utils.math.VoxelAABB;
 import matter_manipulator.core.context.StructureContext;
 import matter_manipulator.core.context.StructureInteractContext;
-import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.meta.MetaKey;
-import matter_manipulator.core.resources.ResourceStack;
 
 public class TileUplinkController extends TileEntity implements MultiblockController<TileUplinkController>, ITickable,
     Alignment, Uplink {
@@ -159,8 +161,7 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         @Override
         public boolean check(StructureContext<? extends TileUplinkController> context, BlockPos pos) {
             if (context.getWorld().getTileEntity(pos) instanceof TileUplinkModule module) {
-                context.getData().modules.add(module);
-                module.connect(context.getData());
+                context.getData().addModule(module);
                 return true;
             } else {
                 return false;
@@ -184,11 +185,14 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     private VoxelAABB aabb;
 
     private boolean structureDirty = true, formed = false;
+
     final HashSet<TileUplinkModule> modules = new HashSet<>();
 
     @Getter
     @Setter
-    private long address;
+    private long address = -1;
+
+    private final NonNullList<ItemStack> inventory = NonNullList.withSize(2, ItemStack.EMPTY);
 
     @Override
     public void onMachineUpdate(BlockPos pos) {
@@ -248,6 +252,10 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         this.aabb.origin.set(this.pos.getX(), this.pos.getY(), this.pos.getZ());
 
         if (!this.world.isRemote) {
+            if (address == -1) {
+                address = System.currentTimeMillis();
+            }
+
             UPLINKS.put(address, new WeakReference<>(this));
             StructureOverlord.get((WorldServer) this.world).addController(this);
         }
@@ -270,6 +278,11 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         }
 
         world.setBlockState(pos, CommonProxy.UPLINK_CONTROLLER.getDefaultState().withProperty(BlockUplinkController.STATE, state));
+    }
+
+    public void addModule(TileUplinkModule module) {
+        this.modules.add(module);
+        module.connect(this);
     }
 
     @Override
@@ -353,7 +366,19 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     }
 
     public void openUI(EntityPlayer player) {
+        if (player instanceof EntityPlayerMP playerMP) {
+            UplinkUIFactory.INSTANCE.open(playerMP, this);
+        }
+    }
 
+    public IItemHandlerModifiable getInventory() {
+        return new ItemStackHandler(inventory) {
+
+            @Override
+            protected void onContentsChanged(int slot) {
+                markDirty();
+            }
+        };
     }
 
     @Override
@@ -383,6 +408,15 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         super.writeToNBT(compound);
 
         compound.setString("facing", this.orientation.name());
+        compound.setLong("address", address);
+
+        if (!this.inventory.get(0).isEmpty()) {
+            compound.setTag("input", this.inventory.get(0).writeToNBT(new NBTTagCompound()));
+        }
+
+        if (!this.inventory.get(1).isEmpty()) {
+            compound.setTag("output", this.inventory.get(1).writeToNBT(new NBTTagCompound()));
+        }
 
         return compound;
     }
@@ -392,6 +426,15 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
         super.readFromNBT(compound);
 
         this.orientation = ExtendedFacing.valueOf(compound.getString("facing"));
+        this.address = compound.getLong("address");
+
+        if (compound.hasKey("input")) {
+            this.inventory.set(0, new ItemStack(compound.getCompoundTag("input")));
+        }
+
+        if (compound.hasKey("output")) {
+            this.inventory.set(1, new ItemStack(compound.getCompoundTag("output")));
+        }
     }
 
     @Override
@@ -433,14 +476,13 @@ public class TileUplinkController extends TileEntity implements MultiblockContro
     }
 
     @Override
-    public void createPlan(EntityPlayer submitter, String name, List<ResourceStack> requirements, boolean autoSubmit) {
+    public @org.jetbrains.annotations.Nullable UplinkPlanReceiver getPlanReceiver() {
         for (var module : modules) {
-            if (module instanceof UplinkPatternReceiver pattern) {
-                pattern.createPlan(submitter, name, requirements, autoSubmit);
-                return;
+            if (module instanceof UplinkPlanReceiver recv) {
+                return recv;
             }
         }
 
-        MCUtils.sendErrorToPlayer(submitter, new Localized("mm.chat.no-plan-module"));
+        return null;
     }
 }

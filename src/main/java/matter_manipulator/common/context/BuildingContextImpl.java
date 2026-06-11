@@ -124,7 +124,7 @@ public class BuildingContextImpl extends HeldManipulatorContextImpl implements M
             cost *= 0.5;
         }
 
-        for (ManipulatorState res : state.getResources(this).values()) {
+        for (ManipulatorState res : state.getStates(this).values()) {
             if (res instanceof EnergyManipulatorState energy) {
                 cost -= energy.extract(cost);
 
@@ -152,7 +152,7 @@ public class BuildingContextImpl extends HeldManipulatorContextImpl implements M
             cost *= 0.5;
         }
 
-        for (ManipulatorState res : state.getResources(this).values()) {
+        for (ManipulatorState res : state.getStates(this).values()) {
             if (res instanceof EnergyManipulatorState energy) {
                 cost -= energy.extract(cost);
 

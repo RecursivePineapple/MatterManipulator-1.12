@@ -42,7 +42,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.Nullable;
 
 import com.cleanroommc.modularui.api.IGuiHolder;
-import com.cleanroommc.modularui.factory.GuiManager;
 import com.cleanroommc.modularui.screen.ModularPanel;
 import com.cleanroommc.modularui.screen.UISettings;
 import com.cleanroommc.modularui.value.sync.PanelSyncManager;
@@ -54,9 +53,9 @@ import matter_manipulator.common.context.HeldManipulatorContextImpl;
 import matter_manipulator.common.context.StackManipulatorContextImpl;
 import matter_manipulator.common.networking.MMAction;
 import matter_manipulator.common.state.MMState;
-import matter_manipulator.common.ui.ManipulatorGuiData;
-import matter_manipulator.common.ui.ManipulatorRadialMenuUI;
-import matter_manipulator.common.ui.ManipulatorUIFactory;
+import matter_manipulator.common.ui.factory.RadialMenuUIFactory.RadialMenuGuiData;
+import matter_manipulator.common.ui.holder.RadialMenuUI;
+import matter_manipulator.common.ui.factory.RadialMenuUIFactory;
 import matter_manipulator.common.utils.MCUtils;
 import matter_manipulator.core.building.Buildable;
 import matter_manipulator.core.i18n.Localized;
@@ -71,7 +70,7 @@ import mcp.MethodsReturnNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ItemMatterManipulator extends Item implements IGuiHolder<ManipulatorGuiData> {
+public class ItemMatterManipulator extends Item implements IGuiHolder<RadialMenuGuiData> {
 
     public final ManipulatorTier tier;
 
@@ -102,7 +101,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
         double capacity = 0;
         double stored = 0;
 
-        for (var e : state.getResources(context).values()) {
+        for (var e : state.getStates(context).values()) {
             if (e instanceof EnergyManipulatorState energy) {
                 stored += energy.getStored();
                 capacity += energy.getCapacity();
@@ -200,7 +199,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
             }
         }
 
-        var resources = new ArrayList<>(state.getResources(context).entrySet());
+        var resources = new ArrayList<>(state.getStates(context).entrySet());
 
         resources.sort(Comparator.comparing(e -> e.getKey().toString()));
 
@@ -233,7 +232,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
                 player.setActiveHand(hand);
             } else {
                 if (player instanceof EntityPlayerMP playerMP) {
-                    GuiManager.open(ManipulatorUIFactory.INSTANCE, new ManipulatorGuiData(playerMP, hand), playerMP);
+                    RadialMenuUIFactory.INSTANCE.open(playerMP, hand);
                 }
             }
         }
@@ -398,8 +397,8 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
     }
 
     @Override
-    public ModularPanel buildUI(ManipulatorGuiData data, PanelSyncManager syncManager, UISettings settings) {
-        return new ManipulatorRadialMenuUI().buildUI(data, syncManager, settings);
+    public ModularPanel buildUI(RadialMenuGuiData data, PanelSyncManager syncManager, UISettings settings) {
+        return new RadialMenuUI().buildUI(data, syncManager, settings);
     }
 
     @Override
@@ -412,7 +411,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
 
                 StackManipulatorContextImpl context = new StackManipulatorContextImpl(stack, state);
 
-                for (var e : state.getResources(context).values()) {
+                for (var e : state.getStates(context).values()) {
                     if (e.hasCapability(capability, facing)) return true;
                 }
 
@@ -425,7 +424,7 @@ public class ItemMatterManipulator extends Item implements IGuiHolder<Manipulato
 
                 StackManipulatorContextImpl context = new StackManipulatorContextImpl(stack, state);
 
-                for (var e : state.getResources(context).values()) {
+                for (var e : state.getStates(context).values()) {
                     if (e.hasCapability(capability, facing)) {
                         return e.getCapability(capability, facing);
                     }

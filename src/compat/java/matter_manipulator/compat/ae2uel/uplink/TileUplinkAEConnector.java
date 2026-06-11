@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -55,20 +54,20 @@ import com.google.common.collect.ImmutableSet;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.items.MMItemList;
 import matter_manipulator.common.uplink.TileUplinkModule;
-import matter_manipulator.common.uplink.UplinkPatternReceiver;
+import matter_manipulator.common.uplink.UplinkPlanReceiver;
+import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.common.utils.MCUtils;
+import matter_manipulator.core.fluid.FluidStackLike;
 import matter_manipulator.core.i18n.Localized;
-import matter_manipulator.core.resources.ResourceStack;
-import matter_manipulator.core.resources.fluid.FluidResourceStack;
-import matter_manipulator.core.resources.item.ItemResourceStack;
+import matter_manipulator.core.item.ItemStackLike;
+import matter_manipulator.core.planning.BuildPlan;
 
-public class TileUplinkAEConnector extends TileUplinkModule implements IGridProxyable, IGridHost, UplinkPatternReceiver, ICraftingProvider, ICraftingRequester, IPowerChannelState, ITickable {
+public class TileUplinkAEConnector extends TileUplinkModule implements IGridProxyable, IGridHost, UplinkPlanReceiver, ICraftingProvider, ICraftingRequester, IPowerChannelState, ITickable {
 
     protected IActionSource requestSource = null;
     protected AENetworkProxy gridProxy = null;
 
-    private final List<ManipulatorRequest> manualRequests = new ArrayList<>();
-    private final List<ManipulatorRequest> autoRequests = new ArrayList<>();
+    private final List<ManipulatorRequest> requests = new ArrayList<>();
 
     /**
      * Stored items that are being pushed to the ME network.
@@ -80,24 +79,6 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
     private NBTTagCompound deferredProxyTag;
 
     public TileUplinkAEConnector() {}
-
-    public void saveRequests(NBTTagCompound tag) {
-        NBTTagList auto = new NBTTagList();
-
-        for (ManipulatorRequest request : autoRequests) {
-            auto.appendTag(request.writeToNBT(new NBTTagCompound()));
-        }
-
-        tag.setTag("auto", auto);
-
-        NBTTagList manual = new NBTTagList();
-
-        for (ManipulatorRequest request : manualRequests) {
-            manual.appendTag(request.writeToNBT(new NBTTagCompound()));
-        }
-
-        tag.setTag("manual", manual);
-    }
 
     @Override
     public @NotNull NBTTagCompound writeToNBT(@NotNull NBTTagCompound tag) {
@@ -113,7 +94,13 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
             tag.setTag("items", pendingItems);
         }
 
-        saveRequests(tag);
+        NBTTagList req = new NBTTagList();
+
+        for (ManipulatorRequest request : requests) {
+            req.appendTag(request.writeToNBT(new NBTTagCompound()));
+        }
+
+        tag.setTag("requests", req);
 
         getProxy().writeToNBT(tag);
 
@@ -132,19 +119,13 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
             }
         }
 
-        autoRequests.clear();
-        manualRequests.clear();
+        requests.clear();
 
-        for (NBTTagCompound request : MCUtils.getCompoundTagList(tag, "auto")) {
-            autoRequests.add(ManipulatorRequest.readFromNBT(this, request));
+        for (NBTTagCompound request : MCUtils.getCompoundTagList(tag, "requests")) {
+            requests.add(ManipulatorRequest.readFromNBT(this, request));
         }
 
-        for (NBTTagCompound request : MCUtils.getCompoundTagList(tag, "manual")) {
-            manualRequests.add(ManipulatorRequest.readFromNBT(this, request));
-        }
-
-        autoRequests.remove(null);
-        manualRequests.remove(null);
+        requests.remove(null);
 
         deferredProxyTag = tag;
     }
@@ -212,7 +193,7 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
     public ImmutableSet<ICraftingLink> getRequestedJobs() {
         ImmutableSet.Builder<ICraftingLink> jobs = ImmutableSet.builder();
 
-        for (ManipulatorRequest request : autoRequests) {
+        for (ManipulatorRequest request : requests) {
             if (request.link != null) jobs.add(request.link);
         }
 
@@ -230,12 +211,12 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
     }
 
     @Override
-    public void createPlan(EntityPlayer submitter, String name, List<ResourceStack> requirements, boolean autoSubmit) {
+    public void addPlan(BuildPlan plan) {
         List<ItemStack> items = new ArrayList<>();
 
-        for (var stack : requirements) {
-            if (stack instanceof ItemResourceStack item) {
-                long l = ResourceStack.getStackAmount(stack);
+        for (var e : plan.required.object2LongEntrySet()) {
+            if (e.getKey() instanceof ItemStackLike item) {
+                long l = e.getLongValue();
 
                 while (l > 0) {
                     ItemStack split = item.toStack((int) Math.min(l, Integer.MAX_VALUE));
@@ -248,44 +229,53 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
                 continue;
             }
 
-            if (stack instanceof FluidResourceStack fluid) {
+            if (e.getKey() instanceof FluidStackLike fluid) {
                 // TODO: fluids
             }
 
-            MCUtils.sendInfoToPlayer(submitter, new Localized("mm.info.invalid_ae_stack", stack.getName()));
+            EntityPlayer player = plan.getPlayer(world.getMinecraftServer());
+
+            if (player != null) {
+                MCUtils.sendInfoToPlayer(player, new Localized("mm.info.invalid_ae_stack", e.getKey().getName()));
+            }
         }
 
-        if (autoSubmit) {
-            autoRequests.add(new ManipulatorRequest(submitter.getGameProfile().getId(), name, items));
-        } else {
-            manualRequests.add(new ManipulatorRequest(submitter.getGameProfile().getId(), name, items));
-        }
-
+        requests.add(new ManipulatorRequest(plan, items));
         onRequestsChanged();
     }
 
     @Override
-    public int getAutoPlanCount() {
-        return autoRequests.size();
+    public List<BuildPlan> getPlans() {
+        return DataUtils.mapToList(requests, r -> r.plan);
     }
 
     @Override
-    public int getManualPlanCount() {
-        return manualRequests.size();
+    public void deletePlan(BuildPlan plan) {
+        requests.removeIf(req -> {
+            if (req.plan == plan) {
+                if (req.link != null) {
+                    req.link.cancel();
+
+                    EntityPlayer player = req.plan.getPlayer(world.getMinecraftServer());
+                    if (player != null) {
+                        MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.craft_failed", req.plan.name));
+                    }
+                }
+
+                if (req.job != null) {
+                    req.job.cancel(false);
+                }
+
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 
     @Override
     public void provideCrafting(ICraftingProviderHelper craftingTracker) {
-        for (ManipulatorRequest request : manualRequests) {
-            try {
-                PatternHelper pattern = new PatternHelper(request.getPattern(), world);
-                craftingTracker.addCraftingOption(this, pattern);
-            } catch (IllegalStateException e) {
-                MatterManipulator.LOG.error("Could not load matter manipulator plan", e);
-            }
-        }
-
-        for (ManipulatorRequest request : autoRequests) {
+        for (ManipulatorRequest request : requests) {
             try {
                 PatternHelper pattern = new PatternHelper(request.getPattern(), world);
                 craftingTracker.addCraftingOption(this, pattern);
@@ -339,19 +329,21 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
 
         IAEItemStack hologram = pattern.getCondensedOutputs()[0];
 
-        Iterator<ManipulatorRequest> iter = autoRequests.iterator();
+        Iterator<ManipulatorRequest> iter = requests.iterator();
 
         while (iter.hasNext()) {
             ManipulatorRequest request = iter.next();
+
+            if (!request.plan.autoSubmit) continue;
 
             if (hologram.isSameType(request.hologram)) {
                 if (request.link != null) {
                     request.link.cancel();
 
-                    EntityPlayer player = MCUtils.getPlayerById(world, request.requester);
+                    EntityPlayer player = request.plan.getPlayer(world.getMinecraftServer());
 
                     if (player != null) {
-                        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.craft_finished", request.requestName));
+                        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.craft_finished", request.plan.name));
                     }
                 }
 
@@ -382,7 +374,7 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
         if (tickCounter++ % 20 == 0) {
             boolean isActive = isActive();
 
-            if (isActive && !autoRequests.isEmpty()) {
+            if (isActive && !requests.isEmpty()) {
                 pollRequests();
             }
 
@@ -390,69 +382,18 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
         }
     }
 
-    public void onScrewdriverRightClick(EntityPlayer aPlayer, float aX, float aY, float aZ, ItemStack aTool) {
-        for (var req : autoRequests) {
-            if (req.link != null) {
-                req.link.cancel();
-            }
-
-            if (req.job != null) {
-                req.job.cancel(false);
-            }
-        }
-
-        autoRequests.clear();
-        manualRequests.clear();
-
-        onRequestsChanged();
-
-        MCUtils.sendInfoToPlayer(aPlayer, new Localized("mm.info.cleared_all_plans_and_pending_jobs"));
-    }
-
-    public void clearManualPlans(EntityPlayer player) {
-        manualRequests.removeIf(request -> request.requester.equals(player.getGameProfile().getId()));
-
-        onRequestsChanged();
-
-        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.cleared_your_manual_plans"));
-    }
-
-    public void cancelAutoPlans(EntityPlayer player) {
-        Iterator<ManipulatorRequest> iter = autoRequests.iterator();
-
-        while (iter.hasNext()) {
-            ManipulatorRequest req = iter.next();
-
-            if (!req.requester.equals(player.getGameProfile().getId())) {
-                continue;
-            }
-
-            if (req.link != null) {
-                req.link.cancel();
-            }
-
-            if (req.job != null) {
-                req.job.cancel(false);
-            }
-
-            iter.remove();
-        }
-
-        onRequestsChanged();
-
-        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.cleared_your_plans_and_craft"));
-    }
-
     private void pollRequests() {
-        Iterator<ManipulatorRequest> iter = autoRequests.iterator();
+        Iterator<ManipulatorRequest> iter = requests.iterator();
 
         while (iter.hasNext()) {
             ManipulatorRequest request = iter.next();
 
+            if (!request.plan.autoSubmit) continue;
+
             if (!request.poll()) {
-                EntityPlayer player = MCUtils.getPlayerById(world, request.requester);
+                EntityPlayer player = request.plan.getPlayer(world.getMinecraftServer());
                 if (player != null) {
-                    MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.craft_failed", request.requestName));
+                    MCUtils.sendErrorToPlayer(player, new Localized("mm.info.error.craft_failed", request.plan.name));
                 }
                 iter.remove();
                 onRequestsChanged();
@@ -509,8 +450,7 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
 
     private class ManipulatorRequest {
 
-        public final UUID requester;
-        public final String requestName;
+        public final BuildPlan plan;
         public final List<ItemStack> requiredItems;
         public final ItemStack hologram;
 
@@ -519,32 +459,31 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
 
         private static int counter;
 
-        public ManipulatorRequest(UUID requester, String requestName, List<ItemStack> requiredItems) {
-            this.requester = requester;
-            this.requestName = requestName;
+        public ManipulatorRequest(BuildPlan plan, List<ItemStack> requiredItems) {
+            this.plan = plan;
             this.requiredItems = requiredItems;
 
             hologram = MMItemList.Hologram.toStack(1);
-            hologram.setStackDisplayName(TextFormatting.RESET + requestName);
+            hologram.setStackDisplayName(TextFormatting.RESET + plan.name);
 
             // add a random number so that holograms with the same name are still different
             hologram.getTagCompound().setInteger("discriminator", counter++);
         }
 
-        private ManipulatorRequest(UUID requester, String requestName, List<ItemStack> requiredItems, ICraftingLink link) {
-            this.requester = requester;
-            this.requestName = requestName;
+        private ManipulatorRequest(BuildPlan plan, List<ItemStack> requiredItems, ICraftingLink link) {
+            this.plan = plan;
             this.requiredItems = requiredItems;
             this.link = link;
 
             hologram = MMItemList.Hologram.toStack(1);
-            hologram.setStackDisplayName(TextFormatting.RESET + requestName);
+            hologram.setStackDisplayName(TextFormatting.RESET + plan.name);
+
+            // add a random number so that holograms with the same name are still different
+            hologram.getTagCompound().setInteger("discriminator", counter++);
         }
 
         public NBTTagCompound writeToNBT(NBTTagCompound tag) {
-            tag.setLong("r1", requester.getMostSignificantBits());
-            tag.setLong("r2", requester.getLeastSignificantBits());
-            tag.setString("rn", requestName);
+            tag.setTag("plan", BuildPlan.writeToTag(plan));
 
             if (link != null) {
                 NBTTagCompound linkTag = new NBTTagCompound();
@@ -564,8 +503,8 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
         }
 
         public static ManipulatorRequest readFromNBT(TileUplinkAEConnector hatch, NBTTagCompound tag) {
-            UUID requester = new UUID(tag.getLong("r1"), tag.getLong("r2"));
-            String requestName = tag.getString("rn");
+            BuildPlan plan = BuildPlan.readFromTag(tag.getCompoundTag("plan"));
+
             ICraftingLink link = null;
 
             if (tag.hasKey("link")) {
@@ -582,12 +521,13 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
 
             if (requiredItems.isEmpty()) return null;
 
-            return hatch.new ManipulatorRequest(requester, requestName, requiredItems, link);
+            return hatch.new ManipulatorRequest(plan, requiredItems, link);
         }
 
-        /**
-         * Check the job future and crafting link. If the job future has finished, submit the plan. If the crafting link was cancelled, tell the hatch to remove this request. The crafting job will never actually get completed. It gets cancelled and this request is removed when the fake pattern is pushed.
-         */
+        /// Check the job future and crafting link. If the job future has finished, submit the plan.
+        /// If the crafting link was cancelled, tell the hatch to remove this request.
+        /// The crafting job will never actually get completed. It gets cancelled and this request is removed when the
+        /// fake pattern is pushed.
         boolean poll() {
             if (!isActive()) return true;
 
@@ -621,10 +561,10 @@ public class TileUplinkAEConnector extends TileUplinkModule implements IGridProx
 
                     if (link == null) return false;
 
-                    EntityPlayer player = MCUtils.getPlayerById(TileUplinkAEConnector.this.world, requester);
+                    EntityPlayer player = plan.getPlayer(TileUplinkAEConnector.this.world.getMinecraftServer());
 
                     if (player != null) {
-                        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.submitted_job", requestName));
+                        MCUtils.sendInfoToPlayer(player, new Localized("mm.info.submitted_job", plan.name));
                     }
                 }
             } catch (final InterruptedException | ExecutionException e) {

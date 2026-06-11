@@ -30,6 +30,7 @@ import matter_manipulator.common.modes.PasteableMode;
 import matter_manipulator.common.modes.ResettableMode;
 import matter_manipulator.common.modes.copying.CopyingConfig.PendingAction;
 import matter_manipulator.common.networking.MMPacketBuffer;
+import matter_manipulator.common.ui.factory.PlanEditUIFactory;
 import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.common.utils.math.Location;
 import matter_manipulator.common.utils.math.Transform;
@@ -147,18 +148,25 @@ public class CopyingManipulatorMode
                 .option()
                     .label(IKey.lang("mm.gui.clear_plans"))
                     .onClicked(() -> {
+                        if (!context.isRemote()) {
+                            PlanEditUIFactory.INSTANCE.open(context);
+                        }
                     })
                 .done()
                 .option()
                     .label(IKey.lang("mm.gui.plan_all_auto"))
                     .onClicked(() -> {
-                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                        if (!context.isRemote()) {
+                            CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                        }
                     })
                 .done()
                 .option()
                     .label(IKey.lang("mm.gui.plan_all_manual"))
                     .onClicked(() -> {
-                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                        if (!context.isRemote()) {
+                            CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, true));
+                        }
                     })
                 .done()
                 .option()
@@ -169,13 +177,17 @@ public class CopyingManipulatorMode
                 .option()
                     .label(IKey.lang("mm.gui.plan_missing_manual"))
                     .onClicked(() -> {
-                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                        if (!context.isRemote()) {
+                            CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                        }
                     })
                 .done()
                 .option()
                     .label(IKey.lang("mm.gui.plan_missing_auto"))
                     .onClicked(() -> {
-                        CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                        if (!context.isRemote()) {
+                            CoroutineExecutor.SERVER.schedule(BuildPlan.createPlan(context, false));
+                        }
                     })
                 .done()
             .done();
@@ -194,17 +206,6 @@ public class CopyingManipulatorMode
 
             if (result.isPresent()) {
                 return result;
-            }
-        } else {
-            var hit = context.getHitResult();
-
-            if (hit != null) {
-                config.action = PendingAction.MARK_COPY_A;
-                config.copyA = null;
-                config.copyB = null;
-                config.paste = null;
-
-                return config.action.process(config, context, false);
             }
         }
 
