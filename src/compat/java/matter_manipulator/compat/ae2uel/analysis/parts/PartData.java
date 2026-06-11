@@ -337,8 +337,8 @@ public class PartData implements Cloneable {
 
             copy.partStack = copy.partStack.copy();
             copy.data = copy.data == null ? null : copy.data.copy();
-            copy.upgrades = copy.upgrades.clone();
-            copy.config = copy.config.clone();
+            copy.upgrades = copy.upgrades != null ? copy.upgrades.clone() : null;
+            copy.config = copy.config != null ? copy.config.clone() : null;
 
             return copy;
         } catch (CloneNotSupportedException e) {

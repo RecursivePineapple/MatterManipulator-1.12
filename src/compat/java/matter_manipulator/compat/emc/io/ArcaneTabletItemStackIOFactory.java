@@ -17,6 +17,8 @@ public class ArcaneTabletItemStackIOFactory implements ResourceIOFactory<ItemSta
 
         var state = ArcaneTabletState.fromPlayer(player);
 
+        if (state == null) return Optional.empty();
+
         return Optional.of(new ArcaneTabletItemStackIO(state));
     }
 }
