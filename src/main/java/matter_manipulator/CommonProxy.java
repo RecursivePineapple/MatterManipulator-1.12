@@ -36,6 +36,7 @@ import matter_manipulator.common.ui.factory.RadialMenuUIFactory;
 import matter_manipulator.common.ui.factory.UplinkUIFactory;
 import matter_manipulator.common.uplink.TileUplinkController;
 import matter_manipulator.common.uplink.TileUplinkEnergyConnector;
+import matter_manipulator.core.i18n.Localized;
 import matter_manipulator.core.tooltip.MMTooltipManager;
 
 public class CommonProxy {
@@ -70,6 +71,7 @@ public class CommonProxy {
         UplinkUIFactory.INSTANCE.register();
         MMKeybinds.init();
         MMGuiTheme.registerThemes();
+        Localized.init();
 
         try {
             Class.forName("matter_manipulator.compat.InteropLoader").getMethod("preInit").invoke(null);

@@ -22,6 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.MessageToMessageCodec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import matter_manipulator.MatterManipulator;
 import matter_manipulator.Tags;
 
 @SuppressWarnings("unused")
@@ -52,6 +53,11 @@ public class MMNetwork extends MessageToMessageCodec<FMLProxyPacket, MMPacket> {
 
         MMPacketEncoder<MMPacket> encoder = this.encoders.get(packet.getPacketID());
 
+        if (encoder == null) {
+            MatterManipulator.LOG.error("Cannot encode message {} because it is not registered", packet.getPacketID(), new Exception());
+            return;
+        }
+
         buffer.writeResourceLocation(packet.getPacketID());
         encoder.writePacket(buffer, packet);
 
@@ -70,6 +76,11 @@ public class MMNetwork extends MessageToMessageCodec<FMLProxyPacket, MMPacket> {
         ResourceLocation loc = buffer.readResourceLocation();
 
         MMPacketEncoder<MMPacket> encoder = this.encoders.get(loc);
+
+        if (encoder == null) {
+            MatterManipulator.LOG.error("Cannot decode message {} because it is not registered", loc, new Exception());
+            return;
+        }
 
         MMPacket packet = encoder.readPacket(buffer);
 

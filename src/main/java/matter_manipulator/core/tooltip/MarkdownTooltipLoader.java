@@ -13,6 +13,7 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.Language;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -197,9 +198,11 @@ public class MarkdownTooltipLoader {
 
     public static String getCurrentLanguage() {
         if (MCUtils.isClientThread()) {
-            return Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage().getLanguageCode();
+            Language currentLanguage = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
+            //noinspection ConstantValue
+            return currentLanguage == null ? "en_us" : currentLanguage.getLanguageCode();
         } else {
-            return "en_US";
+            return "en_us";
         }
     }
 

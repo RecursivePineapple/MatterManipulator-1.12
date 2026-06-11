@@ -88,6 +88,10 @@ public class Localized {
         this.args = args.toArray(new Object[0]);
     }
 
+    public static void init() {
+        // loads the class
+    }
+
     /**
      * Sets the base colour for this entry. Does not clobber the previous style, if the output of
      * {@link #localize(ArgProcessor)} is ran through {@link MCUtils#processFormatStacks(String)}.

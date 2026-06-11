@@ -10,15 +10,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.resource.ISelectiveResourceReloadListener;
 import net.minecraftforge.client.resource.VanillaResourceType;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import matter_manipulator.MatterManipulator;
 import matter_manipulator.common.utils.DataUtils;
 import matter_manipulator.core.item.ItemId;
 
-@EventBusSubscriber
+@EventBusSubscriber(Side.CLIENT)
 public class MMTooltipManager {
 
     private static final Object2ObjectOpenCustomHashMap<ItemStack, TooltipSupplier> TOOLTIPS = new Object2ObjectOpenCustomHashMap<>(ItemId.STACK_ITEM_META_NBT_STRATEGY);
@@ -73,12 +76,19 @@ public class MMTooltipManager {
         }
     }
 
-    static {
+    @SideOnly(Side.CLIENT)
+    private static void registerReloadHook() {
         ((IReloadableResourceManager) Minecraft.getMinecraft()
             .getResourceManager()).registerReloadListener((ISelectiveResourceReloadListener) (resourceManager, resourcePredicate) -> {
             if (!resourcePredicate.test(VanillaResourceType.LANGUAGES)) return;
 
             TOOLTIPS.values().forEach(TooltipSupplier::onResourcesReloaded);
         });
+    }
+
+    static {
+        if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
+            registerReloadHook();
+        }
     }
 }

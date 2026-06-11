@@ -11,6 +11,7 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +43,7 @@ public class RadialMenu extends Widget<RadialMenu> implements Interactable {
     public IDrawable innerIcon;
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void draw(ModularGuiContext context, WidgetThemeEntry<?> widgetTheme) {
         Minecraft.getMinecraft().profiler.startSection("radial menu");
 
@@ -176,6 +178,7 @@ public class RadialMenu extends Widget<RadialMenu> implements Interactable {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public @NotNull Result onMousePressed(int mouseButton) {
         Vector2d mouse = getMousePosition();
         double mouseRadius = mouse.x;
