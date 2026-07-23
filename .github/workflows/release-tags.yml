@@ -89,7 +89,7 @@ jobs:
           else
             echo "Generating changelog notes..."
             export "CHANGELOG_FILE=$(mktemp --suffix=.md)"
-            git log $(git describe --abbrev=0 --tags $(git rev-parse ${RELEASE_VERSION}~1))..${RELEASE_VERSION} --pretty='%h %s (%an, %ah)' > "${CHANGELOG_FILE}"
+            git log $(git describe --abbrev=0 --tags $(git rev-parse ${RELEASE_VERSION}~1))..${RELEASE_VERSION} --pretty='%h %s (%an, %ad)' --date=format:'%Y-%m-%d %H:%M' > "${CHANGELOG_FILE}"
           fi
           cat "${CHANGELOG_FILE}"
           gh release create "${RELEASE_VERSION}" -F "${CHANGELOG_FILE}" ${PRERELEASE_FLAG} ./build/libs/*.jar
