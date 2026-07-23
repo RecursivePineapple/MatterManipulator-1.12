@@ -7,6 +7,7 @@ import com.github.bsideup.jabel.Desugar;
 import com.latmod.mods.projectex.integration.PersonalEMC;
 import com.latmod.mods.projectex.item.ItemArcaneTablet;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
+import matter_manipulator.common.utils.MathUtils;
 import matter_manipulator.compat.util.InvSlotHandle;
 import matter_manipulator.core.item.ItemId;
 import moze_intel.projecte.api.ProjectEAPI;
@@ -77,7 +78,7 @@ public record ArcaneTabletState(InvSlotHandle tablet, IKnowledgeProvider knowled
 
         if (value == 0) return false;
 
-        knowledge.setEmc(knowledge.getEmc() + value * amount);
+        knowledge.setEmc(MathUtils.addSafe(knowledge.getEmc(), value * amount));
 
         return true;
     }

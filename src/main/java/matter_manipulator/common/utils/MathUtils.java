@@ -118,6 +118,20 @@ public class MathUtils {
         return (lhs + rhs - 1) / rhs;
     }
 
+    public static long addSafe(long a, long b) {
+        long result = a + b;
+
+        if (a > 0 && b > 0 && result <= 0) {
+            return Long.MAX_VALUE;
+        }
+
+        if (a < 0 && b < 0 && result >= 0) {
+            return Long.MIN_VALUE;
+        }
+
+        return result;
+    }
+
     public static int signum(int i) {
         return Integer.compare(i, 0);
     }
